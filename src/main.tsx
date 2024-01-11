@@ -13,7 +13,7 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import axios from "axios";
 import ReactDOM from "react-dom/client";
 
-import "./styles/main.css";
+import "./styles/tailwind.css";
 
 type PostType = {
   id: string;
