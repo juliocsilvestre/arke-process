@@ -3,10 +3,9 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 export const AuthLayout = () => {
   return (
-    <div className="bg-white text-purple">
-      <h1>Auth</h1>
+    <main className="h-svh w-dvw bg-primary text-purple">
       <Outlet />
       <TanStackRouterDevtools position="bottom-right" />
-    </div>
+    </main>
   )
 }
