@@ -6,43 +6,34 @@ import { TestDashboard } from './components/TestDashboard'
 
 const rootRoute = new RootRoute()
 
-// const layoutRoute = new Route({
-//   getParentRoute: () => rootRoute,
-//   id: 'layout',
-// })
-
-const authLayoutRoute = new Route({
+const authLayout = new Route({
   getParentRoute: () => rootRoute,
   component: AuthLayout,
   id: 'auth-layout',
 })
 
 const authRoute = new Route({
-  getParentRoute: () => authLayoutRoute,
+  getParentRoute: () => authLayout,
   component: Auth,
   path: '/',
 })
 
-const dashboardLayoutRoute = new Route({
+const dashboardLayout = new Route({
   getParentRoute: () => rootRoute,
   component: DashboardLayout,
   id: 'dashboard-layout',
 })
 
 const dashboardRoute = new Route({
-  getParentRoute: () => dashboardLayoutRoute,
+  getParentRoute: () => dashboardLayout,
   component: TestDashboard,
   path: '/dashboard',
 })
 
-const routeConfig = rootRoute.addChildren([
-  authLayoutRoute.addChildren([authRoute]),
-  dashboardLayoutRoute.addChildren([dashboardRoute]),
+const routeTree = rootRoute.addChildren([
+  authLayout.addChildren([authRoute]),
+  dashboardLayout.addChildren([dashboardRoute]),
 ])
-
-// const indexRoute = new Route({ getParentRoute: () => rootRoute, path: '/', component: Test})
-
-const routeTree = routeConfig
 
 export const router = new Router({ routeTree, defaultPreload: 'intent', defaultStaleTime: 5000 })
 

@@ -3,7 +3,7 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 export const AuthLayout = () => {
   return (
-    <div className="bg-gradient-to-r from-green-700 to-lime-600 text-white">
+    <div className="bg-white text-purple">
       <h1>Auth</h1>
       <Outlet />
       <TanStackRouterDevtools position="bottom-right" />

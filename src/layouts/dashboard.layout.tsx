@@ -3,8 +3,8 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
 export const DashboardLayout = () => {
   return (
-    <div className="bg-gradient-to-r from-green-700 to-lime-600 text-white">
-      <aside className="bg-gradient-to-r from-red-700 to-lime-600 text-white">
+    <div className="flex">
+      <aside className="bg-black text-white w-40 flex justify-center items-center">
         <h1>Dashboard</h1>
       </aside>
       <Outlet />
