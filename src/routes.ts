@@ -1,8 +1,10 @@
 import { RootRoute, Route, Router } from '@tanstack/react-router'
-import { AuthLayout } from './layouts/auth.layout'
-import { Auth } from './components/Test'
-import { DashboardLayout } from './layouts/dashboard.layout'
-import { TestDashboard } from './components/TestDashboard'
+
+import { AuthLayout } from '@layouts/auth.layout'
+import { DashboardLayout } from '@layouts/dashboard.layout'
+
+import { Auth } from '@components/Test'
+import { TestDashboard } from '@components/TestDashboard'
 
 const rootRoute = new RootRoute()
 
@@ -12,16 +14,16 @@ const authLayout = new Route({
   id: 'auth-layout',
 })
 
-const authRoute = new Route({
-  getParentRoute: () => authLayout,
-  component: Auth,
-  path: '/',
-})
-
 const dashboardLayout = new Route({
   getParentRoute: () => rootRoute,
   component: DashboardLayout,
   id: 'dashboard-layout',
+})
+
+const authRoute = new Route({
+  getParentRoute: () => authLayout,
+  component: Auth,
+  path: '/',
 })
 
 const dashboardRoute = new Route({
