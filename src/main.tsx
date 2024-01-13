@@ -1,6 +1,7 @@
 import { RouterProvider } from '@tanstack/react-router'
 import ReactDOM from 'react-dom/client'
 
+import '@styles/globals.css'
 import '@styles/tailwind.css'
 
 import { router } from './routes'
