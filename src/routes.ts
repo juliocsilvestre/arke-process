@@ -5,19 +5,26 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 
 import { Auth } from '@components/Test'
 import { TestDashboard } from '@components/TestDashboard'
+import { PublicLayout } from './layouts/public.layout'
 
 const rootRoute = new RootRoute()
 
 const authLayout = new Route({
+  id: 'auth-layout',
   getParentRoute: () => rootRoute,
   component: AuthLayout,
-  id: 'auth-layout',
 })
 
 const dashboardLayout = new Route({
+  id: 'dashboard-layout',
   getParentRoute: () => rootRoute,
   component: DashboardLayout,
-  id: 'dashboard-layout',
+})
+
+const publicLayout = new Route({
+  id: 'public-layout',
+  getParentRoute: () => rootRoute,
+  component: PublicLayout,
 })
 
 const authRoute = new Route({
@@ -32,9 +39,16 @@ const dashboardRoute = new Route({
   path: '/dashboard',
 })
 
+const publicRoute = new Route({
+  getParentRoute: () => publicLayout,
+  component: TestDashboard,
+  path: '/public',
+})
+
 const routeTree = rootRoute.addChildren([
   authLayout.addChildren([authRoute]),
   dashboardLayout.addChildren([dashboardRoute]),
+  publicLayout.addChildren([publicRoute]),
 ])
 
 export const router = new Router({ routeTree, defaultPreload: 'intent', defaultStaleTime: 5000 })
