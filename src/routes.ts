@@ -3,7 +3,7 @@ import { RootRoute, Route, Router } from '@tanstack/react-router'
 import { AuthLayout } from '@layouts/auth.layout'
 import { DashboardLayout } from '@layouts/dashboard.layout'
 
-import { Auth } from '@components/Test'
+import { Playground } from '@/components/Playground'
 import { TestDashboard } from '@components/TestDashboard'
 import { PublicLayout } from './layouts/public.layout'
 
@@ -29,7 +29,7 @@ const publicLayout = new Route({
 
 const authRoute = new Route({
   getParentRoute: () => authLayout,
-  component: Auth,
+  component: Playground,
   path: '/',
 })
 
