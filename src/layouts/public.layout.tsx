@@ -1,3 +1,4 @@
+import { Footer } from '@/components/footer/Footer'
 import { Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
@@ -10,7 +11,7 @@ export const PublicLayout = (): JSX.Element => {
       </aside>
       <Outlet />
       <TanStackRouterDevtools position="bottom-right" />
-      {/* TODO: Add public footer */}
+      <Footer />
     </main>
   )
 }
