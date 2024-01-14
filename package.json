@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "format": "bunx @biomejs/biome format --write ./src",
     "lint": "bun biome lint . --apply-unsafe",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@heroicons/react": "2.1.1",
@@ -41,6 +42,7 @@
     "@typescript-eslint/parser": "6.14.0",
     "@vitejs/plugin-react-swc": "3.5.0",
     "typescript": "5.2.2",
-    "vite": "5.0.8"
+    "vite": "5.0.8",
+    "husky": "^8.0.0"
   }
 }
