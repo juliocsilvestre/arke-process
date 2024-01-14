@@ -1,14 +1,19 @@
-import { SIZE } from '@/utils/constants'
-import { Input } from '@/components/ui/Input'
-import { Label } from './ui/Label'
+import { Button } from '@/components/Button'
+import { Input } from '@/components/Input'
+import { Label } from '@/components/Label'
+
+import { TrashIcon } from '@heroicons/react/24/solid'
 
 export const Playground = () => {
   return (
-    <div className="p-12 rounded-lg bg-white flex flex-col">
-      <Label htmlFor="email" label="Email" isRequired />
+    <div className="w-[300px] py-8 px-4 rounded-lg bg-white flex flex-col">
+      <Label htmlFor="email" label="Email" />
       <Input type="email" id="email" placeholder="Email" />
-      {/* <Input type="password" id="password" placeholder="Password" size="xl" /> */}
-      {/* <Button>Submit</Button> */}
+      <Label htmlFor="password" label="Password" />
+      <Input type="password" id="password" placeholder="••••••••••" />
+      <Button variant={'destructive'} size={'icon'}>
+        <TrashIcon className='w-4 h-4'/>
+      </Button>
     </div>
   )
 }
