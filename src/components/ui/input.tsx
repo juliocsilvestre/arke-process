@@ -6,23 +6,21 @@ import * as React from 'react'
 type _InputSize = (typeof SIZE)[keyof typeof SIZE]
 
 const _baseStyle =
-  'flex w-full rounded-lg border text-sm placeholder:opacity-50 focus-visible:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100'
+  'flex w-full my-1 rounded-lg border placeholder:opacity-50 focus-visible:text-gray-600 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
 
 const inputVariants = cva(_baseStyle, {
   variants: {
     variant: {
-      default: 'border-primary-500 bg-white text-gray-600 placeholder:text-primary-600',
-      disabled: 'disabled:cursor-not-allowed disabled:opacity-50',
+      default: 'border-gray-500 bg-white text-gray-600 placeholder:text-gray-600 focus-visible:border-primary-500',
       error: 'border-error-500 bg-white text-error-500 placeholder:text-error-500 focus-visible:ring-error-100',
       file: 'file:border-0 file:bg-transparent file:text-sm file:font-medium',
-      negative: 'border-white bg-primary text-white placeholder:text-white focus-visible:text-white',
     },
     size: {
-      xs: 'px-2 py-1',
-      sm: 'px-3 py-1',
-      md: 'px-3 py-1.5',
-      lg: 'px-3 py-2.5',
-      xl: 'px-4 py-3',
+      xs: 'px-2 py-1 text-xs',
+      sm: 'px-3 py-1 text-xs',
+      md: 'px-3 py-1.5 text-sm',
+      lg: 'px-3 py-2.5 text-sm',
+      xl: 'px-4 py-3 text-md',
     },
   },
   defaultVariants: {
