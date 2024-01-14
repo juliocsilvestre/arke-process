@@ -11,8 +11,9 @@ export const Playground = () => {
       <Input type="email" id="email" placeholder="Email" />
       <Label htmlFor="password" label="Password" />
       <Input type="password" id="password" placeholder="••••••••••" />
-      <Button variant={'destructive'} size={'icon'}>
+      <Button variant={'default'} size={'sm'}>
         <TrashIcon className='w-4 h-4'/>
+        Delete
       </Button>
     </div>
   )
