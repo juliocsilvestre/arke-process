@@ -17,6 +17,8 @@ const footerVariants = cva(_baseStyle, {
     },
 });
 
+const footerDate = new Date().getFullYear();
+
 export interface FooterProps
     extends React.HTMLAttributes<HTMLElement>,
         VariantProps<typeof footerVariants> {}
@@ -25,7 +27,7 @@ const Footer = React.forwardRef<HTMLElement, FooterProps>(
     ({ className, variant, ...props }, ref) => {
         return (
             <footer className={cn(footerVariants({ variant, className }))} ref={ref} {...props}>
-                <p>© {new Date().getFullYear()} INIT1. Todos os direitos reservados.</p>
+                <p>© {footerDate} INIT1. Todos os direitos reservados.</p>
             </footer>
         );
     }
