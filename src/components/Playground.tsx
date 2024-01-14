@@ -12,7 +12,7 @@ export const Playground = () => {
       <Label htmlFor="password" label="Password" />
       <Input type="password" id="password" placeholder="••••••••••" />
       <Button variant={'default'} size={'sm'}>
-        <TrashIcon className='w-4 h-4'/>
+        <TrashIcon className="w-4 h-4" />
         Delete
       </Button>
     </div>
