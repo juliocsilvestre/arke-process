@@ -6,6 +6,7 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 import { Playground } from '@/components/Playground'
 import { TestDashboard } from '@components/TestDashboard'
 import { PublicLayout } from './layouts/public.layout'
+import { SignIn } from './pages/SignIn.page'
 
 const rootRoute = new RootRoute()
 
@@ -29,7 +30,7 @@ const publicLayout = new Route({
 
 const authRoute = new Route({
   getParentRoute: () => authLayout,
-  component: Playground,
+  component: SignIn,
   path: '/',
 })
 
