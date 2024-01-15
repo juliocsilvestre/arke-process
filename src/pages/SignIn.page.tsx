@@ -1,15 +1,13 @@
-import * as z from 'zod'
-import * as React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
 import { Button } from '@components/ui/Button'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Input } from '@components/ui/Input'
-import CarvaLogo from '../assets/carvalogo.svg'
 import { Label } from '@components/ui/Label'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@components/ui/Form'
 
-import { TrashIcon } from '@heroicons/react/24/solid'
+import Logo from '../assets/carvalogo.svg'
 
 const CPF_REGEXP = /^(\d{3}.?\d{3}.?\d{3}-?\d{2})$/
 
@@ -40,11 +38,11 @@ export const SignIn = () => {
     console.log(values)
   }
   return (
-    <div className="w-[490px] py-[60px] px-10 rounded-lg bg-white flex flex-col">
+    <div className="w-[400px] mx-4 md:mx-0 py-[45px] px-8 rounded-lg bg-white flex flex-col">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitSignIn)} className="space-y-8">
-          <div className="flex items-center justify-center mb-8">
-            <CarvaLogo />
+        <form onSubmit={form.handleSubmit(onSubmitSignIn)} className="space-y-5">
+          <div className="flex items-center justify-center mb-8 max-w-[70%] mx-auto">
+            <img src={Logo} alt="Carvalheira, Criando Memórias" />
           </div>
           <FormField
             control={form.control}
@@ -53,7 +51,7 @@ export const SignIn = () => {
               <FormItem>
                 <Label htmlFor="cpf" label="CPF" />
                 <FormControl>
-                  <Input id="cpf" placeholder="Insira seu CPF" {...field} />
+                  <Input id="cpf" placeholder="Insira seu CPF" {...field} size="md" />
                 </FormControl>
               </FormItem>
             )}
@@ -65,7 +63,7 @@ export const SignIn = () => {
               <FormItem>
                 <Label htmlFor="password" label="Senha" />
                 <FormControl>
-                  <Input id="password" placeholder="••••••••••" {...field} />
+                  <Input id="password" type="password" placeholder="••••••••••" {...field} size="md" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
