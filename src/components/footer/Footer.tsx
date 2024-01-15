@@ -1,38 +1,34 @@
-import { cn } from "@/utils/styles";
-import { VariantProps, cva } from "class-variance-authority";
-import React from "react";
+import { cn } from '@/utils/styles'
+import { VariantProps, cva } from 'class-variance-authority'
+import React from 'react'
 
-const _baseStyle = "p-4 text-center fixed bottom-0 w-full";
+const _baseStyle = 'p-4 text-center fixed bottom-0 w-full'
 
 const footerVariants = cva(_baseStyle, {
-    variants: {
-        variant: {
-            default: "bg-yellow-300 text-primary",
-            purple: "bg-primary text-secondary",
-            white: "bg-white text-primary",
-        },
+  variants: {
+    variant: {
+      default: 'bg-yellow-300 text-primary',
+      purple: 'bg-primary text-secondary',
+      white: 'bg-white text-primary',
     },
-    defaultVariants: {
-        variant: "default",
-    },
-});
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+})
 
-export interface FooterProps
-    extends React.HTMLAttributes<HTMLElement>,
-        VariantProps<typeof footerVariants> {}
+export interface FooterProps extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof footerVariants> {}
 
-const Footer = React.forwardRef<HTMLElement, FooterProps>(
-    ({ className, variant, ...props }, ref) => {
-        const year = new Date().getFullYear();
+const Footer = React.forwardRef<HTMLElement, FooterProps>(({ className, variant, ...props }, ref) => {
+  const year = new Date().getFullYear()
 
-        return (
-            <footer className={cn(footerVariants({ variant, className }))} ref={ref} {...props}>
-                <p>© {year} INIT1. Todos os direitos reservados.</p>
-            </footer>
-        );
-    }
-);
+  return (
+    <footer className={cn(footerVariants({ variant, className }))} ref={ref} {...props}>
+      <p>© {year} INIT1. Todos os direitos reservados.</p>
+    </footer>
+  )
+})
 
-Footer.displayName = "Footer";
+Footer.displayName = 'Footer'
 
-export { Footer };
+export { Footer }
