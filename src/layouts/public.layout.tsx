@@ -1,4 +1,4 @@
-import { Footer } from '@/components/footer/Footer'
+import { Footer } from '@/components/Footer'
 import { Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
