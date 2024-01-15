@@ -65,6 +65,16 @@ module.exports = {
         'error-700': '#991b1b',
         'error-800': '#7f1d1d',
         'error-900': '#6b1414',
+        'success-50': '#ecfdf5',
+        'success-100': '#d1fae5',
+        'success-200': '#a7f3d0',
+        'success-300': '#6ee7b7',
+        'success-400': '#34d399',
+        'success-500': '#10b981',
+        'success-600': '#059669',
+        'success-700': '#047857',
+        'success-800': '#065f46',
+        'success-900': '#064e3b',
       },
       keyframes: {
         "accordion-down": {

@@ -2,12 +2,13 @@ import * as LabelPrimitive from '@radix-ui/react-label'
 import { type VariantProps, cva } from 'class-variance-authority'
 import * as React from 'react'
 
-import { cn } from '@utils/styles'
 import { SIZE } from '@/utils/constants'
+import { cn } from '@utils/styles'
 
 type _LabelSize = (typeof SIZE)[keyof typeof SIZE]
 
-const _baseStyle = 'text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+const _baseStyle =
+  'text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer'
 
 const labelVariants = cva(_baseStyle, {
   variants: {

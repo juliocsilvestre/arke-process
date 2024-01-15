@@ -128,7 +128,7 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
     const body = error ? String(error?.message) : children
 
     if (!body) {
-      return null
+      return <p className="invisible text-sm font-medium">you shall not pass</p>
     }
 
     return (
