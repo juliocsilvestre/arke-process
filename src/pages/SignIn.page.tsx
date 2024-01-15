@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@components
 import { Input } from '@components/ui/Input'
 import { Label } from '@components/ui/Label'
 
+import { maskCPF } from '@/utils/strings'
 import Logo from '../assets/carvalogo.svg'
 
 const CPF_REGEXP = /^(\d{3}.?\d{3}.?\d{3}-?\d{2})$/
@@ -51,7 +52,16 @@ export const SignIn = () => {
               <FormItem>
                 <Label htmlFor="cpf" label="CPF" />
                 <FormControl>
-                  <Input id="cpf" placeholder="Insira seu CPF" {...field} size="md" />
+                  <Input
+                    id="cpf"
+                    placeholder="Insira seu CPF"
+                    {...field}
+                    size="md"
+                    onChange={(event) => {
+                      const cpf = maskCPF(event.target.value)
+                      form.setValue('cpf', cpf)
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
