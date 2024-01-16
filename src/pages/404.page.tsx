@@ -13,15 +13,10 @@ export const NotFoundPage = () => {
       <div className="minw-[200xp]">
         <img src={NotFoundImg} className="w-auto" alt="404 - Página não encontrada" />
       </div>
-      <Button
-        size={'sm'}
-        className="bg-white text-primary hover:bg-primary-600 hover:text-white"
-      >
-        <Link to="/dashboard">
-            Voltar para o Dashboard
-        </Link>
+      <Button size={'sm'} className="bg-white text-primary hover:bg-primary-600 hover:text-white">
+        <Link to="/dashboard">Voltar para o Dashboard</Link>
       </Button>
-      <Footer className='bg-primary text-white'/>
+      <Footer className="bg-primary text-white" />
     </div>
   )
 }
