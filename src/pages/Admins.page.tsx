@@ -83,7 +83,7 @@ export const AdminsPage = (): JSX.Element => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="name" label="Nome" />
+                    <Label htmlFor="name" label="Nome" isRequired />
                     <FormControl>
                       <Input id="name" placeholder="Insira seu nome" {...field} size="lg" />
                     </FormControl>
@@ -110,7 +110,7 @@ export const AdminsPage = (): JSX.Element => {
                 name="cpf"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="cpf" label="CPF" />
+                    <Label htmlFor="cpf" label="CPF" isRequired />
                     <FormControl>
                       <Input
                         id="cpf"
@@ -135,7 +135,7 @@ export const AdminsPage = (): JSX.Element => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="password" label="Senha" />
+                    <Label htmlFor="password" label="Senha" isRequired />
                     <FormControl>
                       <Input id="password" type="password" placeholder="••••••••••" {...field} size="lg" />
                     </FormControl>
