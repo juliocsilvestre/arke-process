@@ -12,11 +12,11 @@ export const useSignInMutation = () => {
 }
 
 export const useSignOutMutation = () => {
-    const mutation = useMutation({
-        mutationFn: () => {
-        return api.delete('/auth/signoff')
-        },
-    })
-    
-    return { ...mutation }
+  const mutation = useMutation({
+    mutationFn: () => {
+      return api.delete('/auth/signoff')
+    },
+  })
+
+  return { ...mutation }
 }
