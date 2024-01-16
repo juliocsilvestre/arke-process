@@ -54,7 +54,7 @@ export const AdminsPage = (): JSX.Element => {
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto px-4 py-10">
-      <div className="container mx-auto flex items-center justify-between">
+      <div className="mx-auto flex items-center justify-between">
         <h1 className="text-4xl text-primary font-bold">
           {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
         </h1>
