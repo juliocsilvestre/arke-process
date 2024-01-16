@@ -66,7 +66,7 @@ export const AdminsPage = (): JSX.Element => {
       </div>
 
       <section className="mt-[14%]">
-        <div className="w-full h-[600px] bg-gray-800">table</div>
+        <div className="w-full h-[600px] bg-gray-200">,</div>
       </section>
 
       <SlideOver
