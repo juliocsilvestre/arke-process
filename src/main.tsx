@@ -19,12 +19,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <Toaster
-        richColors
-        theme="light"
-        position="bottom-center"
-        expand
-      />
+      <Toaster richColors theme="light" position="bottom-center" expand />
     </QueryClientProvider>,
   )
 }
