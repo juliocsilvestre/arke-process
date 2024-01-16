@@ -1,8 +1,9 @@
-import { RootRoute, Route, Router, redirect } from '@tanstack/react-router'
+import { NotFoundRoute, RootRoute, Route, Router, redirect } from '@tanstack/react-router'
 
 import { AuthLayout } from '@layouts/auth.layout'
 import { DashboardLayout } from '@layouts/dashboard.layout'
 
+import { NotFoundPage } from './pages/404.page'
 import { TestDashboard } from '@components/TestDashboard'
 import { PublicLayout } from './layouts/public.layout'
 import { SignIn } from './pages/SignIn.page'
@@ -70,13 +71,18 @@ const publicRoute = new Route({
   path: '/public',
 })
 
+const notFoundRoute = new NotFoundRoute({
+  getParentRoute: () => rootRoute,
+  component: NotFoundPage,
+})
+
 const routeTree = rootRoute.addChildren([
   authLayout.addChildren([authRoute]),
   dashboardLayout.addChildren([dashboardRoute.addChildren([adminsRoute])]),
   publicLayout.addChildren([publicRoute]),
 ])
 
-export const router = new Router({ routeTree, defaultPreload: 'intent', defaultStaleTime: 5000 })
+export const router = new Router({ routeTree, notFoundRoute, defaultPreload: 'intent', defaultStaleTime: 5000 })
 
 declare module '@tanstack/react-router' {
   interface Register {
