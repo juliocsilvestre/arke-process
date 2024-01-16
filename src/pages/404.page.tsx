@@ -13,7 +13,7 @@ export const NotFoundPage = () => {
       <div className="sm:max-w-[400px] 2xl:max-w-[800px]">
         <img src={NotFoundImg} className="w-auto" alt="404 - Página não encontrada" />
       </div>
-      <Button size='sm' className="bg-white text-primary hover:bg-primary-600 hover:text-white">
+      <Button size="sm" className="bg-white text-primary hover:bg-primary-600 hover:text-white">
         <Link to="/dashboard">Voltar para o Dashboard</Link>
       </Button>
       <Footer className="bg-primary text-white" />
