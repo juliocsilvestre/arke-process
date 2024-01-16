@@ -9,7 +9,7 @@ export const SignUpSchema = z.object({
   email: z.union([z.string().email({ message: 'Email inválido.' }), z.literal('')]),
   cpf: z.string().refine(
     (v) => {
-        console.log(v, CPF_REGEXP.test(v.toString()))
+      console.log(v, CPF_REGEXP.test(v.toString()))
       return CPF_REGEXP.test(v.toString())
     },
     { message: 'CPF inválido' },
