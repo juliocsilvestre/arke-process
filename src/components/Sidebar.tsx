@@ -20,7 +20,7 @@ export const navigation = [
   { name: 'Funcionários', href: '/dashboard/funcionarios', icon: UserGroupIcon },
   { name: 'Fornecedores', href: '/dashboard/fornecedores', icon: BuildingOfficeIcon },
   { name: 'Eventos', href: '/dashboard/eventos', icon: TicketIcon },
-  { name: 'Relatório', href: '/dashboard/relatorios', icon: ChartBarIcon },
+  { name: 'Relatórios', href: '/dashboard/relatorios', icon: ChartBarIcon },
 ]
 
 function classNames(...classes: string[]) {
