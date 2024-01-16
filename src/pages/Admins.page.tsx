@@ -128,8 +128,10 @@ export const AdminsPage = (): JSX.Element => {
                         placeholder="Insira seu CPF"
                         {...field}
                         size="lg"
-                        onBlur={() => {
-                          form.trigger('cpf')
+                        onBlur={(event) => {
+                          if (event.target.value) {
+                            form.trigger('cpf')
+                          }
                         }}
                         onChange={(event) => {
                           const cpf = maskCPF(event.target.value)
