@@ -95,7 +95,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                   <nav className="flex flex-1 flex-col">
                     <ul className="flex flex-1 flex-col gap-y-7">
                       <li>
-                        <ul className="-mx-2 space-y-1">
+                        <ul className="mx-auto space-y-1">
                           {navigation.map((item) => (
                             <li key={item.name}>
                               <Link
@@ -127,7 +127,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-6">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-4">
           <div className="my-10 flex h-16 shrink-0 items-center hover:opacity-80">
             {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
             <a href="#">
@@ -137,7 +137,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-4">
               <li>
-                <ul className="-mx-2 space-y-1">
+                <ul className="mx-auto space-y-1">
                   {navigation.map((item) => (
                     <li key={item.name}>
                       <Link
@@ -162,7 +162,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => void handleSignOut()}
-                  className="w-full group -mx-2 flex justify-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-50 hover:text-primary"
+                  className="w-full group mx-auto flex justify-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-50 hover:text-primary"
                 >
                   <PowerIcon className="h-6 w-6 shrink-0 text-white group-hover:text-primary" aria-hidden="true" />
                   Sair
