@@ -12,6 +12,7 @@ import { useRouter } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { SignUpBody, SignUpSchema } from './Admins.defs'
 
 export const AdminsPage = (): JSX.Element => {
@@ -36,6 +37,11 @@ export const AdminsPage = (): JSX.Element => {
       await createAdmin(values)
       form.reset()
       handleOnClose()
+      toast.success(
+        <p>
+          O administrador <strong>{values.name}</strong> foi criado com sucesso!
+        </p>,
+      )
     } catch (error: unknown) {
       if (!(error instanceof AxiosError)) return
       console.log(error.response?.data.errors)
@@ -43,6 +49,11 @@ export const AdminsPage = (): JSX.Element => {
       // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
       for (const e of error.response?.data.errors) {
         form.setError(e.field, { message: e.message })
+        toast.error(
+          <p>
+            Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
+          </p>,
+        )
       }
     }
   }

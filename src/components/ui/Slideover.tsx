@@ -39,8 +39,8 @@ export const SlideOver = ({ title, subtitle, isOpen, children, close }: SlideOve
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel className="pointer-events-auto w-screen max-w-md h-full shadow-md">
-                  <div ref={headerRef} className="bg-primary px-4 py-6 sm:px-6">
+                <Dialog.Panel className="pointer-events-auto w-screen max-w-md h-svh shadow-md">
+                  <div ref={headerRef} className="bg-primary px-4 py-6 sm:px-6 h-[112px]">
                     <div className="flex items-center justify-between">
                       <Dialog.Title className="text-lg font-semibold leading-6 text-white">{title}</Dialog.Title>
                       <div className="ml-3 flex h-7 items-center">
@@ -60,9 +60,9 @@ export const SlideOver = ({ title, subtitle, isOpen, children, close }: SlideOve
                     </div>
                   </div>
                   <div
-                    className="bg-white"
+                    className="bg-white h-full"
                     style={{
-                      height: `calc(100% - ${headerHeight}px)`,
+                      height: 'calc(100% - 112px)',
                     }}
                   >
                     {children}
