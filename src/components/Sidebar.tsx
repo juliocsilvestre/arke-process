@@ -1,19 +1,26 @@
-// TODO: Refactor this to comport only the sidebar and not the entire layout
-
 import { Dialog, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { BuildingOfficeIcon, ChartBarIcon, PowerIcon, TicketIcon, UserGroupIcon } from '@heroicons/react/24/solid'
-import { Outlet } from '@tanstack/react-router'
+import {
+  BuildingOfficeIcon,
+  ChartBarIcon,
+  PowerIcon,
+  ShieldCheckIcon,
+  TicketIcon,
+  UserGroupIcon,
+} from '@heroicons/react/24/solid'
+import { Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { Fragment, ReactNode, useState } from 'react'
 
+import { useSignOutMutation } from '@/api/mutations/auth.mutation'
+import { removeUser } from '@/store/auth.store'
 import Logo from '../assets/logo-white.png'
 
-// use router to get current route
 const navigation = [
-  { name: 'Funcionários', href: '#', icon: UserGroupIcon, current: true },
-  { name: 'Fornecedores', href: '#', icon: BuildingOfficeIcon, current: false },
-  { name: 'Eventos', href: '#', icon: TicketIcon, current: false },
-  { name: 'Relatório', href: '#', icon: ChartBarIcon, current: false },
+  { name: 'Administradores', href: '/dashboard/administradores', icon: ShieldCheckIcon },
+  { name: 'Funcionários', href: '/dashboard/funcionarios', icon: UserGroupIcon },
+  { name: 'Fornecedores', href: '/dashboard/fornecedores', icon: BuildingOfficeIcon },
+  { name: 'Eventos', href: '/dashboard/eventos', icon: TicketIcon },
+  { name: 'Relatório', href: '/dashboard/relatorio', icon: ChartBarIcon },
 ]
 
 function classNames(...classes: string[]) {
@@ -22,6 +29,19 @@ function classNames(...classes: string[]) {
 
 export function Sidebar({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const navigate = useNavigate()
+  const { latestLocation } = useRouter()
+
+  console.log(latestLocation)
+
+  const { mutateAsync: doLogout } = useSignOutMutation()
+
+  const handleSignOut = async () => {
+    await doLogout()
+    removeUser()
+    await navigate({ to: '/' })
+  }
 
   return (
     <div className="w-full">
@@ -80,24 +100,19 @@ export function Sidebar({ children }: { children: ReactNode }) {
                         <ul className="-mx-2 space-y-1">
                           {navigation.map((item) => (
                             <li key={item.name}>
-                              <a
-                                href={item.href}
+                              <Link
+                                to={item.href}
+                                activeOptions={{ exact: true }}
                                 className={classNames(
-                                  item.current
-                                    ? 'bg-white text-primary'
-                                    : 'text-white hover:text-primary hover:bg-white',
-                                  'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold',
+                                  '[&.active]:bg-white [&.active]:text-primary [&.active_.icon]:text-primary text-white hover:text-primary hover:bg-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold',
                                 )}
                               >
                                 <item.icon
-                                  className={classNames(
-                                    item.current ? 'text-primary' : 'text-white group-hover:text-primary',
-                                    'h-6 w-6 shrink-0',
-                                  )}
+                                  className={classNames('icon text-white group-hover:text-primary h-6 w-6 shrink-0')}
                                   aria-hidden="true"
                                 />
                                 {item.name}
-                              </a>
+                              </Link>
                             </li>
                           ))}
                         </ul>
@@ -127,35 +142,33 @@ export function Sidebar({ children }: { children: ReactNode }) {
                 <ul className="-mx-2 space-y-1">
                   {navigation.map((item) => (
                     <li key={item.name}>
-                      <a
-                        href={item.href}
+                      <Link
+                        to={item.href}
+                        activeOptions={{ exact: true }}
                         className={classNames(
-                          item.current ? 'bg-white text-primary' : 'text-white hover:text-primary hover:bg-white',
+                          '[&.active]:bg-white [&.active]:text-primary [&.active_.icon]:text-primary text-white hover:text-primary hover:bg-white',
                           'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold',
                         )}
                       >
                         <item.icon
-                          className={classNames(
-                            item.current ? 'text-primary' : 'text-white group-hover:text-primary',
-                            'h-6 w-6 shrink-0',
-                          )}
+                          className={classNames('icon text-white group-hover:text-primary', 'h-6 w-6 shrink-0')}
                           aria-hidden="true"
                         />
                         {item.name}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
               </li>
               <li className="mt-auto">
-                <a
-                  // biome-ignore lint/a11y/useValidAnchor: <explanation>
-                  href="#"
-                  className="group -mx-2 flex justify-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-50 hover:text-primary"
+                <button
+                  type="button"
+                  onClick={() => void handleSignOut()}
+                  className="w-full group -mx-2 flex justify-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-50 hover:text-primary"
                 >
                   <PowerIcon className="h-6 w-6 shrink-0 text-white group-hover:text-primary" aria-hidden="true" />
                   Sair
-                </a>
+                </button>
               </li>
               <li className="flex flex-col items-center mb-4">
                 <p className="text-[10px] text-white/50">
@@ -174,7 +187,9 @@ export function Sidebar({ children }: { children: ReactNode }) {
           <Bars3Icon className="h-6 w-6" aria-hidden="true" />
         </button>
         {/* make this dynamic */}
-        <div className="flex-1 text-sm font-semibold leading-6 text-white">Funcionários</div>
+        <div className="flex-1 text-sm font-semibold leading-6 text-white">
+          {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}{' '}
+        </div>
       </div>
 
       {children}

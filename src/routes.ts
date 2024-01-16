@@ -1,12 +1,12 @@
-import { RootRoute, Route, Router } from '@tanstack/react-router'
+import { RootRoute, Route, Router, redirect } from '@tanstack/react-router'
 
 import { AuthLayout } from '@layouts/auth.layout'
 import { DashboardLayout } from '@layouts/dashboard.layout'
 
-import { Playground } from '@/components/Playground'
 import { TestDashboard } from '@components/TestDashboard'
 import { PublicLayout } from './layouts/public.layout'
 import { SignIn } from './pages/SignIn.page'
+import { useAuthStore } from './store/auth.store'
 
 const rootRoute = new RootRoute()
 
@@ -37,7 +37,31 @@ const authRoute = new Route({
 const dashboardRoute = new Route({
   getParentRoute: () => dashboardLayout,
   component: TestDashboard,
-  path: '/dashboard',
+  path: 'dashboard',
+  beforeLoad: async () => {
+    const isUserAuthenticated = useAuthStore.getState().isAuthenticated
+
+    if (!isUserAuthenticated) {
+      throw redirect({
+        to: '/',
+      })
+    }
+  },
+})
+
+const adminsRoute = new Route({
+  getParentRoute: () => dashboardRoute,
+  component: TestDashboard,
+  path: 'administradores',
+  // beforeLoad: async () => {
+  //   const isUserAuthenticated = useAuthStore.getState().isAuthenticated
+
+  //   if (!isUserAuthenticated) {
+  //     throw redirect({
+  //       to: '/',
+  //     })
+  //   }
+  // },
 })
 
 const publicRoute = new Route({
@@ -48,7 +72,7 @@ const publicRoute = new Route({
 
 const routeTree = rootRoute.addChildren([
   authLayout.addChildren([authRoute]),
-  dashboardLayout.addChildren([dashboardRoute]),
+  dashboardLayout.addChildren([dashboardRoute.addChildren([adminsRoute])]),
   publicLayout.addChildren([publicRoute]),
 ])
 
