@@ -15,7 +15,7 @@ import { useSignOutMutation } from '@/api/mutations/auth.mutation'
 import { removeUser } from '@/store/auth.store'
 import Logo from '../assets/logo-white.png'
 
-const navigation = [
+export const navigation = [
   { name: 'Administradores', href: '/dashboard/administradores', icon: ShieldCheckIcon },
   { name: 'Funcionários', href: '/dashboard/funcionarios', icon: UserGroupIcon },
   { name: 'Fornecedores', href: '/dashboard/fornecedores', icon: BuildingOfficeIcon },
