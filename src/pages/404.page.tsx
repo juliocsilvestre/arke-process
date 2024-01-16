@@ -1,7 +1,7 @@
+import NotFoundImg from '@/assets/404-error.png'
 import { Footer } from '@/components/Footer'
 import { Button } from '@/components/ui/Button'
 import { Link } from '@tanstack/react-router'
-import NotFoundImg from '../assets/404-error.png'
 
 export const NotFoundPage = () => {
   return (
