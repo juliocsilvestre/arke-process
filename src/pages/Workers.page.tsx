@@ -1,3 +1,3 @@
 export const WorkersPage = (): JSX.Element => {
-    return <div>Workers Page</div>;
+  return <div>Workers Page</div>
 }
