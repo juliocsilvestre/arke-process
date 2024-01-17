@@ -188,6 +188,15 @@ export function Sidebar({ children }: { children: ReactNode }) {
         <div className="flex-1 text-sm font-semibold leading-6 text-white">
           {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}{' '}
         </div>
+
+        <button
+          type="button"
+          onClick={() => void handleSignOut()}
+          className="flex items-center gap-x-2 text-sm font-semibold leading-6 text-white hover:text-primary"
+        >
+          <PowerIcon className="h-5 w-5" aria-hidden="true" />
+          Sair
+        </button>
       </div>
 
       {children}
