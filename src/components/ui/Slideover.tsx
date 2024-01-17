@@ -24,7 +24,7 @@ export const SlideOver = ({ title, subtitle, isOpen, children, close }: SlideOve
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={close}>
+      <Dialog as="div" className="relative z-50" onClose={close}>
         <div className="fixed inset-0" />
 
         <div className="fixed inset-0 overflow-hidden">
