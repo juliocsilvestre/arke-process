@@ -64,8 +64,8 @@ export const AdminsPage = (): JSX.Element => {
   }
 
   return (
-    <section className="bg-gray-50 min-h-screen overflow-y-auto p-10">
-      <div className="mx-auto flex items-center justify-between">
+    <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
+      <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
         <h1 className="text-4xl text-primary font-bold">
           {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
         </h1>
