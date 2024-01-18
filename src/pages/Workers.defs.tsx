@@ -17,14 +17,14 @@ export const CreateWorkerSchema = z.object({
     },
     { message: 'Celular inválido' },
   ),
-  role: z.string().min(2, { message: 'Cargo deve conter pelo menos 2 caracteres.' }),
+  role: z.string().min(2, { message: 'Cargo inválido.' }),
   status: z.nativeEnum(WORKER_STATUS),
   company_id: z.string().uuid({ message: 'Empresa inválida.' }).min(1, { message: 'Empresa inválida.' }),
   street: z.string().min(2, { message: 'Rua deve conter pelo menos 2 caracteres.' }),
   complement: z.string(),
   number: z.number().min(1, { message: 'Número inválido.' }),
   picture: z.any(),
-  city: z.string().min(2, { message: 'Cidade deve conter pelo menos 2 caracteres.' }),
+  city: z.string().min(2, { message: 'Cidade inválida.' }),
   uf: z.nativeEnum(UF_LIST),
   cep: z.string().refine(
     (v) => {
@@ -34,7 +34,7 @@ export const CreateWorkerSchema = z.object({
       message: 'CEP inválido',
     },
   ),
-  neighborhood: z.string().min(2, { message: 'Bairro deve conter pelo menos 2 caracteres.' }),
+  neighborhood: z.string().min(2, { message: 'Bairro inválido.' }),
 })
 
 export type CreateWorkerBody = z.infer<typeof CreateWorkerSchema>

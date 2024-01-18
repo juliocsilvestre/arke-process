@@ -130,8 +130,8 @@ export const WorkersPage = (): JSX.Element => {
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onCreateCompany)} className="h-full flex flex-col gap-2 justify-between">
-            <div className="px-5 py-6 flex flex-col gap-y-5">
-              <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4>
+            <div className="px-5 py-6 flex flex-col ">
+              {/* <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4> */}
 
               <div className="flex flex-row-reverse gap-2">
                 <div className="flex flex-col items-center">
@@ -202,7 +202,7 @@ export const WorkersPage = (): JSX.Element => {
                         <FormItem className="w-[100%]">
                           <Label htmlFor="full_name" label="Nome Completo" isRequired />
                           <FormControl>
-                            <Input id="full_name" placeholder="Insira o nome completo" {...field} size="lg" />
+                            <Input id="full_name" placeholder="Insira o nome completo" {...field} size="md" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -222,7 +222,7 @@ export const WorkersPage = (): JSX.Element => {
                               id="cpf"
                               placeholder="Insira seu CPF"
                               {...field}
-                              size="lg"
+                              size="md"
                               onBlur={(event) => {
                                 if (event.target.value) {
                                   form.trigger('cpf')
@@ -249,7 +249,7 @@ export const WorkersPage = (): JSX.Element => {
                               id="rg"
                               placeholder="Insira seu RG"
                               {...field}
-                              size="lg"
+                              size="md"
                               onBlur={(event) => {
                                 if (event.target.value) {
                                   form.trigger('rg')
@@ -271,7 +271,7 @@ export const WorkersPage = (): JSX.Element => {
                         <FormItem className="w-[60%]">
                           <Label htmlFor="email" label="E-mail" />
                           <FormControl>
-                            <Input id="email" placeholder="Insira seu e-mail" {...field} size="lg" />
+                            <Input id="email" placeholder="Insira seu e-mail" {...field} size="md" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -289,7 +289,7 @@ export const WorkersPage = (): JSX.Element => {
                               id="phone_number"
                               placeholder="Insira seu celular/whatsapp"
                               {...field}
-                              size="lg"
+                              size="md"
                               onBlur={(event) => {
                                 if (event.target.value) {
                                   form.trigger('phone_number')
@@ -341,7 +341,7 @@ export const WorkersPage = (): JSX.Element => {
                         <FormItem className="w-[50%]">
                           <Label htmlFor="role" label="Função" isRequired />
                           <FormControl>
-                            <Input id="role" placeholder="Insira a função" {...field} size="lg" />
+                            <Input id="role" placeholder="Insira a função" {...field} size="md" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -351,7 +351,7 @@ export const WorkersPage = (): JSX.Element => {
                 </div>
               </div>
 
-              <h4 className="text-2xl text-primary font-bold">Endereço</h4>
+              {/* <h4 className="text-2xl text-primary font-bold">Endereço</h4> */}
               <div className="flex gap-2">
                 <FormField
                   control={form.control}
@@ -364,7 +364,7 @@ export const WorkersPage = (): JSX.Element => {
                           id="cep"
                           placeholder="Insira o CEP"
                           {...field}
-                          size="lg"
+                          size="md"
                           onBlur={(event) => {
                             if (event.target.value) {
                               form.trigger('cep')
@@ -390,7 +390,7 @@ export const WorkersPage = (): JSX.Element => {
                     <FormItem className="w-[70%]">
                       <Label htmlFor="street" label="Rua" isRequired />
                       <FormControl>
-                        <Input id="street" placeholder="Insira a rua" {...field} size="lg" />
+                        <Input id="street" placeholder="Insira a rua" {...field} size="md" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -408,7 +408,7 @@ export const WorkersPage = (): JSX.Element => {
                           id="number"
                           placeholder="Insira o número"
                           {...field}
-                          size="lg"
+                          size="md"
                           value={field.value === 0 ? '' : field.value}
                           onChange={
                             // remove non-numeric characters
@@ -433,7 +433,7 @@ export const WorkersPage = (): JSX.Element => {
                     <FormItem className="w-[30%]">
                       <Label htmlFor="neighborhood" label="Bairro" isRequired />
                       <FormControl>
-                        <Input id="neighborhood" placeholder="Insira o bairro" {...field} size="lg" />
+                        <Input id="neighborhood" placeholder="Insira o bairro" {...field} size="md" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -447,7 +447,7 @@ export const WorkersPage = (): JSX.Element => {
                     <FormItem className="w-[40%]">
                       <Label htmlFor="complement" label="Complemento" />
                       <FormControl>
-                        <Input id="complement" placeholder="Insira o complemento" {...field} size="lg" />
+                        <Input id="complement" placeholder="Insira o complemento" {...field} size="md" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -461,7 +461,7 @@ export const WorkersPage = (): JSX.Element => {
                     <FormItem className="w-[30%]">
                       <Label htmlFor="city" label="Cidade" isRequired />
                       <FormControl>
-                        <Input id="city" placeholder="Insira a cidade" {...field} size="lg" />
+                        <Input id="city" placeholder="Insira a cidade" {...field} size="md" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -504,7 +504,7 @@ export const WorkersPage = (): JSX.Element => {
             </div> */}
 
             <SlideOverFooter>
-              <div className="flex flex-shrink-0 justify-end px-4 py-4 bg-white gap-2">
+              <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
                 <Button type="button" variant="outline" onClick={handleOnClose}>
                   Cancelar
                 </Button>
