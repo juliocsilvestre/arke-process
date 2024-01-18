@@ -19,8 +19,6 @@ export function Sidebar({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
   const { latestLocation } = useRouter()
 
-  console.log(latestLocation)
-
   const { mutateAsync: doLogout } = useSignOutMutation()
 
   const handleSignOut = async () => {

@@ -5,8 +5,6 @@ import { api } from '../api'
 export const useCreateWorker = () => {
   const mutation = useMutation({
     mutationFn: (worker: CreateWorkerBody) => {
-      console.log(worker.picture)
-
       const formData = new FormData()
 
       for (const [key, value] of Object.entries(worker)) {

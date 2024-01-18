@@ -8,7 +8,6 @@ export const CreateCompanySchema = z.object({
     .max(50, { message: 'Nome deve conter no máximo 50 caracteres.' }),
   cnpj: z.string().refine(
     (v) => {
-      console.log(v, CNPJ_REGEXP.test(v.toString()))
       return CNPJ_REGEXP.test(v.toString())
     },
     { message: 'CNPJ inválido.' },

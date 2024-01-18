@@ -35,7 +35,6 @@ export const WorkersPage = (): JSX.Element => {
   const onCreateCompany = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
-        console.log('@@@PREVIEW', picturePreview)
         if (picturePreview instanceof File) {
           await createWorker({ ...values, picture: picturePreview })
           form.reset()
@@ -76,9 +75,6 @@ export const WorkersPage = (): JSX.Element => {
   const { data: companies } = useQuery(indexCompaniesQueryOptions)
 
   useEffect(() => {
-    // transform File into URL to use on <img> component
-    console.log(picturePreview)
-
     if (picturePreview instanceof File) {
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -87,6 +83,7 @@ export const WorkersPage = (): JSX.Element => {
       reader.readAsDataURL(picturePreview)
     }
   }, [picturePreview])
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">

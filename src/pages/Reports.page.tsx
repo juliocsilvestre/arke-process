@@ -43,9 +43,9 @@ export const ReportsPage = (): JSX.Element => {
       )
     } catch (error: unknown) {
       if (!(error instanceof AxiosError)) return
-      console.log(error.response?.data.errors)
+      console.error(error.response?.data.errors)
 
-      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+      // biome-ignore lint/correctness/noUnsafeOptionalChaining: we know that error.response?.data.errors exists
       for (const e of error.response?.data.errors) {
         form.setError(e.field, { message: e.message })
         toast.error(
