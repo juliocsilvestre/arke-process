@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Company } from './Companies.defs'
-import { CreateWorkerBody, CreateWorkerSchema } from './Workers.defs'
+import { CreateWorkerBody, CreateWorkerSchema, workerInitialValues } from './Workers.defs'
 
 export const WorkersPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -27,24 +27,7 @@ export const WorkersPage = (): JSX.Element => {
 
   const form = useForm<CreateWorkerBody>({
     resolver: zodResolver(CreateWorkerSchema),
-    defaultValues: {
-      full_name: '',
-      cpf: '',
-      rg: '',
-      email: '',
-      phone_number: '',
-      picture: '',
-      company_id: '',
-      role: '',
-      status: 'active',
-      street: '',
-      complement: '',
-      cep: '',
-      city: '',
-      neighborhood: '',
-      number: 0,
-      uf: 'AC',
-    },
+    defaultValues: workerInitialValues,
   })
 
   const { mutateAsync: createWorker } = useCreateWorker()
