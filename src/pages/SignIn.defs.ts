@@ -1,6 +1,5 @@
+import { CPF_REGEXP } from '@/utils/constants'
 import * as z from 'zod'
-
-export const CPF_REGEXP = /^(\d{3}.?\d{3}.?\d{3}-?\d{2})$/
 
 export const SignInSchema = z.object({
   cpf: z.string().refine(

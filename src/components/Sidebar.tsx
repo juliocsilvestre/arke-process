@@ -15,12 +15,12 @@ import { useSignOutMutation } from '@/api/mutations/auth.mutation'
 import { removeUser } from '@/store/auth.store'
 import Logo from '../assets/logo-white.png'
 
-const navigation = [
+export const navigation = [
   { name: 'Administradores', href: '/dashboard/administradores', icon: ShieldCheckIcon },
   { name: 'Funcionários', href: '/dashboard/funcionarios', icon: UserGroupIcon },
   { name: 'Fornecedores', href: '/dashboard/fornecedores', icon: BuildingOfficeIcon },
   { name: 'Eventos', href: '/dashboard/eventos', icon: TicketIcon },
-  { name: 'Relatório', href: '/dashboard/relatorio', icon: ChartBarIcon },
+  { name: 'Relatórios', href: '/dashboard/relatorios', icon: ChartBarIcon },
 ]
 
 function classNames(...classes: string[]) {
@@ -32,8 +32,6 @@ export function Sidebar({ children }: { children: ReactNode }) {
 
   const navigate = useNavigate()
   const { latestLocation } = useRouter()
-
-  console.log(latestLocation)
 
   const { mutateAsync: doLogout } = useSignOutMutation()
 
@@ -97,7 +95,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                   <nav className="flex flex-1 flex-col">
                     <ul className="flex flex-1 flex-col gap-y-7">
                       <li>
-                        <ul className="-mx-2 space-y-1">
+                        <ul className="mx-auto space-y-1">
                           {navigation.map((item) => (
                             <li key={item.name}>
                               <Link
@@ -129,7 +127,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-6">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-4">
           <div className="my-10 flex h-16 shrink-0 items-center hover:opacity-80">
             {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
             <a href="#">
@@ -139,7 +137,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-4">
               <li>
-                <ul className="-mx-2 space-y-1">
+                <ul className="mx-auto space-y-1">
                   {navigation.map((item) => (
                     <li key={item.name}>
                       <Link
@@ -164,7 +162,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => void handleSignOut()}
-                  className="w-full group -mx-2 flex justify-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-50 hover:text-primary"
+                  className="w-full group mx-auto flex justify-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-white hover:bg-gray-50 hover:text-primary"
                 >
                   <PowerIcon className="h-6 w-6 shrink-0 text-white group-hover:text-primary" aria-hidden="true" />
                   Sair
@@ -190,6 +188,15 @@ export function Sidebar({ children }: { children: ReactNode }) {
         <div className="flex-1 text-sm font-semibold leading-6 text-white">
           {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}{' '}
         </div>
+
+        <button
+          type="button"
+          onClick={() => void handleSignOut()}
+          className="flex items-center gap-x-2 text-sm font-semibold leading-6 text-white hover:text-primary"
+        >
+          <PowerIcon className="h-5 w-5" aria-hidden="true" />
+          Sair
+        </button>
       </div>
 
       {children}

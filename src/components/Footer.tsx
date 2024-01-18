@@ -24,7 +24,7 @@ const Footer = React.forwardRef<HTMLElement, FooterProps>(({ className, variant,
 
   return (
     <footer className={cn(footerVariants({ variant, className }))} ref={ref} {...props}>
-      <p>© {year} INIT1. Todos os direitos reservados.</p>
+      <p>© {year} Init1. Todos os direitos reservados.</p>
     </footer>
   )
 })
