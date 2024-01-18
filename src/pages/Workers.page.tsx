@@ -75,6 +75,8 @@ export const WorkersPage = (): JSX.Element => {
 
   const handleOnClose = () => {
     setIsOpen(false)
+    setPicturePreview(null)
+    setPreviewImageURL('')
     form.reset()
   }
 
