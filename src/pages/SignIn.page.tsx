@@ -36,7 +36,7 @@ export const SignIn = () => {
       setUser(user.data)
 
       if (user.data.cpf) {
-        await navigate({ to: '/dashboard/administradores' })
+        await navigate({ to: '/dashboard/eventos' })
       }
     } catch (error: unknown) {
       if (!(error instanceof AxiosError)) return

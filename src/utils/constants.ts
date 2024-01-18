@@ -49,8 +49,8 @@ export const NAVIGATION = [
   { name: 'Administradores', href: '/dashboard/administradores', icon: ShieldCheckIcon },
   { name: 'Funcionários', href: '/dashboard/funcionarios', icon: UserGroupIcon },
   { name: 'Fornecedores', href: '/dashboard/fornecedores', icon: BuildingOfficeIcon },
-  // { name: 'Eventos', href: '/dashboard/eventos', icon: TicketIcon },
-  // { name: 'Relatórios', href: '/dashboard/relatorios', icon: ChartBarIcon },
+  { name: 'Eventos', href: '/dashboard/eventos', icon: TicketIcon },
+  { name: 'Relatórios', href: '/dashboard/relatorios', icon: ChartBarIcon },
 ]
 
 export const WORKER_STATUS = {
