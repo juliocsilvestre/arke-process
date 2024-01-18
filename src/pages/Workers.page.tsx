@@ -1,11 +1,15 @@
 import { useCreateWorker } from '@/api/mutations/workers.mutation'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
+import { useGetAddresByCep } from '@/api/queries/workers.query'
 import { Button } from '@/components/ui/Button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
+import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
 import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
@@ -13,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,6 +28,7 @@ export const WorkersPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
   const [picturePreview, setPicturePreview] = useState<File | null>(null)
   const [previewImageURL, setPreviewImageURL] = useState<string>('')
+  const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   const form = useForm<CreateWorkerBody>({
@@ -83,6 +89,20 @@ export const WorkersPage = (): JSX.Element => {
       reader.readAsDataURL(picturePreview)
     }
   }, [picturePreview])
+
+  const { data } = useGetAddresByCep(form.watch('cep'))
+
+  const cep = form.watch('cep')
+  useEffect(() => {
+    if (cep.length !== 9) return
+
+    if (Object.keys(data ?? {})?.length > 0) {
+      form.setValue('street', data.logradouro)
+      form.setValue('neighborhood', data.bairro)
+      form.setValue('city', data.localidade)
+      form.setValue('uf', data.uf)
+    }
+  }, [cep, data, form])
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
@@ -158,14 +178,14 @@ export const WorkersPage = (): JSX.Element => {
                               if (picture) {
                                 if (picture.size > MAX_FILE_SIZE) {
                                   form.setError('picture', {
-                                    message: 'O arquivo deve ter no máximo 2MB.',
+                                    message: 'Tamanho máximo de 2MB.',
                                   })
                                   return
                                 }
 
                                 if (!ACCEPTED_IMAGE_TYPES.includes(picture.type)) {
                                   form.setError('picture', {
-                                    message: 'O arquivo deve ser uma imagem.',
+                                    message: 'Tipo de arquivo inválido.',
                                   })
 
                                   return
@@ -177,7 +197,7 @@ export const WorkersPage = (): JSX.Element => {
                             }}
                           />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-center" />
                       </FormItem>
                     )}
                   />
@@ -306,22 +326,53 @@ export const WorkersPage = (): JSX.Element => {
                   render={({ field }) => (
                     <FormItem className="w-[50%]">
                       <Label htmlFor="company_id" label="Fornecedor" isRequired />
-                      <FormControl>
-                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Fornecedor" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
+                      <Popover open={isCompanySelectOpen} onOpenChange={setIsCompanySelectOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              size="select"
+                              className={cn(
+                                'w-full justify-between border-slate-200 hover:bg-transparent text-gray-600 hover:text-gray-600',
+                                !field.value && 'opacity-50 text-muted-foreground',
+                              )}
+                            >
+                              {field.value
+                                ? companies?.data.companies.data.find((company: Company) => company.id === field.value)
+                                    ?.name
+                                : 'Fornecedor'}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[420px] p-0">
+                          <Command className="w-full">
+                            <CommandInput placeholder="Fornecedor..." className="w-full" />
+                            <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
+                            <CommandGroup>
                               {companies?.data.companies.data.map((company: Company) => (
-                                <SelectItem key={company.id} value={company.id}>
+                                <CommandItem
+                                  value={company.name}
+                                  key={company.id}
+                                  onSelect={() => {
+                                    form.setValue('company_id', company.id)
+                                    setIsCompanySelectOpen(false)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 h-4 w-4',
+                                      company.id === field.value ? 'opacity-100' : 'opacity-0',
+                                    )}
+                                  />
                                   {company.name}
-                                </SelectItem>
+                                </CommandItem>
                               ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
