@@ -11,7 +11,7 @@ const _baseStyle =
 const inputVariants = cva(_baseStyle, {
   variants: {
     variant: {
-      default: 'border-gray-500 bg-white text-gray-600 placeholder:text-gray-600 focus-visible:border-primary-500',
+      default: 'border-slate-200 bg-white text-gray-600 placeholder:text-gray-600 focus-visible:border-primary-500',
       error: 'border-error-500 bg-white text-error-500 placeholder:text-error-500 focus-visible:ring-error-100',
       file: 'file:border-0 file:bg-transparent file:text-sm file:font-medium',
     },
