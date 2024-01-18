@@ -8,7 +8,7 @@ import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/util
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { PlusIcon, UserIcon } from '@heroicons/react/24/solid'
+import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
@@ -110,31 +110,41 @@ export const WorkersPage = (): JSX.Element => {
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onCreateCompany)} className="h-full flex flex-col gap-2 justify-between">
-            <div className="px-5 py-6 flex flex-col ">
+            <div className="px-5 py-6 flex flex-col">
               {/* <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4> */}
 
-              <div className="flex flex-row-reverse gap-2">
+              <div className="flex flex-row gap-10">
                 <div className="flex flex-col items-center">
-                  {previewImageURL ? (
-                    <img
-                      src={previewImageURL}
-                      alt="Foto do funcionário"
-                      className="mx-auto w-[185px] h-[185px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg"
-                    />
-                  ) : (
-                    <div className="relative mx-auto w-[185px] h-[185px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg bg-gray-200">
-                      <UserIcon
-                        className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] h-20 w-20 text-gray-500"
-                        aria-hidden="true"
+                  <div className="w-full !shrink-0">
+                    {previewImageURL ? (
+                      <img
+                        src={previewImageURL}
+                        alt="Foto do funcionário"
+                        className="mx-auto w-[200px] h-[200px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg !shrink-0"
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div className="relative flex mx-auto w-[200px] h-[200px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg bg-gray-200 !shrink-0">
+                        <UserIcon
+                          className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] h-20 w-20 text-gray-500"
+                          aria-hidden="true"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="picture"
                     render={({ field }) => (
                       <FormItem className="w-[100%]">
-                        <Label htmlFor="picture" label="Foto" />
+                        <div className="flex items-center justify-center gap-1">
+                          <PaperClipIcon className="w-5 text-primary-700" />
+                          <Label
+                            htmlFor="picture"
+                            label={picturePreview ? 'Trocar foto' : 'Fazer upload de foto'}
+                            className="italic font-normal"
+                          />
+                        </div>
                         <FormControl>
                           <Input
                             id="picture"
@@ -142,7 +152,7 @@ export const WorkersPage = (): JSX.Element => {
                             {...field}
                             type="file"
                             size="md"
-                            className="h-[42px]"
+                            className="h-[42px] hidden"
                             onChange={(event) => {
                               const picture = event.target.files?.[0]
                               if (picture) {
@@ -173,7 +183,7 @@ export const WorkersPage = (): JSX.Element => {
                   />
                 </div>
 
-                <div className="w-[80%]">
+                <div className="w-[70%]">
                   <div className="flex gap-2">
                     <FormField
                       control={form.control}
@@ -286,51 +296,51 @@ export const WorkersPage = (): JSX.Element => {
                       )}
                     />
                   </div>
-                  <div className="flex gap-2">
-                    <FormField
-                      control={form.control}
-                      name="company_id"
-                      render={({ field }) => (
-                        <FormItem className="w-[50%]">
-                          <Label htmlFor="company_id" label="Empresa" isRequired />
-                          <FormControl>
-                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Empresa" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  {companies?.data.companies.data.map((company: Company) => (
-                                    <SelectItem key={company.id} value={company.id}>
-                                      {company.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem className="w-[50%]">
-                          <Label htmlFor="role" label="Função" isRequired />
-                          <FormControl>
-                            <Input id="role" placeholder="Insira a função" {...field} size="md" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
                 </div>
               </div>
 
+              <div className="flex gap-2">
+                <FormField
+                  control={form.control}
+                  name="company_id"
+                  render={({ field }) => (
+                    <FormItem className="w-[50%]">
+                      <Label htmlFor="company_id" label="Fornecedor" isRequired />
+                      <FormControl>
+                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Fornecedor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {companies?.data.companies.data.map((company: Company) => (
+                                <SelectItem key={company.id} value={company.id}>
+                                  {company.name}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem className="w-[50%]">
+                      <Label htmlFor="role" label="Função" isRequired />
+                      <FormControl>
+                        <Input id="role" placeholder="Insira a função" {...field} size="md" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               {/* <h4 className="text-2xl text-primary font-bold">Endereço</h4> */}
               <div className="flex gap-2">
                 <FormField
