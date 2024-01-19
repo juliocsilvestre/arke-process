@@ -14,6 +14,7 @@ const buttonVariants = cva(_baseStyle, {
       destructive: 'bg-error-500 text-white hover:bg-error-600',
       outline: 'text-primary-600 border border-primary-500 bg-transparent hover:bg-primary hover:text-white',
       secondary: 'bg-secondary-400 text-gray-800 hover:bg-secondary-500',
+      ghost: 'bg-transparent text-primary-600 hover:bg-primary-50',
     },
     size: {
       default: 'h-10 px-4 py-2',
