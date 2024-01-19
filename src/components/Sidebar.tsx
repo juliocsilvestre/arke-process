@@ -1,27 +1,13 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import {
-  BuildingOfficeIcon,
-  ChartBarIcon,
-  PowerIcon,
-  ShieldCheckIcon,
-  TicketIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/solid'
+import { PowerIcon } from '@heroicons/react/24/solid'
 import { Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { Fragment, ReactNode, useState } from 'react'
 
 import { useSignOutMutation } from '@/api/mutations/auth.mutation'
 import { removeUser } from '@/store/auth.store'
+import { NAVIGATION } from '@/utils/constants'
 import Logo from '../assets/logo-white.png'
-
-export const navigation = [
-  { name: 'Administradores', href: '/dashboard/administradores', icon: ShieldCheckIcon },
-  { name: 'Funcionários', href: '/dashboard/funcionarios', icon: UserGroupIcon },
-  { name: 'Fornecedores', href: '/dashboard/fornecedores', icon: BuildingOfficeIcon },
-  { name: 'Eventos', href: '/dashboard/eventos', icon: TicketIcon },
-  { name: 'Relatórios', href: '/dashboard/relatorios', icon: ChartBarIcon },
-]
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -87,16 +73,15 @@ export function Sidebar({ children }: { children: ReactNode }) {
                 {/* Sidebar component, swap this element with another sidebar if you like */}
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-6 pb-2">
                   <div className="flex my-10 h-16 shrink-0 items-center  hover:opacity-80">
-                    {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-                    <a href="#">
+                    <Link to="/dashboard/eventos">
                       <img className="w-auto" src={Logo} alt="Carvalheira, Criando Memórias" />
-                    </a>
+                    </Link>
                   </div>
                   <nav className="flex flex-1 flex-col">
                     <ul className="flex flex-1 flex-col gap-y-7">
                       <li>
                         <ul className="mx-auto space-y-1">
-                          {navigation.map((item) => (
+                          {NAVIGATION.map((item) => (
                             <li key={item.name}>
                               <Link
                                 to={item.href}
@@ -129,16 +114,15 @@ export function Sidebar({ children }: { children: ReactNode }) {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-4">
           <div className="my-10 flex h-16 shrink-0 items-center hover:opacity-80">
-            {/* biome-ignore lint/a11y/useValidAnchor: <explanation> */}
-            <a href="#">
+            <Link to="/dashboard/eventos">
               <img className="w-auto" src={Logo} alt="Carvalheira, Criando Memórias" />
-            </a>
+            </Link>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-4">
               <li>
                 <ul className="mx-auto space-y-1">
-                  {navigation.map((item) => (
+                  {NAVIGATION.map((item) => (
                     <li key={item.name}>
                       <Link
                         to={item.href}
@@ -186,7 +170,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
         </button>
         {/* make this dynamic */}
         <div className="flex-1 text-sm font-semibold leading-6 text-white">
-          {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}{' '}
+          {NAVIGATION.find((n) => n.href === latestLocation.pathname)?.name ?? ''}{' '}
         </div>
 
         <button

@@ -1,9 +1,12 @@
-import { NotFoundRoute, RootRoute, Route, Router, redirect } from '@tanstack/react-router'
+import { NotFoundRoute, Route, Router, redirect, rootRouteWithContext } from '@tanstack/react-router'
 
 import { AuthLayout } from '@layouts/auth.layout'
 import { DashboardLayout } from '@layouts/dashboard.layout'
 
 import { TestDashboard } from '@components/TestDashboard'
+import { QueryClient } from '@tanstack/react-query'
+import { indexCompaniesQueryOptions } from './api/queries/companies.query'
+import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
 import { NotFoundPage } from './pages/404.page'
 import { AdminsPage } from './pages/Admins.page'
@@ -14,7 +17,9 @@ import { SignIn } from './pages/SignIn.page'
 import { WorkersPage } from './pages/Workers.page'
 import { useAuthStore } from './store/auth.store'
 
-const rootRoute = new RootRoute()
+const rootRoute = rootRouteWithContext<{
+  queryClient: QueryClient
+}>()()
 
 const authLayout = new Route({
   id: 'auth-layout',
@@ -25,7 +30,6 @@ const authLayout = new Route({
 const dashboardLayout = new Route({
   id: 'dashboard-layout',
   getParentRoute: () => rootRoute,
-  component: DashboardLayout,
 })
 
 const publicLayout = new Route({
@@ -38,10 +42,21 @@ const authRoute = new Route({
   getParentRoute: () => authLayout,
   component: SignIn,
   path: '/',
+  pendingComponent: Loading,
+  beforeLoad: async () => {
+    const isUserAuthenticated = useAuthStore.getState().isAuthenticated
+
+    if (isUserAuthenticated) {
+      throw redirect({
+        to: '/dashboard',
+      })
+    }
+  },
 })
 
 const dashboardRoute = new Route({
   getParentRoute: () => dashboardLayout,
+  component: DashboardLayout,
   path: 'dashboard',
   beforeLoad: async () => {
     const isUserAuthenticated = useAuthStore.getState().isAuthenticated
@@ -58,12 +73,20 @@ const adminsRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: AdminsPage,
   path: 'administradores',
+  // TODO: force loading or fetch lists...
+  loader: async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+  },
+  pendingComponent: Loading,
 })
 
 const workersRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: WorkersPage,
   path: 'funcionarios',
+  loader: async ({ context: { queryClient } }) => {
+    queryClient.ensureQueryData(indexCompaniesQueryOptions)
+  },
 })
 
 const companiesRoute = new Route({
@@ -103,7 +126,17 @@ const routeTree = rootRoute.addChildren([
   publicLayout.addChildren([publicRoute]),
 ])
 
-export const router = new Router({ routeTree, notFoundRoute, defaultPreload: 'intent', defaultStaleTime: 5000 })
+export const queryClient = new QueryClient()
+
+export const router = new Router({
+  context: {
+    queryClient,
+  },
+  routeTree,
+  notFoundRoute,
+  defaultPreload: 'intent',
+  defaultStaleTime: 5000,
+})
 
 declare module '@tanstack/react-router' {
   interface Register {

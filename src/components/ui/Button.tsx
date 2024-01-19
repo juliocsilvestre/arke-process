@@ -20,6 +20,7 @@ const buttonVariants = cva(_baseStyle, {
       sm: 'h-9 rounded-md px-3',
       lg: 'h-11 rounded-md px-8',
       icon: 'h-10 w-10',
+      select: 'h-[34px] px-4 py-2',
     },
   },
   defaultVariants: {

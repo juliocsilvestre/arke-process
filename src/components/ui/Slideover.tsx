@@ -1,27 +1,18 @@
+import { cn } from '@/utils/styles'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/solid'
-import { Fragment, ReactNode, useEffect, useRef, useState } from 'react'
+import { Fragment, ReactNode } from 'react'
 
 export interface SlideOverProps {
   isOpen: boolean
   children: ReactNode
   title: string
   subtitle?: string
+  classNames?: string
   close: () => void
 }
 
-export const SlideOver = ({ title, subtitle, isOpen, children, close }: SlideOverProps): JSX.Element => {
-  const [headerHeight, setHeaderHeight] = useState(0)
-
-  const headerRef = useRef<HTMLDivElement | null>(null)
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    if (headerRef.current) {
-      setHeaderHeight(headerRef.current.clientHeight)
-    }
-  }, [isOpen, headerRef])
-
+export const SlideOver = ({ title, subtitle, isOpen, children, classNames, close }: SlideOverProps): JSX.Element => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={close}>
@@ -39,8 +30,8 @@ export const SlideOver = ({ title, subtitle, isOpen, children, close }: SlideOve
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel className="pointer-events-auto w-screen max-w-md h-full shadow-md">
-                  <div ref={headerRef} className="bg-primary px-4 py-6 sm:px-6 h-[112px]">
+                <Dialog.Panel className={cn('pointer-events-auto w-screen max-w-md h-full shadow-md', classNames)}>
+                  <div className="bg-primary px-4 py-6 sm:px-6 h-[112px]">
                     <div className="flex items-center justify-between">
                       <Dialog.Title className="text-lg font-semibold leading-6 text-white">{title}</Dialog.Title>
                       <div className="ml-3 flex h-7 items-center">

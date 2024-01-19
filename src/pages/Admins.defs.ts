@@ -1,22 +1,23 @@
-import { CPF_REGEXP } from '@/utils/constants'
-import { z } from 'zod'
+import { CPF_REGEXP } from '@utils/constants'
+import * as z from 'zod'
 
-export const SignUpSchema = z.object({
+export const CreateAdminSchema = z.object({
   name: z
     .string()
-    .min(2, { message: 'Nome deve conter pelo menos 2 caracteres.' })
+    .min(3, { message: 'Nome deve conter pelo menos 3 caracteres.' })
     .max(50, { message: 'Nome deve conter no máximo 50 caracteres.' }),
-  email: z.union([z.string().email({ message: 'Email inválido.' }), z.literal('')]),
+  email: z.string().email({ message: 'Email inválido.' }),
   cpf: z.string().refine(
-    (v) => {
-      console.log(v, CPF_REGEXP.test(v.toString()))
-      return CPF_REGEXP.test(v.toString())
+    (cpf) => {
+      return CPF_REGEXP.test(cpf.toString())
     },
-    { message: 'CPF inválido' },
+    {
+      message: 'Credenciais inválidas',
+    },
   ),
   password: z.string().min(10, {
-    message: 'A senha deve conter pelo menos 10 caracteres.',
+    message: 'Credenciais inválidas',
   }),
 })
 
-export type SignUpBody = z.infer<typeof SignUpSchema>
+export type CreateAdminBody = z.infer<typeof CreateAdminSchema>

@@ -1,9 +1,9 @@
 import { useCreateAdmin } from '@/api/mutations/admin.mutation'
-import { navigation } from '@/components/Sidebar'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
+import { NAVIGATION } from '@/utils/constants'
 import { maskCPF } from '@/utils/strings'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
@@ -13,26 +13,26 @@ import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { SignUpBody, SignUpSchema } from './Admins.defs'
+import { CreateAdminBody, CreateAdminSchema } from './Admins.defs'
 
 export const AdminsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const form = useForm<SignUpBody>({
-    resolver: zodResolver(SignUpSchema),
+  const form = useForm<CreateAdminBody>({
+    resolver: zodResolver(CreateAdminSchema),
     defaultValues: {
-      cpf: '',
-      password: '',
-      email: '',
       name: '',
+      cpf: '',
+      email: '',
+      password: '',
     },
   })
 
   const { mutateAsync: createAdmin } = useCreateAdmin()
 
-  const onSignUp = async (values: SignUpBody): Promise<void> => {
+  const onSignUp = async (values: CreateAdminBody): Promise<void> => {
     try {
       await createAdmin(values)
       form.reset()
@@ -44,7 +44,7 @@ export const AdminsPage = (): JSX.Element => {
       )
     } catch (error: unknown) {
       if (!(error instanceof AxiosError)) return
-      console.log(error.response?.data.errors)
+      console.error(error.response?.data.errors)
 
       // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
       for (const e of error.response?.data.errors) {
@@ -67,7 +67,7 @@ export const AdminsPage = (): JSX.Element => {
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
         <h1 className="text-4xl text-primary font-bold">
-          {navigation.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
+          {NAVIGATION.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
         </h1>
 
         <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)}>
@@ -77,7 +77,7 @@ export const AdminsPage = (): JSX.Element => {
       </div>
 
       <section className="mt-[14%]">
-        <div className="w-full h-[600px] bg-gray-200">,</div>
+        <div className="w-full h-[500px] bg-gray-200">,</div>
       </section>
 
       <SlideOver
