@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/Button'
-import NotFoundImg from '../assets/404-error.png'
-import { Link } from '@tanstack/react-router'
+import NotFoundImg from '@/assets/404-error.png'
 import { Footer } from '@/components/Footer'
+import { Button } from '@/components/ui/Button'
+import { Link } from '@tanstack/react-router'
 
 export const NotFoundPage = () => {
   return (
@@ -14,7 +14,7 @@ export const NotFoundPage = () => {
         <img src={NotFoundImg} className="w-auto" alt="404 - Página não encontrada" />
       </div>
       <Button size="sm" className="bg-white text-primary hover:bg-primary-600 hover:text-white">
-        <Link to="/dashboard">Voltar para o Dashboard</Link>
+        <Link to="/dashboard">Voltar</Link>
       </Button>
       <Footer className="bg-primary text-white" />
     </div>

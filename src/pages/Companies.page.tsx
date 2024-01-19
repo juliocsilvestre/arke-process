@@ -1,3 +1,7 @@
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
+import { PlusIcon } from '@heroicons/react/24/solid'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -10,10 +14,7 @@ import { Label } from '@/components/ui/Label'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { NAVIGATION } from '@/utils/constants'
 import { maskCNPJ } from '@/utils/strings'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
-import { PlusIcon } from '@heroicons/react/24/solid'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from '@tanstack/react-router'
+
 import { CreateCompanyBody, CreateCompanySchema } from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
