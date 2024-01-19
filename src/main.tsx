@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom/client'
 import '@styles/globals.css'
 import '@styles/tailwind.css'
 
-import { Toaster } from '@/components/ui/sonner'
+import { Toaster } from '@components/ui/Sonner'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient, router } from './routes'
 

@@ -539,12 +539,6 @@ export const WorkersPage = (): JSX.Element => {
                 />
               </div>
             </div>
-            {/* <div className="relative px-4">
-              <p className="absolute top-[50%] translate-y-[-50%] bg-white px-2 z-40 left-[50%] translate-x-[-50%]">
-                Ou
-              </p>
-              <Separator className="absolute top-[50%] translate-y-[-50%]" />
-            </div> */}
 
             <SlideOverFooter>
               <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
