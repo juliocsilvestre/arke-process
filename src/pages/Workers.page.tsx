@@ -41,20 +41,18 @@ export const WorkersPage = (): JSX.Element => {
   const onCreateCompany = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
-        if (picturePreview instanceof File) {
-          await createWorker({ ...values, picture: picturePreview })
-          form.reset()
-          handleOnClose()
-          toast.success(
-            Array.isArray(values) && values.length > 0 ? (
-              <p>{values.length} funcionários foram criados com sucesso!</p>
-            ) : (
-              <p>
-                O funcionário <strong>{values.full_name}</strong> foi criado com sucesso!
-              </p>
-            ),
-          )
-        }
+        await createWorker({ ...values, picture: picturePreview })
+        form.reset()
+        handleOnClose()
+        toast.success(
+          Array.isArray(values) && values.length > 0 ? (
+            <p>{values.length} funcionários foram criados com sucesso!</p>
+          ) : (
+            <p>
+              O funcionário <strong>{values.full_name}</strong> foi criado com sucesso!
+            </p>
+          ),
+        )
       } catch (error: unknown) {
         if (!(error instanceof AxiosError)) return
 
