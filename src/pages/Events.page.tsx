@@ -15,8 +15,8 @@ import { Calendar } from '@components/ui/Calendar'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Input } from '@components/ui/Input'
 import { Label } from '@components/ui/Label'
+import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@components/ui/Slideover'
-import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/popover'
 import { NAVIGATION } from '@utils/constants'
 import { cn } from '@utils/styles'
 
@@ -105,7 +105,7 @@ export const EventsPage = (): JSX.Element => {
                   <FormItem>
                     <Label htmlFor="name" label="Nome" isRequired />
                     <FormControl>
-                      <Input id="name" placeholder="Insira seu nome" {...field} size="lg" />
+                      <Input id="name" placeholder="Insira o nome do evento" {...field} size="lg" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -167,7 +167,7 @@ export const EventsPage = (): JSX.Element => {
                   Cancelar
                 </Button>
                 <Button variant="default" type="submit">
-                  Criar fornecedor
+                  Criar evento
                 </Button>
               </div>
             </SlideOverFooter>
