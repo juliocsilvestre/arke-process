@@ -2,44 +2,52 @@ import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { useCreateCompany } from '@/api/mutations/companies.mutation'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
-import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { NAVIGATION } from '@/utils/constants'
-import { maskCNPJ } from '@/utils/strings'
+import { useCreateEvent } from '@/api/mutations/events.mutation'
+import { Button } from '@components/ui/Button'
+import { Calendar } from '@components/ui/Calendar'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
+import { Input } from '@components/ui/Input'
+import { Label } from '@components/ui/Label'
+import { SlideOver, SlideOverFooter } from '@components/ui/Slideover'
+import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/popover'
+import { NAVIGATION } from '@utils/constants'
+import { cn } from '@utils/styles'
 
-import { CreateCompanyBody, CreateCompanySchema } from './Companies.defs'
+import { CreateEventBody, CreateEventSchema } from './Events.defs'
 
 export const EventsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const form = useForm<CreateCompanyBody>({
-    resolver: zodResolver(CreateCompanySchema),
+  const form = useForm<CreateEventBody>({
+    resolver: zodResolver(CreateEventSchema),
     defaultValues: {
       name: '',
-      cnpj: '',
+      dates: {
+        from: undefined,
+        to: undefined,
+      },
     },
   })
 
-  const { mutateAsync: createCompany } = useCreateCompany()
+  const { mutateAsync: createEvent } = useCreateEvent()
 
-  const onCreateCompany = async (values: CreateCompanyBody): Promise<void> => {
+  const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
     try {
-      await createCompany(values)
+      await createEvent(values)
       form.reset()
       handleOnClose()
       toast.success(
         <p>
-          O fornecedor <strong>{values.name}</strong> foi criado com sucesso!
+          O evento <strong>{values.name}</strong> foi criado com sucesso!
         </p>,
       )
     } catch (error: unknown) {
@@ -62,6 +70,7 @@ export const EventsPage = (): JSX.Element => {
     setIsOpen(false)
     form.reset()
   }
+  const disabledDays = [{ before: new Date() }]
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
@@ -72,7 +81,7 @@ export const EventsPage = (): JSX.Element => {
 
         <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)}>
           <PlusIcon className="h-6 w-6" aria-hidden="true" />
-          Novo fornecedor
+          Novo evento
         </Button>
       </div>
 
@@ -81,13 +90,13 @@ export const EventsPage = (): JSX.Element => {
       </section>
 
       <SlideOver
-        title="Novo fornecedor"
-        subtitle="Preencha os campos abaixo para criar um novo fornecedor."
+        title="Novo evento"
+        subtitle="Preencha os campos abaixo para criar um novo evento."
         isOpen={isOpen}
         close={handleOnClose}
       >
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onCreateCompany)} className="h-full flex flex-col gap-2 justify-between">
+          <form onSubmit={form.handleSubmit(onCreateEvent)} className="h-full flex flex-col gap-2 justify-between">
             <div className="px-5 py-6">
               <FormField
                 control={form.control}
@@ -105,27 +114,47 @@ export const EventsPage = (): JSX.Element => {
 
               <FormField
                 control={form.control}
-                name="cnpj"
+                name="dates"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="cnpj" label="CNPJ" isRequired />
-                    <FormControl>
-                      <Input
-                        id="cnpj"
-                        placeholder="Insira seu CNPJ"
-                        {...field}
-                        size="lg"
-                        onBlur={(event) => {
-                          if (event.target.value) {
-                            form.trigger('cnpj')
-                          }
-                        }}
-                        onChange={(event) => {
-                          const cnpj = maskCNPJ(event.target.value)
-                          form.setValue('cnpj', cnpj)
-                        }}
-                      />
-                    </FormControl>
+                    <Label htmlFor="dates" label="Dias do evento" isRequired />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="date"
+                          variant="outline"
+                          className={cn(
+                            'w-[300px] justify-start text-left font-normal !border-slate-200 text-gray-600 hover:bg-white hover:text-gray-600 focus-visible:!border-primary-700',
+                            !field.value?.from && !field.value?.to && '!opacity-50',
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value?.from ? (
+                            field.value.to ? (
+                              <>
+                                {format(field.value.from, 'LLL dd, y')} - {format(field.value.to, 'LLL dd, y')}
+                              </>
+                            ) : (
+                              format(field.value.from, 'LLL dd, y')
+                            )
+                          ) : (
+                            <span>Escolha uma data</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 " align="start">
+                        <Calendar
+                          locale={ptBR}
+                          initialFocus
+                          mode="range"
+                          defaultMonth={field.value?.from}
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          numberOfMonths={1}
+                          disabled={disabledDays}
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
