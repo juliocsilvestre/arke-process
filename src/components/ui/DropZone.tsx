@@ -58,7 +58,6 @@ export const DropZone = ({ readFile }: { readFile: (props: UploadFileProps) => v
         action="/target"
         className="dropzone flex flex-col items-start justify-center w-full [&_.dz-details]:flex [&_.dz-details]:flex-row-reverse [&_.dz-details]:w-full [&_.dz-preview]:w-full  [&_.dz-details]:justify-between [&_.dz-size]:text-primary-700 [&_.dz-filename]:text-primary-700"
       >
-        {/* <Label htmlFor="dropzone-file" label="Importar de uma planilha" className="mb-2" /> */}
         <label
           htmlFor="dropzone-file"
           className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
