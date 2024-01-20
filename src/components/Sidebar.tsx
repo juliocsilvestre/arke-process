@@ -8,6 +8,7 @@ import { useSignOutMutation } from '@/api/mutations/auth.mutation'
 import { removeUser } from '@/store/auth.store'
 import { NAVIGATION } from '@/utils/constants'
 import Logo from '../assets/logo-white.png'
+import { Badge } from './ui/Badge'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -95,6 +96,11 @@ export function Sidebar({ children }: { children: ReactNode }) {
                                   aria-hidden="true"
                                 />
                                 {item.name}
+                                {!item.released && (
+                                  <Badge variant="success" className="ml-2">
+                                    Em breve!
+                                  </Badge>
+                                )}
                               </Link>
                             </li>
                           ))}
@@ -126,17 +132,39 @@ export function Sidebar({ children }: { children: ReactNode }) {
                     <li key={item.name}>
                       <Link
                         to={item.href}
+                        disabled={!item.released}
                         activeOptions={{ exact: true }}
                         className={classNames(
-                          '[&.active]:bg-white [&.active]:text-primary [&.active_.icon]:text-primary text-white hover:text-primary hover:bg-white',
+                          '[&.active]:bg-white [&.active_.label]:text-primary [&.active]:text-primary [&.active_.icon]:text-primary text-white hover:text-primary hover:bg-white',
                           'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold',
+                          !item.released ? 'hover:!bg-transparent hover:!text-white cursor-not-allowed' : '',
                         )}
                       >
                         <item.icon
-                          className={classNames('icon text-white group-hover:text-primary', 'h-6 w-6 shrink-0')}
+                          className={classNames(
+                            'icon text-white group-hover:text-primary',
+                            'h-6 w-6 shrink-0',
+                            !item.released ? 'opacity-50 cursor-not-allowed group-hover:text-white' : '',
+                          )}
                           aria-hidden="true"
                         />
-                        {item.name}
+                        <span
+                          className={classNames(
+                            'label text-white group-hover:text-primary',
+                            !item.released ? 'opacity-50 cursor-not-allowed group-hover:text-white' : '',
+                          )}
+                        >
+                          {item.name}
+                        </span>
+                        {!item.released && (
+                          <Badge
+                            variant="success"
+                            size="sm"
+                            className={classNames('ml-2', !item.released ? 'cursor-not-allowed' : '')}
+                          >
+                            Em breve!
+                          </Badge>
+                        )}
                       </Link>
                     </li>
                   ))}

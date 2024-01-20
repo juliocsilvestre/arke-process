@@ -1,16 +1,17 @@
 import { useCreateWorker } from '@/api/mutations/workers.mutation'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
-import { useGetAddresByCep } from '@/api/queries/workers.query'
+import { indexWorkersQueryOption, useGetAddresByCep } from '@/api/queries/workers.query'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
+import { DataTable } from '@/components/ui/DataTable'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
+import { Popover, PopoverContent, PopoverTrigger } from '@components/ui/Popover'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
 import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,7 +23,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Company } from './Companies.defs'
-import { CreateWorkerBody, CreateWorkerSchema, workerInitialValues } from './Workers.defs'
+import { CreateWorkerBody, CreateWorkerSchema, workerInitialValues, workersColumns } from './Workers.defs'
 
 export const WorkersPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -79,6 +80,7 @@ export const WorkersPage = (): JSX.Element => {
   }
 
   const { data: companies } = useQuery(indexCompaniesQueryOptions)
+  const { data: workers } = useQuery(indexWorkersQueryOption)
 
   useEffect(() => {
     if (picturePreview instanceof File) {
@@ -117,8 +119,13 @@ export const WorkersPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[14%]">
-        <div className="w-full h-[500px] bg-gray-200">,</div>
+      <section className="mt-[30px]">
+        <DataTable
+          columns={workersColumns}
+          data={workers?.data.workers.data ?? []}
+          count={workers?.data.workers_count}
+          onRowClick={(worker) => console.log(worker)}
+        />
       </section>
 
       <SlideOver

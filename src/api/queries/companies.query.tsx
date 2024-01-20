@@ -6,6 +6,7 @@ export const indexCompaniesQueryOptions = queryOptions({
   queryKey: ['companies'],
   queryFn: getCompanies,
 })
+
 export const useIndexCompanies = () => {
   const companies = useQuery(indexCompaniesQueryOptions)
 
