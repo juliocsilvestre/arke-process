@@ -1,7 +1,9 @@
 import { CreateEventBody } from '@/pages/Events.defs'
+import { queryClient } from '@/routes'
 import { useMutation } from '@tanstack/react-query'
 import { eachDayOfInterval } from 'date-fns'
 import { api } from '../api'
+import { indexEventsQueryOption } from '../queries/events.query'
 
 export const useCreateEvent = () => {
   const mutation = useMutation({
@@ -12,6 +14,9 @@ export const useCreateEvent = () => {
       })
 
       return api.post('/events', { ...event, dates: arrayOfDates })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexEventsQueryOption)
     },
   })
 

@@ -20,7 +20,10 @@ import { SlideOver, SlideOverFooter } from '@components/ui/Slideover'
 import { NAVIGATION } from '@utils/constants'
 import { cn } from '@utils/styles'
 
-import { CreateEventBody, CreateEventSchema } from './Events.defs'
+import { indexEventsQueryOption } from '@/api/queries/events.query'
+import { DataTable } from '@/components/ui/DataTable'
+import { useQuery } from '@tanstack/react-query'
+import { CreateEventBody, CreateEventSchema, eventsColumns } from './Events.defs'
 
 export const EventsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -39,6 +42,7 @@ export const EventsPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createEvent } = useCreateEvent()
+  const { data: events } = useQuery(indexEventsQueryOption)
 
   const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
     try {
@@ -85,8 +89,8 @@ export const EventsPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[14%]">
-        <div className="w-full h-[500px] bg-gray-200">,</div>
+      <section className="mt-[200px]">
+        <DataTable columns={eventsColumns} data={events?.data.events.data ?? []} count={events?.data.events_count} />
       </section>
 
       <SlideOver
