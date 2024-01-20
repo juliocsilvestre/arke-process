@@ -84,7 +84,6 @@ export const DropZone = ({ readFile }: { readFile: (props: UploadFileProps) => v
             <p className="text-xs text-gray-500 dark:text-gray-400">planilhas do tipo XLSX.</p>
           </div>
 
-          {/* <input id="dropzone-file" type="file" className="hidden" /> */}
           <Input
             ref={fileInputRef}
             id="dropzone-file"
