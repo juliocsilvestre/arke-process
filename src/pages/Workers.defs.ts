@@ -57,3 +57,64 @@ export const workerInitialValues: CreateWorkerBody = {
   number: 0,
   uf: 'AC',
 }
+
+export interface WorkerSheet {
+  Bairro: string
+  CEP: string
+  CPF: string
+  Cargo: string
+  Cidade: string
+  Complemento: string
+  'E-mail': string
+  'Nome completo': string
+  Número: string
+  RG: string
+  Rua: string
+  'Telefone/Whatsapp': string
+  UF: string
+}
+
+export interface CreateWorkerRow {
+  full_name: string
+  cpf: string
+  rg: string
+  email: string
+  phone_number: string
+  picture_url: string
+  role: string
+  status: string
+  address: {
+    street: string
+    complement: string
+    cep: string
+    city: string
+    neighborhood: string
+    number: string
+    uf: string
+  }
+}
+
+export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
+  return sheet.map((row) => {
+    return {
+      full_name: row['Nome completo'],
+      cpf: row.CPF,
+      rg: row.RG,
+      email: row['E-mail'],
+      phone_number: row['Telefone/Whatsapp'],
+      picture_url: '',
+      role: row.Cargo,
+      status: WORKER_STATUS.active,
+      address: {
+        street: row.Rua,
+        complement: row.Complemento,
+        cep: row.CEP,
+        city: row.Cidade,
+        neighborhood: row.Bairro,
+        // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+        number: row['Número'],
+        uf: row.UF,
+      },
+    }
+  })
+}
