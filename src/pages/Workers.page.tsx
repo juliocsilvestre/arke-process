@@ -1,13 +1,14 @@
-import { useCreateWorker } from '@/api/mutations/workers.mutation'
+import { useCreateWorker, useCreateWorkersBulk } from '@/api/mutations/workers.mutation'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { useGetAddresByCep } from '@/api/queries/workers.query'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
+import { DropZone } from '@/components/ui/DropZone'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
+import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST, WORKER_STATUS } from '@/utils/constants'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
@@ -18,11 +19,24 @@ import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
-import { CreateWorkerBody, CreateWorkerSchema, workerInitialValues } from './Workers.defs'
+import {
+  CreateWorkerBody,
+  CreateWorkerRow,
+  CreateWorkerSchema,
+  WorkerSheet,
+  workerInitialValues,
+  workersSheetMapper,
+} from './Workers.defs'
+
+export type UploadFileProps = {
+  e?: ChangeEvent<HTMLInputElement>
+  f?: File
+}
 
 export const WorkersPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -30,6 +44,10 @@ export const WorkersPage = (): JSX.Element => {
   const [previewImageURL, setPreviewImageURL] = useState<string>('')
   const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [isSpreadsheetManagerOpen, setIsSpreadsheetManagerOpen] = useState(false)
+  const [workersToUpload, setWorkersToUpload] = useState<CreateWorkerRow[]>([])
+  const [companyToBulkUpload, setCompanyToBulkUpload] = useState<string>('')
+  const [isBulkComboBoxOpen, setIsBulkComboBoxOpen] = useState(false)
 
   const form = useForm<CreateWorkerBody>({
     resolver: zodResolver(CreateWorkerSchema),
@@ -37,8 +55,25 @@ export const WorkersPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createWorker } = useCreateWorker()
+  const { mutateAsync: createWorkersBulk } = useCreateWorkersBulk()
 
-  const onCreateCompany = useCallback(
+  const onCreateWorkersBulk = useCallback(async () => {
+    try {
+      await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
+      handleOnClose()
+      toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
+    } catch (error: unknown) {
+      if (!(error instanceof AxiosError)) return
+
+      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+      for (const e of error.response?.data.message) {
+        console.error(e)
+        toast.error(<p>Alguma coisa deu errado com o campo</p>)
+      }
+    }
+  }, [workersToUpload, companyToBulkUpload, createWorkersBulk])
+
+  const onCreateWorker = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
         await createWorker({ ...values, picture: picturePreview })
@@ -104,6 +139,27 @@ export const WorkersPage = (): JSX.Element => {
     }
   }, [cep, data, form])
 
+  const readUploadFile = ({ e, f }: UploadFileProps) => {
+    e?.preventDefault()
+    const file = e?.target.files?.[0] ?? f
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const data = e?.target?.result
+
+        const workbook = xlsx.read(data, { type: 'array' })
+        const sheetName = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetName]
+        const json = xlsx.utils.sheet_to_json(worksheet)
+        const serializedJson = workersSheetMapper(json as WorkerSheet[])
+
+        setWorkersToUpload(serializedJson)
+      }
+
+      reader.readAsArrayBuffer(file)
+    }
+  }
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
@@ -111,15 +167,85 @@ export const WorkersPage = (): JSX.Element => {
           {NAVIGATION.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
         </h1>
 
-        <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)}>
-          <PlusIcon className="h-6 w-6" aria-hidden="true" />
-          Novo funcionário
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" size="sm" className="mt-4" onClick={() => setIsSpreadsheetManagerOpen(true)}>
+            <PaperClipIcon className="h-5 w-5" aria-hidden="true" />
+            Importar funcionários
+          </Button>
+          <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)}>
+            <PlusIcon className="h-6 w-6" aria-hidden="true" />
+            Novo funcionário
+          </Button>
+        </div>
       </div>
 
       <section className="mt-[14%]">
         <div className="w-full h-[500px] bg-gray-200">,</div>
       </section>
+
+      <SlideOver
+        title="Importar funcionários de uma planilha"
+        subtitle="Se o fornecedor não estiver cadastrado, cadastre-o primeiro."
+        isOpen={isSpreadsheetManagerOpen}
+        close={() => setIsSpreadsheetManagerOpen(false)}
+      >
+        <div className="flex flex-col gap-2 p-4 h-[93%]">
+          <Label label="Fornecedor" isRequired />
+          <Popover open={isBulkComboBoxOpen} onOpenChange={setIsBulkComboBoxOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                size="select"
+                className={cn(
+                  'w-full justify-between border-slate-200 hover:bg-transparent text-gray-600 hover:text-gray-600',
+                  !companyToBulkUpload && 'opacity-50 text-muted-foreground',
+                )}
+              >
+                {companyToBulkUpload
+                  ? companies?.data.companies.data.find((company: Company) => company.id === companyToBulkUpload)?.name
+                  : 'Selecione um fornecedor'}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[420px] p-0">
+              <Command className="w-full">
+                <CommandInput placeholder="Fornecedor..." className="w-full" />
+                <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
+                <CommandGroup>
+                  {companies?.data.companies.data.map((company: Company) => (
+                    <CommandItem
+                      value={company.name}
+                      key={company.id}
+                      onSelect={() => {
+                        setCompanyToBulkUpload(company.id)
+                        setIsBulkComboBoxOpen(false)
+                      }}
+                    >
+                      <Check
+                        className={cn('mr-2 h-4 w-4', company.id === companyToBulkUpload ? 'opacity-100' : 'opacity-0')}
+                      />
+                      {company.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <DropZone readFile={readUploadFile} />
+        </div>
+
+        <SlideOverFooter>
+          <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
+            <Button type="button" variant="outline" onClick={handleOnClose}>
+              Cancelar
+            </Button>
+            <Button variant="default" type="button" onClick={onCreateWorkersBulk}>
+              Criar funcionários
+            </Button>
+          </div>
+        </SlideOverFooter>
+      </SlideOver>
 
       <SlideOver
         title="Novo funcionário"
@@ -129,7 +255,7 @@ export const WorkersPage = (): JSX.Element => {
         close={handleOnClose}
       >
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onCreateCompany)} className="h-full flex flex-col gap-2 justify-between">
+          <form onSubmit={form.handleSubmit(onCreateWorker)} className="h-full flex flex-col gap-2 justify-between">
             <div className="px-5 py-6 flex flex-col">
               {/* <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4> */}
 
