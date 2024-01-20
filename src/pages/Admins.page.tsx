@@ -44,8 +44,8 @@ export const AdminsPage = (): JSX.Element => {
       )
     } catch (error: unknown) {
       const errors = checkError<AdminBodyKeys>(error)
-      if(Array.isArray(errors) && errors.length > 0) {
-        for  (const e of errors) {
+      if (Array.isArray(errors) && errors.length > 0) {
+        for (const e of errors) {
           form.setError(e.field, { message: e.message })
           toast.error(
             <p>
@@ -53,7 +53,7 @@ export const AdminsPage = (): JSX.Element => {
             </p>,
           )
         }
-      } else if (typeof errors === 'string'){
+      } else if (typeof errors === 'string') {
         toast.error(errors)
       }
     }

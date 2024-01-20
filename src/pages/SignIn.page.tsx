@@ -41,12 +41,12 @@ export const SignIn = () => {
       }
     } catch (error: unknown) {
       const errors = checkError<SigninBodyKeys>(error)
-      if(Array.isArray(errors) && errors.length > 0) {
-        for  (const e of errors) {
+      if (Array.isArray(errors) && errors.length > 0) {
+        for (const e of errors) {
           form.setError(e.field, { message: e.message })
-          toast.error("Credenciais inválidas")
+          toast.error('Credenciais inválidas')
         }
-      } else if (typeof errors === 'string'){
+      } else if (typeof errors === 'string') {
         toast.error(errors)
       }
     }
