@@ -2,7 +2,7 @@
 
 import fixtures from '../../fixtures/signin.fixtures.json'
 
-const [{formData, formDataTriggerFieldError, formDataWithInvalidCPF, formDataWithInvalidPassword, emptyFormData, signinResponse, signinResponseWithErrors }] = fixtures 
+const [{formData, formDataTriggerPasswordMinLengthError, formDataWithInvalidCPF, formDataWithInvalidPassword, emptyFormData, signinResponse, signinResponseWithErrors }] = fixtures 
 
 const API_URL = Cypress.env('API_URL')
 
@@ -23,7 +23,7 @@ describe('Signin', () => {
     cy.clearCookies()
   })
 
-  it('should not authenticate with empty values', () => {
+  it('should show error below field when submiting empty values', () => {
     const cpfInput = cy.get('input[name=cpf]')
     const passwordInput = cy.get('input[name=password]')
     const button = cy.get('button[type=submit]')
@@ -38,19 +38,19 @@ describe('Signin', () => {
     error.contains(emptyFormData.message)
   });
 
-  it('should not authenticate with invalid values', () => {    
+  it('should show error below field when password min-length is not fulfiled', () => {    
     const cpfInput = cy.get('input[name=cpf]')
     const passwordInput = cy.get('input[name=password]')
     const button = cy.get('button[type=submit]')
 
-    cpfInput.type(formDataTriggerFieldError.cpf)
-    passwordInput.type(formDataTriggerFieldError.password)
+    cpfInput.type(formDataTriggerPasswordMinLengthError.cpf)
+    passwordInput.type(formDataTriggerPasswordMinLengthError.password)
     
     button.click()
     
     const error = cy.get('p')
 
-    error.contains(formDataTriggerFieldError.message)
+    error.contains(formDataTriggerPasswordMinLengthError.message)
   });
 
   it('should not authenticate with invalid cpf', () => {    

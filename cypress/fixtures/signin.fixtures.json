@@ -12,7 +12,7 @@
             "cpf": "377.082.734-12",
             "password": "some-invalid-password"
         },
-        "formDataTriggerFieldError": {
+        "formDataTriggerPasswordMinLengthError": {
             "cpf":"377.082.734-12",
             "password": "12312",
             "message":"Credenciais inválidas"
