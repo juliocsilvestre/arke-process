@@ -5,6 +5,7 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
+import { indexEventsQueryOption } from './api/queries/events.query'
 import { indexWorkersQueryOption } from './api/queries/workers.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
@@ -100,6 +101,9 @@ const eventsRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: EventsPage,
   path: 'eventos',
+  loader: async ({ context: { queryClient } }) => {
+    queryClient.ensureQueryData(indexEventsQueryOption)
+  },
 })
 
 const reportsRoute = new Route({
