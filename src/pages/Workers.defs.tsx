@@ -1,5 +1,12 @@
-import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF_LIST, WORKER_STATUS } from '@/utils/constants'
+import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
+import { QrCodeIcon } from '@heroicons/react/24/solid'
+import { useQuery } from '@tanstack/react-query'
+import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
+import { Company } from './Companies.defs'
 
 export const CreateWorkerSchema = z.object({
   full_name: z.string().min(2, { message: 'Nome deve conter pelo menos 2 caracteres.' }),
@@ -36,7 +43,6 @@ export const CreateWorkerSchema = z.object({
   ),
   neighborhood: z.string().min(2, { message: 'Bairro inválido.' }),
 })
-
 export type CreateWorkerBody = z.infer<typeof CreateWorkerSchema>
 export type WorkerBodyKeys = keyof CreateWorkerBody
 
@@ -58,3 +64,143 @@ export const workerInitialValues: CreateWorkerBody = {
   number: 0,
   uf: 'AC',
 }
+
+export interface WorkerSheet {
+  Bairro: string
+  CEP: string
+  CPF: string
+  Cargo: string
+  Cidade: string
+  Complemento: string
+  'E-mail': string
+  'Nome completo': string
+  Número: string
+  RG: string
+  Rua: string
+  'Telefone/Whatsapp': string
+  UF: string
+}
+
+export interface Worker {
+  id: string
+  full_name: string
+  cpf: string
+  rg: string
+  email: string
+  phone_number: string
+  picture_url: string
+  status: string
+
+  company_id: string
+  role: string
+
+  admin_id: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateWorkerRow {
+  full_name: string
+  cpf: string
+  rg: string
+  email: string
+  phone_number: string
+  picture_url: string
+  role: string
+  status: string
+  address: {
+    street: string
+    complement: string
+    cep: string
+    city: string
+    neighborhood: string
+    number: string
+    uf: string
+  }
+}
+
+export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
+  return sheet.map((row) => {
+    return {
+      full_name: row['Nome completo'],
+      cpf: row.CPF,
+      rg: row.RG,
+      email: row['E-mail'],
+      phone_number: row['Telefone/Whatsapp'],
+      picture_url: '',
+      role: row.Cargo,
+      status: WORKER_STATUS.active,
+      address: {
+        street: row.Rua,
+        complement: row.Complemento,
+        cep: row.CEP,
+        city: row.Cidade,
+        neighborhood: row.Bairro,
+        // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+        number: row['Número'],
+        uf: row.UF,
+      },
+    }
+  })
+}
+
+export const workersColumns: ColumnDef<Worker>[] = [
+  {
+    accessorKey: 'full_name',
+    header: 'Nome completo',
+  },
+  {
+    accessorKey: 'cpf',
+    header: 'CPF',
+  },
+  {
+    accessorKey: 'company_id',
+    header: 'Fornecedor',
+    cell: ({ row }) => {
+      const worker = row.original
+
+      const { data: companies } = useQuery(indexCompaniesQueryOptions)
+      const companyName = companies?.data.companies?.data.find(
+        (company: Company) => company.id === worker.company_id,
+      )?.name
+
+      return <span>{companyName}</span>
+    },
+  },
+  {
+    accessorKey: 'role',
+    header: 'Cargo',
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const worker = row.original
+
+      return <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{worker.status}</Badge>
+    },
+  },
+  {
+    header: 'Ações',
+    id: 'actions',
+    cell: ({ row }) => {
+      const worker = row.original
+
+      return (
+        <div className="flex justify-start">
+          {/* TODO: create actions */}
+          <Button
+            size="icon"
+            onClick={(event) => {
+              event.stopPropagation()
+              // TODO: Generate QR CODE
+              console.log('QR CODE')
+            }}
+          >
+            <QrCodeIcon className="w-6 h-6" />
+          </Button>
+        </div>
+      )
+    },
+  },
+]

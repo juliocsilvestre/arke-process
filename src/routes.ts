@@ -3,9 +3,9 @@ import { NotFoundRoute, Route, Router, redirect, rootRouteWithContext } from '@t
 import { AuthLayout } from '@layouts/auth.layout'
 import { DashboardLayout } from '@layouts/dashboard.layout'
 
-import { TestDashboard } from '@components/TestDashboard'
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
+import { indexWorkersQueryOption } from './api/queries/workers.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
 import { NotFoundPage } from './pages/404.page'
@@ -86,6 +86,7 @@ const workersRoute = new Route({
   path: 'funcionarios',
   loader: async ({ context: { queryClient } }) => {
     queryClient.ensureQueryData(indexCompaniesQueryOptions)
+    queryClient.ensureQueryData(indexWorkersQueryOption)
   },
 })
 
@@ -109,7 +110,7 @@ const reportsRoute = new Route({
 
 const publicRoute = new Route({
   getParentRoute: () => publicLayout,
-  component: TestDashboard,
+  // TODO: Create public component
   path: '/public',
 })
 

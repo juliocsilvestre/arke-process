@@ -1,5 +1,5 @@
+import { type VariantProps, cva } from 'class-variance-authority'
 import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@utils/styles'
 
@@ -12,16 +12,22 @@ const badgeVariants = cva(_baseStyle, {
       error: 'bg-error-100 text-error-600',
       secondary: 'bg-secondary-100 text-secondary-600 ',
     },
+    size: {
+      sm: 'px-2 py-0 text-[10px]',
+      md: 'px-3 py-1',
+      lg: 'px-4 py-1.5 text-lg',
+    },
   },
   defaultVariants: {
     variant: 'success',
+    size: 'md',
   },
 })
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />
+function Badge({ className, variant, size, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant, size }), className)} {...props} />
 }
 
 export { Badge, badgeVariants }

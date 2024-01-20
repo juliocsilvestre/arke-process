@@ -14,8 +14,11 @@ import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { NAVIGATION } from '@/utils/constants'
 import { maskCNPJ } from '@/utils/strings'
 
-import { CompanyBodyKeys, CreateCompanyBody, CreateCompanySchema } from './Companies.defs'
 import { checkError } from '@/utils/errors'
+import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
+import { DataTable } from '@/components/ui/DataTable'
+import { useQuery } from '@tanstack/react-query'
+import { CreateCompanyBody, CreateCompanySchema, companiesColumns, CompanyBodyKeys } from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -31,6 +34,7 @@ export const CompaniesPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createCompany } = useCreateCompany()
+  const { data: companies } = useQuery(indexCompaniesQueryOptions)
 
   const onCreateCompany = async (values: CreateCompanyBody): Promise<void> => {
     try {
@@ -77,8 +81,12 @@ export const CompaniesPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[14%]">
-        <div className="w-full h-[500px] bg-gray-200">,</div>
+      <section className="mt-[200px]">
+        <DataTable
+          columns={companiesColumns}
+          data={companies?.data.companies.data ?? []}
+          count={companies?.data.companies_count}
+        />
       </section>
 
       <SlideOver

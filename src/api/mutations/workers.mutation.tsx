@@ -1,4 +1,4 @@
-import { CreateWorkerBody } from '@/pages/Workers.defs'
+import { CreateWorkerBody, CreateWorkerRow } from '@/pages/Workers.defs'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
 
@@ -16,6 +16,16 @@ export const useCreateWorker = () => {
           'Content-Type': 'multipart/form-data',
         },
       })
+    },
+  })
+
+  return { ...mutation }
+}
+
+export const useCreateWorkersBulk = () => {
+  const mutation = useMutation({
+    mutationFn: (workers: { workers: CreateWorkerRow[]; company_id: string }) => {
+      return api.post('/workers/bulk', workers)
     },
   })
 

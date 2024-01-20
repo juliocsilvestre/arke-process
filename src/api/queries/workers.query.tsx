@@ -1,5 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
+
+import { api } from '../api'
 
 export const useGetAddresByCep = (cep: string) => {
   const query = useQuery({
@@ -12,4 +14,16 @@ export const useGetAddresByCep = (cep: string) => {
   })
 
   return { ...query }
+}
+
+export const getWorkers = async () => await api.get('/workers')
+export const indexWorkersQueryOption = queryOptions({
+  queryKey: ['workers'],
+  queryFn: getWorkers,
+})
+
+export const useIndexWorkers = () => {
+  const workers = useQuery(indexWorkersQueryOption)
+
+  return { workers }
 }
