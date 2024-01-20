@@ -1,14 +1,15 @@
 import { useCreateWorker, useCreateWorkersBulk } from '@/api/mutations/workers.mutation'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
-import { useGetAddresByCep } from '@/api/queries/workers.query'
+import { indexWorkersQueryOption, useGetAddresByCep } from '@/api/queries/workers.query'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
+import { DataTable } from '@/components/ui/DataTable'
 import { DropZone } from '@/components/ui/DropZone'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST, WORKER_STATUS } from '@/utils/constants'
+import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
@@ -30,6 +31,7 @@ import {
   CreateWorkerSchema,
   WorkerSheet,
   workerInitialValues,
+  workersColumns,
   workersSheetMapper,
 } from './Workers.defs'
 
@@ -114,6 +116,7 @@ export const WorkersPage = (): JSX.Element => {
   }
 
   const { data: companies } = useQuery(indexCompaniesQueryOptions)
+  const { data: workers } = useQuery(indexWorkersQueryOption)
 
   useEffect(() => {
     if (picturePreview instanceof File) {
@@ -179,8 +182,13 @@ export const WorkersPage = (): JSX.Element => {
         </div>
       </div>
 
-      <section className="mt-[14%]">
-        <div className="w-full h-[500px] bg-gray-200">,</div>
+      <section className="mt-[30px]">
+        <DataTable
+          columns={workersColumns}
+          data={workers?.data.workers.data ?? []}
+          count={workers?.data.workers_count}
+          onRowClick={(worker) => console.log(worker)}
+        />
       </section>
 
       <SlideOver
@@ -189,7 +197,7 @@ export const WorkersPage = (): JSX.Element => {
         isOpen={isSpreadsheetManagerOpen}
         close={() => setIsSpreadsheetManagerOpen(false)}
       >
-        <div className="flex flex-col gap-2 p-4 h-[93%]">
+        <div className="flex flex-col gap-2 p-4 h-[89%]">
           <Label label="Fornecedor" isRequired />
           <Popover open={isBulkComboBoxOpen} onOpenChange={setIsBulkComboBoxOpen}>
             <PopoverTrigger asChild>
@@ -237,7 +245,7 @@ export const WorkersPage = (): JSX.Element => {
 
         <SlideOverFooter>
           <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
-            <Button type="button" variant="outline" onClick={handleOnClose}>
+            <Button type="button" variant="outline" onClick={() => setIsSpreadsheetManagerOpen(false)}>
               Cancelar
             </Button>
             <Button variant="default" type="button" onClick={onCreateWorkersBulk}>

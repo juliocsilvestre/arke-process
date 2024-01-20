@@ -8,16 +8,17 @@ import {
   PaginationPrevious,
 } from '@/components/ui/Pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
+import { cn } from '@/utils/styles'
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
-import { Button } from './Button'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   count: number
+  onRowClick?: (row: TData) => void
 }
 
-export const DataTable = <TData, TValue>({ columns, data, count }: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({ columns, data, count, onRowClick }: DataTableProps<TData, TValue>) => {
   const table = useReactTable({
     data,
     columns,
@@ -45,7 +46,12 @@ export const DataTable = <TData, TValue>({ columns, data, count }: DataTableProp
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="even:bg-gray-100">
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={cn('even:bg-gray-100', onRowClick && 'cursor-pointer hover:bg-gray-200')}
+                  onClick={() => onRowClick?.(row.original)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
