@@ -1,20 +1,32 @@
 [
     {
-        "signinFormData": {
+        "formData": {
             "cpf": "377.082.734-12",
             "password": "123123123123"
         },
-        "signinFormDataWithErrors": {
+        "formDataWithInvalidCPF": {
             "cpf": "123.456.789-00",
             "password": "123123123123"
         },
+        "formDataWithInvalidPassword": {
+            "cpf": "377.082.734-12",
+            "password": "some-invalid-password"
+        },
+        "formDataTriggerFieldError": {
+            "cpf":"377.082.734-12",
+            "password": "12312",
+            "message":"Credenciais inválidas"
+        },
+        "emptyFormData": {
+            "cpf": "",
+            "password": "",
+            "message": "Credenciais inválidas"
+        },
         "signinResponseWithErrors": {
-            "errors": [
-                {
-                    "code": "INVALID_CREDENTIALS",
-                    "message": "Invalid credentials"
-                }
-            ]
+            "statusCode": 401,
+            "body": {
+                "message": "Credenciais inválidas."
+            }
         },
         "signinResponse": {
             "statusCode": 200,

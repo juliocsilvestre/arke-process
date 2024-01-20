@@ -2,7 +2,7 @@
 
 import fixtures from '../../fixtures/signin.fixtures.json'
 
-const [{signinFormData, signinFormDataWithErrors, signinResponse, signinResponseWithErrors }] = fixtures 
+const [{formData, formDataTriggerFieldError, formDataWithInvalidCPF, formDataWithInvalidPassword, emptyFormData, signinResponse, signinResponseWithErrors }] = fixtures 
 
 const API_URL = Cypress.env('API_URL')
 
@@ -15,78 +15,95 @@ interface SigninResponse {
 }
 
 describe('Signin', () => {
+  beforeEach(() => {
+    cy.visit('/')
+  })
+
+  afterEach(() => {
+    cy.clearCookies()
+  })
+
   it('should not authenticate with empty values', () => {
-    cy.visit('/')
-
     const cpfInput = cy.get('input[name=cpf]')
     const passwordInput = cy.get('input[name=password]')
     const button = cy.get('button[type=submit]')
-    const error = cy.get('p')
 
-    cpfInput.should('have.value', '')
-    passwordInput.should('have.value', '')
+    cpfInput.should('have.value', emptyFormData.cpf)
+    passwordInput.should('have.value', emptyFormData.password)
+
     button.click()
-
-    error.contains('Credenciais inválidas')
+    
+    const error = cy.get('p')
+    
+    error.contains(emptyFormData.message)
   });
 
-  it('should not authenticate with invalid values', () => {
-    cy.visit('/')
-
+  it('should not authenticate with invalid values', () => {    
     const cpfInput = cy.get('input[name=cpf]')
     const passwordInput = cy.get('input[name=password]')
     const button = cy.get('button[type=submit]')
+
+    cpfInput.type(formDataTriggerFieldError.cpf)
+    passwordInput.type(formDataTriggerFieldError.password)
+    
+    button.click()
+    
     const error = cy.get('p')
 
-    cpfInput.type('12345678900')
-    passwordInput.type('123456')
-    button.click()
-
-    error.contains('Credenciais inválidas')
+    error.contains(formDataTriggerFieldError.message)
   });
 
-  it.skip('should not authenticate with invalid cpf', () => {
-    cy.visit('/')
-
+  it('should not authenticate with invalid cpf', () => {    
     const cpfInput = cy.get('input[name=cpf]')
     const passwordInput = cy.get('input[name=password]')
     const button = cy.get('button[type=submit]')
-    const error = cy.get('p')
 
-    cpfInput.type('12345678900')
-    passwordInput.type(signinFormData.password)
-    button.click()
+    cpfInput.type(formDataWithInvalidCPF.cpf)
+    passwordInput.type(formData.password)
 
-    error.contains('Credenciais inválidas')
-  })
+    cy.intercept('POST', `${API_URL}/auth/signin`, {
+    ...signinResponseWithErrors,
+    }).as('signin')
 
-  it.skip('should not authenticate with invalid password', () => {
-    cy.visit('/')
-
-    const cpfInput = cy.get('input[name=cpf]')
-    const passwordInput = cy.get('input[name=password]')
-    const button = cy.get('button[type=submit]')
-    const toastError = cy.get('li.group.toast  div[data-content]')
-
-    console.error(toastError)
-
-    cpfInput.type(signinFormData.cpf)
-    passwordInput.type('123456')
     button.click().then(() => {
-      toastError.contains('Credenciais inválidas')
+      cy.wait('@signin').then((interception) => {
+        expect(interception.response?.statusCode).to.eq(401)
+        expect(interception.response?.body.message).to.eq(signinResponseWithErrors.body.message)
+        const toastError =  cy.get('div').contains('Credenciais inválidas')
+        toastError.should("be.visible")
+      })
     })
-
   })
 
-  it.only('should authenticate with valid values', () => {
-    cy.visit('/')
-
+  it('should not authenticate with invalid password', () => {    
     const cpfInput = cy.get('input[name=cpf]')
     const passwordInput = cy.get('input[name=password]')
     const button = cy.get('button[type=submit]')
 
-    cpfInput.type(signinFormData.cpf)
-    passwordInput.type(signinFormData.password)
+    cpfInput.type(formData.cpf)
+    passwordInput.type(formDataWithInvalidPassword.password)
+
+    cy.intercept('POST', `${API_URL}/auth/signin`, {
+    ...signinResponseWithErrors,
+    }).as('signin')
+
+    button.click().then(() => {
+      cy.wait('@signin').then((interception) => {
+        expect(interception.response?.statusCode).to.eq(401)
+        expect(interception.response?.body.message).to.eq(signinResponseWithErrors.body.message)
+        const toastError =  cy.get('div').contains('Credenciais inválidas')
+        toastError.should("be.visible")
+      })
+    })
+  })
+
+  it('should authenticate with valid values', () => {
+    const cpfInput = cy.get('input[name=cpf]')
+    const passwordInput = cy.get('input[name=password]')
+    const button = cy.get('button[type=submit]')
+
+    cpfInput.type(formData.cpf)
+    passwordInput.type(formData.password)
 
     cy.intercept('POST', `${API_URL}/auth/signin`, {
       ...signinResponse,
