@@ -16,7 +16,6 @@ export const useCreateCompany = () => {
   return { ...mutation }
 }
 
-
 export const useDeleteCompany = () => {
   const mutation = useMutation({
     mutationFn: (id: string) => {

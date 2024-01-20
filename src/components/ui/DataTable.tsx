@@ -34,7 +34,7 @@ export const DataTable = <TData, TValue>({ columns, data, count }: DataTableProp
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className='bg-gray-200 font-semibold'>
+                    <TableHead key={header.id} className="bg-gray-200 font-semibold">
                       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
@@ -45,7 +45,7 @@ export const DataTable = <TData, TValue>({ columns, data, count }: DataTableProp
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className='even:bg-gray-100'>
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className="even:bg-gray-100">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
