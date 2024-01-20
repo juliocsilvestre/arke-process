@@ -2,7 +2,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@components
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from '@tanstack/react-router'
-import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -15,10 +14,11 @@ import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { NAVIGATION } from '@/utils/constants'
 import { maskCNPJ } from '@/utils/strings'
 
+import { checkError } from '@/utils/errors'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { DataTable } from '@/components/ui/DataTable'
 import { useQuery } from '@tanstack/react-query'
-import { CreateCompanyBody, CreateCompanySchema, companiesColumns } from './Companies.defs'
+import { CreateCompanyBody, CreateCompanySchema, companiesColumns, CompanyBodyKeys } from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -47,17 +47,18 @@ export const CompaniesPage = (): JSX.Element => {
         </p>,
       )
     } catch (error: unknown) {
-      if (!(error instanceof AxiosError)) return
-      console.error(error.response?.data.errors)
-
-      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
-      for (const e of error.response?.data.errors) {
-        form.setError(e.field, { message: e.message })
-        toast.error(
-          <p>
-            Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
-          </p>,
-        )
+      const errors = checkError<CompanyBodyKeys>(error)
+      if (Array.isArray(errors) && errors.length > 0) {
+        for (const e of errors) {
+          form.setError(e.field, { message: e.message })
+          toast.error(
+            <p>
+              Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
+            </p>,
+          )
+        }
+      } else if (typeof errors === 'string') {
+        toast.error(errors)
       }
     }
   }

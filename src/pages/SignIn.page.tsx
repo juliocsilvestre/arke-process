@@ -1,6 +1,6 @@
-import { AxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { toast } from 'sonner'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
@@ -14,8 +14,9 @@ import { useSignInMutation } from '@/api/mutations/auth.mutation'
 import { useAuthStore } from '@/store/auth.store'
 import { maskCPF } from '@/utils/strings'
 import Logo from '../assets/carvalogo.svg'
-import { SignInSchema } from './SignIn.defs'
+import { SignInSchema, SigninBodyKeys } from './SignIn.defs'
 import { type SignInBody } from './SignIn.defs'
+import { checkError } from '@/utils/errors'
 
 export const SignIn = () => {
   const form = useForm<z.infer<typeof SignInSchema>>({
@@ -39,8 +40,15 @@ export const SignIn = () => {
         await navigate({ to: '/dashboard/eventos' })
       }
     } catch (error: unknown) {
-      if (!(error instanceof AxiosError)) return
-      form.setError('password', { message: error?.response?.data?.message })
+      const errors = checkError<SigninBodyKeys>(error)
+      if (Array.isArray(errors) && errors.length > 0) {
+        for (const e of errors) {
+          form.setError(e.field, { message: e.message })
+          toast.error('Credenciais inválidas')
+        }
+      } else if (typeof errors === 'string') {
+        toast.error(errors)
+      }
     }
   }
 
