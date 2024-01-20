@@ -16,13 +16,13 @@ import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { AxiosError } from 'axios'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Company } from './Companies.defs'
-import { CreateWorkerBody, CreateWorkerSchema, workerInitialValues } from './Workers.defs'
+import { CreateWorkerBody, CreateWorkerSchema, WorkerBodyKeys, workerInitialValues } from './Workers.defs'
+import { checkError } from '@/utils/errors'
 
 export const WorkersPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -54,17 +54,18 @@ export const WorkersPage = (): JSX.Element => {
           ),
         )
       } catch (error: unknown) {
-        if (!(error instanceof AxiosError)) return
-
-        // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
-        for (const e of error.response?.data.errors) {
-          console.error(e)
-          form.setError(e.field, { message: e.message })
-          toast.error(
-            <p>
-              Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
-            </p>,
-          )
+        const errors = checkError<WorkerBodyKeys>(error)
+        if(Array.isArray(errors) && errors.length > 0) {
+          for  (const e of errors) {
+            form.setError(e.field, { message: e.message })
+            toast.error(
+              <p>
+                Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
+              </p>,
+            )
+          }
+        } else if (typeof errors === 'string'){
+          toast.error(errors)
         }
       }
     },

@@ -16,3 +16,4 @@ export const SignInSchema = z.object({
 })
 
 export type SignInBody = z.infer<typeof SignInSchema>
+export type SigninBodyKeys = keyof SignInBody

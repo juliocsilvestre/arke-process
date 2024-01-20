@@ -38,6 +38,7 @@ export const CreateWorkerSchema = z.object({
 })
 
 export type CreateWorkerBody = z.infer<typeof CreateWorkerSchema>
+export type WorkerBodyKeys = keyof CreateWorkerBody
 
 export const workerInitialValues: CreateWorkerBody = {
   full_name: '',

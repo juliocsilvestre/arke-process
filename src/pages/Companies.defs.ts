@@ -15,6 +15,7 @@ export const CreateCompanySchema = z.object({
 })
 
 export type CreateCompanyBody = z.infer<typeof CreateCompanySchema>
+export type CompanyBodyKeys = keyof CreateCompanyBody
 
 export interface Company {
   id: string

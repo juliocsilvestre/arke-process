@@ -21,3 +21,4 @@ export const CreateAdminSchema = z.object({
 })
 
 export type CreateAdminBody = z.infer<typeof CreateAdminSchema>
+export type AdminBodyKeys = keyof CreateAdminBody
