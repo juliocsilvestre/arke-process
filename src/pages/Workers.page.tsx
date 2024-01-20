@@ -60,7 +60,7 @@ export const WorkersPage = (): JSX.Element => {
   const { mutateAsync: createWorker } = useCreateWorker()
   const { mutateAsync: createWorkersBulk } = useCreateWorkersBulk()
 
-const  onCreateWorkersBulk = useCallback(async () => {
+  const onCreateWorkersBulk = useCallback(async () => {
     try {
       await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
       handleOnClose()
