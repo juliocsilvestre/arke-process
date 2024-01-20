@@ -9,7 +9,9 @@
     "format": "bunx @biomejs/biome format --write ./src",
     "lint": "bun biome lint . --apply-unsafe",
     "preview": "vite preview",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:e2e": "cypress open",
+    "test:e2e:ci": "cypress run --headless"
   },
   "dependencies": {
     "@headlessui/react": "1.7.18",
@@ -55,6 +57,7 @@
     "@typescript-eslint/eslint-plugin": "6.14.0",
     "@typescript-eslint/parser": "6.14.0",
     "@vitejs/plugin-react-swc": "3.5.0",
+    "cypress": "13.6.3",
     "husky": "8.0.0",
     "typescript": "5.2.2",
     "vite": "5.0.8"

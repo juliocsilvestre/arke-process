@@ -1,0 +1,30 @@
+[
+    {
+        "signinFormData": {
+            "cpf": "377.082.734-12",
+            "password": "123123123123"
+        },
+        "signinFormDataWithErrors": {
+            "cpf": "123.456.789-00",
+            "password": "123123123123"
+        },
+        "signinResponseWithErrors": {
+            "errors": [
+                {
+                    "code": "INVALID_CREDENTIALS",
+                    "message": "Invalid credentials"
+                }
+            ]
+        },
+        "signinResponse": {
+            "statusCode": 200,
+            "headers": {
+                "set-cookie": "carva-session=mocked-session;"
+            },
+            "body": {
+                "cpf": "377.082.734-12",
+                "name": "Kameron"
+            }
+        }
+    }
+]
