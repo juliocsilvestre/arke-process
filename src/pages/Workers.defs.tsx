@@ -164,7 +164,7 @@ export const workersColumns: ColumnDef<Worker>[] = [
         (company: Company) => company.id === worker.company_id,
       )?.name
 
-      return <span>{companyName}</span>
+      return <span>{companyName ?? '-'}</span>
     },
   },
   {
