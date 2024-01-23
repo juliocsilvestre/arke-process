@@ -43,6 +43,7 @@ export const EventsPage = (): JSX.Element => {
 
   const { mutateAsync: createEvent } = useCreateEvent()
   const { data: events } = useQuery(indexEventsQueryOption)
+
   const navigate = useNavigate()
 
   const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
@@ -118,7 +119,7 @@ export const EventsPage = (): JSX.Element => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="name" label="Nome" isRequired />
+                    <Label htmlFor="name" label="Nome" isrequired />
                     <FormControl>
                       <Input id="name" placeholder="Insira o nome do evento" {...field} size="lg" />
                     </FormControl>
@@ -132,7 +133,7 @@ export const EventsPage = (): JSX.Element => {
                 name="dates"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="dates" label="Dias do evento" isRequired />
+                    <Label htmlFor="dates" label="Dias do evento" isrequired />
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button

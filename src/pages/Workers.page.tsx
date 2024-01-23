@@ -1,6 +1,6 @@
 import { useCreateWorker, useCreateWorkersBulk } from '@/api/mutations/workers.mutation'
-import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
-import { indexWorkersQueryOption, useGetAddresByCep } from '@/api/queries/workers.query'
+import { indexCompaniesQueryOptions, useIndexCompanies } from '@/api/queries/companies.query'
+import { indexWorkersQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
 import { DataTable } from '@/components/ui/DataTable'
@@ -16,8 +16,8 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@components
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
 import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useRouter, useSearch } from '@tanstack/react-router'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -42,7 +42,7 @@ export type UploadFileProps = {
 }
 
 export const WorkersPage = (): JSX.Element => {
-  const { latestLocation } = useRouter()
+  const { latestLocation, navigate } = useRouter()
   const [picturePreview, setPicturePreview] = useState<File | null>(null)
   const [previewImageURL, setPreviewImageURL] = useState<string>('')
   const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
@@ -51,6 +51,7 @@ export const WorkersPage = (): JSX.Element => {
   const [workersToUpload, setWorkersToUpload] = useState<CreateWorkerRow[]>([])
   const [companyToBulkUpload, setCompanyToBulkUpload] = useState<string>('')
   const [isBulkComboBoxOpen, setIsBulkComboBoxOpen] = useState(false)
+  const [queryString, setQueryString] = useState('')
 
   const form = useForm<CreateWorkerBody>({
     resolver: zodResolver(CreateWorkerSchema),
@@ -123,9 +124,6 @@ export const WorkersPage = (): JSX.Element => {
     form.reset()
   }
 
-  const { data: companies } = useQuery(indexCompaniesQueryOptions)
-  const { data: workers } = useQuery(indexWorkersQueryOption)
-
   useEffect(() => {
     if (picturePreview instanceof File) {
       const reader = new FileReader()
@@ -171,6 +169,12 @@ export const WorkersPage = (): JSX.Element => {
     }
   }
 
+  const { data: companies, refetch } = useIndexCompanies({ q: queryString, page: '1' })
+
+  const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios' }) as { q: string; page: string }
+  const options = indexWorkersQueryOptions(search)
+  const { data: workers } = useSuspenseQuery(options)
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
@@ -196,6 +200,9 @@ export const WorkersPage = (): JSX.Element => {
           data={workers?.data.workers.data ?? []}
           count={workers?.data.workers_count}
           onRowClick={(worker) => console.log(worker)}
+          onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
+          pages={workers?.data.workers.meta.last_page ?? 1}
+          currentPage={workers?.data.workers.meta.current_page ?? 1}
         />
       </section>
 
@@ -206,7 +213,7 @@ export const WorkersPage = (): JSX.Element => {
         close={() => setIsSpreadsheetManagerOpen(false)}
       >
         <div className="flex flex-col gap-2 p-4 h-[89%]">
-          <Label label="Fornecedor" isRequired />
+          <Label label="Fornecedor" isrequired />
           <Popover open={isBulkComboBoxOpen} onOpenChange={setIsBulkComboBoxOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -226,7 +233,13 @@ export const WorkersPage = (): JSX.Element => {
             </PopoverTrigger>
             <PopoverContent className="w-[420px] p-0">
               <Command className="w-full">
-                <CommandInput placeholder="Fornecedor..." className="w-full" />
+                <CommandInput
+                  placeholder="Fornecedor..."
+                  className="w-full"
+                  onValueChange={(s) => {
+                    setQueryString(s)
+                  }}
+                />
                 <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
                 <CommandGroup>
                   {companies?.data.companies.data.map((company: Company) => (
@@ -352,7 +365,7 @@ export const WorkersPage = (): JSX.Element => {
                       name="full_name"
                       render={({ field }) => (
                         <FormItem className="w-[100%]">
-                          <Label htmlFor="full_name" label="Nome Completo" isRequired />
+                          <Label htmlFor="full_name" label="Nome Completo" isrequired />
                           <FormControl>
                             <Input id="full_name" placeholder="Insira o nome completo" {...field} size="md" />
                           </FormControl>
@@ -368,7 +381,7 @@ export const WorkersPage = (): JSX.Element => {
                       name="cpf"
                       render={({ field }) => (
                         <FormItem className="w-[50%]">
-                          <Label htmlFor="cpf" label="CPF" isRequired />
+                          <Label htmlFor="cpf" label="CPF" isrequired />
                           <FormControl>
                             <Input
                               id="cpf"
@@ -395,7 +408,7 @@ export const WorkersPage = (): JSX.Element => {
                       name="rg"
                       render={({ field }) => (
                         <FormItem className="w-[50%]">
-                          <Label htmlFor="rg" label="RG" isRequired />
+                          <Label htmlFor="rg" label="RG" isrequired />
                           <FormControl>
                             <Input
                               id="rg"
@@ -435,7 +448,7 @@ export const WorkersPage = (): JSX.Element => {
                       name="phone_number"
                       render={({ field }) => (
                         <FormItem className="w-[40%]">
-                          <Label htmlFor="phone_number" label="Celular/Whatsapp" isRequired />
+                          <Label htmlFor="phone_number" label="Celular/Whatsapp" isrequired />
                           <FormControl>
                             <Input
                               id="phone_number"
@@ -467,7 +480,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="company_id"
                   render={({ field }) => (
                     <FormItem className="w-[50%]">
-                      <Label htmlFor="company_id" label="Fornecedor" isRequired />
+                      <Label htmlFor="company_id" label="Fornecedor" isrequired />
                       <Popover open={isCompanySelectOpen} onOpenChange={setIsCompanySelectOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -525,7 +538,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="role"
                   render={({ field }) => (
                     <FormItem className="w-[50%]">
-                      <Label htmlFor="role" label="Função" isRequired />
+                      <Label htmlFor="role" label="Função" isrequired />
                       <FormControl>
                         <Input id="role" placeholder="Insira a função" {...field} size="md" />
                       </FormControl>
@@ -541,7 +554,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="cep"
                   render={({ field }) => (
                     <FormItem className="w-[20%]">
-                      <Label htmlFor="cep" label="CEP" isRequired />
+                      <Label htmlFor="cep" label="CEP" isrequired />
                       <FormControl>
                         <Input
                           id="cep"
@@ -571,7 +584,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="street"
                   render={({ field }) => (
                     <FormItem className="w-[70%]">
-                      <Label htmlFor="street" label="Rua" isRequired />
+                      <Label htmlFor="street" label="Rua" isrequired />
                       <FormControl>
                         <Input id="street" placeholder="Insira a rua" {...field} size="md" />
                       </FormControl>
@@ -585,7 +598,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="number"
                   render={({ field }) => (
                     <FormItem className="w-[20%]">
-                      <Label htmlFor="number" label="Número" isRequired />
+                      <Label htmlFor="number" label="Número" isrequired />
                       <FormControl>
                         <Input
                           id="number"
@@ -614,7 +627,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="neighborhood"
                   render={({ field }) => (
                     <FormItem className="w-[30%]">
-                      <Label htmlFor="neighborhood" label="Bairro" isRequired />
+                      <Label htmlFor="neighborhood" label="Bairro" isrequired />
                       <FormControl>
                         <Input id="neighborhood" placeholder="Insira o bairro" {...field} size="md" />
                       </FormControl>
@@ -642,7 +655,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="city"
                   render={({ field }) => (
                     <FormItem className="w-[30%]">
-                      <Label htmlFor="city" label="Cidade" isRequired />
+                      <Label htmlFor="city" label="Cidade" isrequired />
                       <FormControl>
                         <Input id="city" placeholder="Insira a cidade" {...field} size="md" />
                       </FormControl>
@@ -656,7 +669,7 @@ export const WorkersPage = (): JSX.Element => {
                   name="uf"
                   render={({ field }) => (
                     <FormItem className="w-[10%]">
-                      <Label htmlFor="uf" label="UF" isRequired />
+                      <Label htmlFor="uf" label="UF" isrequired />
                       <FormControl>
                         <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
                           <SelectTrigger className="w-full">

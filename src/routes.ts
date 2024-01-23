@@ -5,8 +5,8 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
+import { indexWorkersQueryOptions } from './api/queries/workers.query'
 import { getSingleEvent, indexEventsQueryOption } from './api/queries/events.query'
-import { indexWorkersQueryOption } from './api/queries/workers.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
 import { NotFoundPage } from './pages/404.page'
@@ -82,13 +82,32 @@ const adminsRoute = new Route({
   pendingComponent: Loading,
 })
 
+// const workersRoute = new Route({
+//   getParentRoute: () => dashboardRoute,
+//   component: WorkersPage,
+//   path: 'funcionarios',
+//   loader: async ({ context: { queryClient } }) => {
+//     return queryClient.ensureQueryData(indexWorkersQueryOption)
+//   },
+// })
+
 const workersRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: WorkersPage,
   path: 'funcionarios',
-  loader: async ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(indexCompaniesQueryOptions)
-    queryClient.ensureQueryData(indexWorkersQueryOption)
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q,
+      page: String(search.page || 1),
+    }
+  },
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+
+  loader: async ({ context: { queryClient }, deps: { page, q } }) => {
+    const options = indexWorkersQueryOptions({ page, q })
+    return queryClient.ensureQueryData(options)
   },
 })
 
@@ -96,6 +115,20 @@ const companiesRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: CompaniesPage,
   path: 'fornecedores',
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q,
+      page: String(search.page || 1),
+    }
+  },
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+
+  loader: async ({ context: { queryClient }, deps: { page, q } }) => {
+    const options = indexCompaniesQueryOptions({ page, q })
+    return queryClient.ensureQueryData(options)
+  },
 })
 
 const eventsRoute = new Route({

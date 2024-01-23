@@ -1,22 +1,11 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/AlertDialog'
 import { useCreateCompany } from '@/api/mutations/companies.mutation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -28,11 +17,11 @@ import { maskCNPJ } from '@/utils/strings'
 import { checkError } from '@/utils/errors'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { DataTable } from '@/components/ui/DataTable'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { CreateCompanyBody, CreateCompanySchema, companiesColumns, CompanyBodyKeys } from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
-  const { latestLocation } = useRouter()
+  const { latestLocation, navigate } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -45,7 +34,9 @@ export const CompaniesPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createCompany } = useCreateCompany()
-  const { data: companies } = useQuery(indexCompaniesQueryOptions)
+  const search = useSearch({ from: '/dashboard-layout/dashboard/fornecedores' }) as { q: string; page: string }
+  const options = indexCompaniesQueryOptions(search)
+  const { data: companies } = useSuspenseQuery(options)
 
   const onCreateCompany = async (values: CreateCompanyBody): Promise<void> => {
     try {
@@ -92,12 +83,16 @@ export const CompaniesPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[30px]">
-        <DataTable
-          columns={companiesColumns}
-          data={companies?.data.companies.data ?? []}
-          count={companies?.data.companies_count}
-        />
+      <section className="mt-[200px]">
+          <DataTable
+            columns={companiesColumns}
+            data={companies?.data.companies.data ?? []}
+            count={companies?.data.companies_count}
+            onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
+            pages={companies?.data.companies.meta.last_page ?? 1}
+            currentPage={companies?.data.companies.meta.current_page ?? 1}
+          />
+  
       </section>
 
       <SlideOver
@@ -114,7 +109,7 @@ export const CompaniesPage = (): JSX.Element => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="name" label="Nome" isRequired />
+                    <Label htmlFor="name" label="Nome" isrequired />
                     <FormControl>
                       <Input id="name" placeholder="Insira seu nome" {...field} size="lg" />
                     </FormControl>
@@ -128,7 +123,7 @@ export const CompaniesPage = (): JSX.Element => {
                 name="cnpj"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="cnpj" label="CNPJ" isRequired />
+                    <Label htmlFor="cnpj" label="CNPJ" isrequired />
                     <FormControl>
                       <Input
                         id="cnpj"

@@ -17,6 +17,8 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   count: number
+  pages?: number
+  currentPage?: number
   onRowClick?: (row: TData) => void
   onQueryChange?: (query: string) => void
 }
@@ -25,6 +27,8 @@ export const DataTable = <TData, TValue>({
   columns,
   data,
   count,
+  pages,
+  currentPage,
   onRowClick,
   onQueryChange,
 }: DataTableProps<TData, TValue>) => {
@@ -65,10 +69,10 @@ export const DataTable = <TData, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   className={cn('even:bg-gray-100', onRowClick && 'cursor-pointer hover:bg-gray-200')}
                   onClick={() => onRowClick?.(row.original)}
-                  key={row.id}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
@@ -91,16 +95,34 @@ export const DataTable = <TData, TValue>({
         <Pagination className="!mx-0 !justify-end">
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href="#" />
+              <PaginationPrevious
+                search={(prev: { q: string; page: number }) => ({
+                  ...prev,
+                  page: Number(prev.page) > 1 ? Number(prev.page) - 1 : 1,
+                })}
+              />
             </PaginationItem>
             <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
+              {Array(pages)
+                .fill(0)
+                .map((_, index) => (
+                  <PaginationLink
+                    key={`page-${index}`}
+                    search={(prev) => ({ ...prev, page: index + 1 })}
+                    isActive={currentPage === index + 1}
+                    className="mx-1"
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                ))}
             </PaginationItem>
             <PaginationItem>
               <PaginationEllipsis />
             </PaginationItem>
             <PaginationItem>
-              <PaginationNext href="#" />
+              <PaginationNext
+                search={(prev: { q: string; page: number }) => ({ ...prev, page: Number(prev.page) + 1 })}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

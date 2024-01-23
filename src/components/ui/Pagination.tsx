@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import { ButtonProps, buttonVariants } from '@components/ui/Button'
 import { cn } from '@utils/styles'
+import { Link, LinkProps } from '@tanstack/react-router'
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav
@@ -28,15 +29,16 @@ PaginationItem.displayName = 'PaginationItem'
 
 type PaginationLinkProps = {
   isActive?: boolean
+  next?: boolean
 } & Pick<ButtonProps, 'size'> &
-  React.ComponentProps<'a'>
+  LinkProps
 
-const PaginationLink = ({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) => (
-  <a
+const PaginationLink = ({ className, isActive, next, size = 'icon', ...props }: PaginationLinkProps) => (
+  <Link
     aria-current={isActive ? 'page' : undefined}
     className={cn(
       buttonVariants({
-        variant: isActive ? 'outline' : 'ghost',
+        variant: isActive ? 'default' : 'ghost',
         size,
       }),
       className,
@@ -55,7 +57,7 @@ const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof
 PaginationPrevious.displayName = 'PaginationPrevious'
 
 const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to next page" size="default" className={cn('gap-1 pr-2.5', className)} {...props}>
+  <PaginationLink aria-label="Go to next page" size="default" className={cn('gap-1 pr-2.5', className)} {...props} next>
     <span>Próxima página</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
