@@ -24,7 +24,7 @@ export const EventDetailsPage = () => {
 
   const startDate = event?.data.days[0].date
   const endDate = event?.data.days.at(-1).date
-  
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
