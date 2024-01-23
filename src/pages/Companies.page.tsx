@@ -1,22 +1,11 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useLoaderData, useRouter, useSearch } from '@tanstack/react-router'
+import { useRouter, useSearch } from '@tanstack/react-router'
 import { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/AlertDialog'
 import { useCreateCompany } from '@/api/mutations/companies.mutation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -102,6 +91,7 @@ export const CompaniesPage = (): JSX.Element => {
             count={companies?.data.companies_count}
             onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
             pages={companies?.data.companies.meta.last_page ?? 1}
+            currentPage={companies?.data.companies.meta.current_page ?? 1}
           />
         </Suspense>
       </section>
