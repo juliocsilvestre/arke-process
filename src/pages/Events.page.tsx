@@ -43,8 +43,7 @@ export const EventsPage = (): JSX.Element => {
 
   const { mutateAsync: createEvent } = useCreateEvent()
   const { data: events } = useQuery(indexEventsQueryOption)
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
     try {
@@ -84,18 +83,18 @@ export const EventsPage = (): JSX.Element => {
         <h1 className="text-4xl text-primary font-bold">
           {NAVIGATION.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
         </h1>
-
         <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)}>
           <PlusIcon className="h-6 w-6" aria-hidden="true" />
           Novo evento
         </Button>
       </div>
 
-      <section className="mt-[200px]">
+      <section className="mt-[30px]">
         <DataTable
           columns={eventsColumns}
           data={events?.data.events.data ?? []}
-          count={events?.data.events_count ? events?.data.events_count : 0}
+          count={events?.data.events_count}
+          onQueryChange={(query) => console.log(query)}
           onRowClick={({ id }) =>
             navigate({
               to: '/dashboard/eventos/$id',

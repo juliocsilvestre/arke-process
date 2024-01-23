@@ -43,7 +43,7 @@ export const EventDetailsPage = () => {
         <Tabs>
           <TabsList>
             {/* biome-ignore lint/suspicious/noExplicitAny: <explanation> */}
-            {event?.data.days.map((day: any) => (
+            {event?.data.days.map((day: any, index: number) => (
               <TabsTrigger value={day.id} key={day.id}>{`Dia ${index + 1}`}</TabsTrigger>
             ))}
           </TabsList>

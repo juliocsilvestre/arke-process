@@ -9,16 +9,25 @@ import {
 } from '@/components/ui/Pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import { cn } from '@/utils/styles'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
+import { Input } from './Input'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   count: number
   onRowClick?: (row: TData) => void
+  onQueryChange?: (query: string) => void
 }
 
-export const DataTable = <TData, TValue>({ columns, data, count, onRowClick }: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({
+  columns,
+  data,
+  count,
+  onRowClick,
+  onQueryChange,
+}: DataTableProps<TData, TValue>) => {
   const table = useReactTable({
     data,
     columns,
@@ -27,7 +36,16 @@ export const DataTable = <TData, TValue>({ columns, data, count, onRowClick }: D
   })
 
   return (
-    <div>
+    <div className="flex flex-col justify-end	gap-4">
+      <div className="relative ml-auto">
+        <MagnifyingGlassIcon className="h-6 w-6 text-gray-400 absolute left-3 top-[50%] translate-y-[-50%]" />
+        <Input
+          className="w-full mt-4 md:w-64 md:mt-0 pl-10"
+          type="search"
+          placeholder="Pesquisar"
+          onChange={(e) => onQueryChange?.(e.target.value)}
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
