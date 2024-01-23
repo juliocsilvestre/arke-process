@@ -6,6 +6,17 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/AlertDialog'
 import { useCreateCompany } from '@/api/mutations/companies.mutation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'

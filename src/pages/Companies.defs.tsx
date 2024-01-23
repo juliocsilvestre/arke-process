@@ -8,6 +8,7 @@ import { TrashIcon } from '@heroicons/react/24/solid'
 import { CNPJ_REGEXP } from '@utils/constants'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 
 export const CreateCompanySchema = z.object({
   name: z
@@ -48,18 +49,27 @@ const _DeleteCompanyButton = ({ company }: { company: Company }) => {
   }
 
   return (
-    <>
+    <ConfirmationModal
+      title={
+        <span>
+          Você tem certeza de que deseja apagar <strong>"{company.name}"</strong>?
+        </span>
+      }
+      description="Esta ação não pode ser desfeita. Isso excluirá permanentemente o fornecedor."
+      variant={'destructive'}
+      actionButtonLabel="Apagar"
+      onAction={() => void onDeleteCompany(company)}
+    >
       <Button
         data-tooltip-id={`delete-company-${company.id}`}
         data-tooltip-content={`Apagar "${company.name}"`}
         variant="destructive"
         size="icon"
-        onClick={() => void onDeleteCompany(company)}
       >
         <TrashIcon className="w-4 h-4" />
       </Button>
       <Tooltip id={`delete-company-${company.id}`} place="top" />
-    </>
+    </ConfirmationModal>
   )
 }
 
