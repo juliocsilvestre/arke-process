@@ -6,7 +6,7 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
 import { indexEventsQueryOption } from './api/queries/events.query'
-import { indexWorkersQueryOption } from './api/queries/workers.query'
+import { indexWorkersQueryOptions } from './api/queries/workers.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
 import { NotFoundPage } from './pages/404.page'
@@ -81,13 +81,32 @@ const adminsRoute = new Route({
   pendingComponent: Loading,
 })
 
+// const workersRoute = new Route({
+//   getParentRoute: () => dashboardRoute,
+//   component: WorkersPage,
+//   path: 'funcionarios',
+//   loader: async ({ context: { queryClient } }) => {
+//     return queryClient.ensureQueryData(indexWorkersQueryOption)
+//   },
+// })
+
 const workersRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: WorkersPage,
   path: 'funcionarios',
-  loader: async ({ context: { queryClient } }) => {
-    // queryClient.ensureQueryData(indexCompaniesQueryOptions)
-    return queryClient.ensureQueryData(indexWorkersQueryOption)
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q,
+      page: String(search.page || 1),
+    }
+  },
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+
+  loader: async ({ context: { queryClient }, deps: { page, q } }) => {
+    const options = indexWorkersQueryOptions({ page, q })
+    return queryClient.ensureQueryData(options)
   },
 })
 

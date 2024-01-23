@@ -94,7 +94,7 @@ export const ReportsPage = (): JSX.Element => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="name" label="Nome" isRequired />
+                    <Label htmlFor="name" label="Nome" isrequired />
                     <FormControl>
                       <Input id="name" placeholder="Insira seu nome" {...field} size="lg" />
                     </FormControl>
@@ -108,7 +108,7 @@ export const ReportsPage = (): JSX.Element => {
                 name="cnpj"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="cnpj" label="CNPJ" isRequired />
+                    <Label htmlFor="cnpj" label="CNPJ" isrequired />
                     <FormControl>
                       <Input
                         id="cnpj"

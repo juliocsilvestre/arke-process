@@ -111,7 +111,7 @@ export const EventsPage = (): JSX.Element => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="name" label="Nome" isRequired />
+                    <Label htmlFor="name" label="Nome" isrequired />
                     <FormControl>
                       <Input id="name" placeholder="Insira o nome do evento" {...field} size="lg" />
                     </FormControl>
@@ -125,7 +125,7 @@ export const EventsPage = (): JSX.Element => {
                 name="dates"
                 render={({ field }) => (
                   <FormItem>
-                    <Label htmlFor="dates" label="Dias do evento" isRequired />
+                    <Label htmlFor="dates" label="Dias do evento" isrequired />
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button

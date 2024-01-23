@@ -1,10 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { api } from '../api'
-
-type Pagination = {
-  q?: string
-  page?: string
-}
+import { Pagination } from '@/utils/types'
 
 export const getCompanies = async (pagination?: Pagination) => {
   // Construct the base path with optional query parameters
@@ -26,3 +22,7 @@ export const indexCompaniesQueryOptions = (pagination?: Pagination) =>
     queryKey: ['companies', pagination],
     queryFn: () => getCompanies(pagination),
   })
+
+export const useIndexCompanies = (pagination?: Pagination) => {
+  return useQuery(indexCompaniesQueryOptions(pagination))
+}

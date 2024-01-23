@@ -35,7 +35,7 @@ export interface LabelProps
   extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>,
     VariantProps<typeof labelVariants> {
   size?: _LabelSize
-  isRequired?: boolean
+  isrequired?: boolean
   label?: string
 }
 
@@ -43,7 +43,7 @@ const Label = React.forwardRef<React.ElementRef<typeof LabelPrimitive.Root>, Lab
   ({ className, variant, size, ...props }, ref) => (
     <LabelPrimitive.Root ref={ref} className={cn(labelVariants({ variant, size, className }))} {...props}>
       {props.label}
-      {props.isRequired && <span className="text-md text-error-500">*</span>}
+      {props.isrequired && <span className="text-md text-error-500">*</span>}
     </LabelPrimitive.Root>
   ),
 )

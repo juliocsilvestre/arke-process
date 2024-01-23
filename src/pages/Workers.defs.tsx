@@ -3,7 +3,6 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { QrCodeIcon } from '@heroicons/react/24/solid'
-import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 import { Company } from './Companies.defs'
@@ -91,6 +90,7 @@ export interface Worker {
   picture_url: string
   status: string
 
+  company: Company
   company_id: string
   role: string
 
@@ -159,12 +159,7 @@ export const workersColumns: ColumnDef<Worker>[] = [
     cell: ({ row }) => {
       const worker = row.original
 
-      const { data: companies } = useQuery(indexCompaniesQueryOptions)
-      const companyName = companies?.data.companies?.data.find(
-        (company: Company) => company.id === worker.company_id,
-      )?.name
-
-      return <span>{companyName ?? '-'}</span>
+      return <span>{worker.company?.name ?? '-'}</span>
     },
   },
   {

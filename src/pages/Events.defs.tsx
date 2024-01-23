@@ -52,7 +52,6 @@ export const eventsColumns: ColumnDef<Event>[] = [
     cell: ({ row }) => {
       const event = row.original
 
-      console.log(event)
       const date = new Date(event?.start_date ?? null)
       return date.toLocaleDateString('pt-BR')
     },

@@ -107,6 +107,7 @@ export const DataTable = <TData, TValue>({
                 .fill(0)
                 .map((_, index) => (
                   <PaginationLink
+                    key={`page-${index}`}
                     search={(prev) => ({ ...prev, page: index + 1 })}
                     isActive={currentPage === index + 1}
                     className="mx-1"
