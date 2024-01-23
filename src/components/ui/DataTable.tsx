@@ -47,10 +47,10 @@ export const DataTable = <TData, TValue>({ columns, data, count, onRowClick }: D
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   className={cn('even:bg-gray-100', onRowClick && 'cursor-pointer hover:bg-gray-200')}
                   onClick={() => onRowClick?.(row.original)}
+                  key={row.id}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>

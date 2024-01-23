@@ -5,7 +5,7 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
-import { indexEventsQueryOption } from './api/queries/events.query'
+import { getSingleEvent, indexEventsQueryOption } from './api/queries/events.query'
 import { indexWorkersQueryOption } from './api/queries/workers.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
@@ -17,6 +17,7 @@ import { ReportsPage } from './pages/Reports.page'
 import { SignIn } from './pages/SignIn.page'
 import { WorkersPage } from './pages/Workers.page'
 import { useAuthStore } from './store/auth.store'
+import { EventDetailsPage } from './pages/EventDetails.page'
 
 const rootRoute = rootRouteWithContext<{
   queryClient: QueryClient
@@ -99,10 +100,27 @@ const companiesRoute = new Route({
 
 const eventsRoute = new Route({
   getParentRoute: () => dashboardRoute,
-  component: EventsPage,
   path: 'eventos',
+})
+
+const eventsPageRoute = new Route({
+  getParentRoute: () => eventsRoute,
+  path: '/',
+  component: EventsPage,
   loader: async ({ context: { queryClient } }) => {
     queryClient.ensureQueryData(indexEventsQueryOption)
+  },
+})
+
+const eventDetailsRoute = new Route({
+  getParentRoute: () => eventsRoute,
+  path: '$id',
+  component: EventDetailsPage,
+  loader: async ({ context: { queryClient }, params }) => {
+    queryClient.ensureQueryData({
+      queryKey: ['events', 'single', params.id],
+      queryFn: () => getSingleEvent(params.id),
+    })
   },
 })
 
@@ -126,7 +144,13 @@ const notFoundRoute = new NotFoundRoute({
 const routeTree = rootRoute.addChildren([
   authLayout.addChildren([authRoute]),
   dashboardLayout.addChildren([
-    dashboardRoute.addChildren([adminsRoute, workersRoute, companiesRoute, eventsRoute, reportsRoute]),
+    dashboardRoute.addChildren([
+      adminsRoute,
+      workersRoute,
+      companiesRoute,
+      eventsRoute.addChildren([eventsPageRoute, eventDetailsRoute]),
+      reportsRoute,
+    ]),
   ]),
   publicLayout.addChildren([publicRoute]),
 ])
