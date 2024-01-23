@@ -51,29 +51,28 @@ export const EventDetailsPage = () => {
           {event?.data.days.map((day: any) => (
             <TabsContent value={day.id} key={day.id}>
               <TabsList>
-                <TabsTrigger value={`working-${day.id}`} key= {`working-${day.id}`}>Trabalhando</TabsTrigger>
-                <TabsTrigger value={`assign-${day.id}`} key={`assign-${day.id}`}>Adicionar</TabsTrigger>
+                <TabsTrigger value={`working-${day.id}`} key={`working-${day.id}`}>
+                  Trabalhando
+                </TabsTrigger>
+                <TabsTrigger value={`assign-${day.id}`} key={`assign-${day.id}`}>
+                  Adicionar
+                </TabsTrigger>
               </TabsList>
             </TabsContent>
           ))}
           {/* biome-ignore lint/suspicious/noExplicitAny: <explanation> */}
           {event?.data.days.map((day: any) => (
             <div key={`content-${day.id}`}>
-             <TabsContent value={`working-${day.id}`} key={`working-${day.id}`}>
-              <DataTable
-               columns={workersByEventDayColumns}
-               data={[]}
-               count={0}
-             />
-             </TabsContent>
-             <TabsContent value={`assign-${day.id}`} key={`assign-${day.id}`}>
-             <p>Adicionar</p>
-             </TabsContent>
-             </div>  
+              <TabsContent value={`working-${day.id}`} key={`working-${day.id}`}>
+                <DataTable columns={workersByEventDayColumns} data={[]} count={0} />
+              </TabsContent>
+              <TabsContent value={`assign-${day.id}`} key={`assign-${day.id}`}>
+                <p>Adicionar</p>
+              </TabsContent>
+            </div>
           ))}
         </Tabs>
       </div>
     </section>
   )
 }
-

@@ -13,14 +13,14 @@ export type EventDay = {
   updated_at: string
 }
 
-interface EventDayWithWorkers {  
-    id: string
-    event_id: string
-    full_name: string
-    cpf: string
-    company_id: string
-    role: string
-    status: string
+interface EventDayWithWorkers {
+  id: string
+  event_id: string
+  full_name: string
+  cpf: string
+  company_id: string
+  role: string
+  status: string
 }
 
 export const workersByEventDayColumns: ColumnDef<EventDayWithWorkers>[] = [
@@ -49,7 +49,7 @@ export const workersByEventDayColumns: ColumnDef<EventDayWithWorkers>[] = [
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const worker = row.original;
+      const worker = row.original
       return <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{worker.status}</Badge>
     },
   },
