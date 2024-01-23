@@ -43,7 +43,7 @@ export const EventsPage = (): JSX.Element => {
 
   const { mutateAsync: createEvent } = useCreateEvent()
   const { data: events } = useQuery(indexEventsQueryOption)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
     try {
