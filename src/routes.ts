@@ -86,8 +86,8 @@ const workersRoute = new Route({
   component: WorkersPage,
   path: 'funcionarios',
   loader: async ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(indexCompaniesQueryOptions)
-    queryClient.ensureQueryData(indexWorkersQueryOption)
+    // queryClient.ensureQueryData(indexCompaniesQueryOptions)
+    return queryClient.ensureQueryData(indexWorkersQueryOption)
   },
 })
 
@@ -95,6 +95,20 @@ const companiesRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: CompaniesPage,
   path: 'fornecedores',
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q,
+      page: String(search.page || 1),
+    }
+  },
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+
+  loader: async ({ context: { queryClient }, deps: { page, q } }) => {
+    const options = indexCompaniesQueryOptions({ page, q })
+    return queryClient.ensureQueryData(options)
+  },
 })
 
 const eventsRoute = new Route({

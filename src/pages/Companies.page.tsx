@@ -1,8 +1,8 @@
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useLoaderData, useRouter, useSearch } from '@tanstack/react-router'
+import { Suspense, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -28,11 +28,11 @@ import { maskCNPJ } from '@/utils/strings'
 import { checkError } from '@/utils/errors'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { DataTable } from '@/components/ui/DataTable'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { CreateCompanyBody, CreateCompanySchema, companiesColumns, CompanyBodyKeys } from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
-  const { latestLocation } = useRouter()
+  const { latestLocation, navigate } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -45,7 +45,9 @@ export const CompaniesPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createCompany } = useCreateCompany()
-  const { data: companies } = useQuery(indexCompaniesQueryOptions)
+  const search = useSearch({ from: '/dashboard-layout/dashboard/fornecedores' }) as { q: string; page: string }
+  const options = indexCompaniesQueryOptions(search)
+  const { data: companies } = useSuspenseQuery(options)
 
   const onCreateCompany = async (values: CreateCompanyBody): Promise<void> => {
     try {
@@ -93,11 +95,15 @@ export const CompaniesPage = (): JSX.Element => {
       </div>
 
       <section className="mt-[200px]">
-        <DataTable
-          columns={companiesColumns}
-          data={companies?.data.companies.data ?? []}
-          count={companies?.data.companies_count}
-        />
+        <Suspense fallback={<p>...</p>}>
+          <DataTable
+            columns={companiesColumns}
+            data={companies?.data.companies.data ?? []}
+            count={companies?.data.companies_count}
+            onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
+            pages={companies?.data.companies.meta.last_page ?? 1}
+          />
+        </Suspense>
       </section>
 
       <SlideOver
