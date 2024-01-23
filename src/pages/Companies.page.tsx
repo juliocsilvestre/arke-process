@@ -2,7 +2,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@components
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter, useSearch } from '@tanstack/react-router'
-import { Suspense, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -84,7 +84,6 @@ export const CompaniesPage = (): JSX.Element => {
       </div>
 
       <section className="mt-[200px]">
-        <Suspense fallback={<p>...</p>}>
           <DataTable
             columns={companiesColumns}
             data={companies?.data.companies.data ?? []}
@@ -93,7 +92,7 @@ export const CompaniesPage = (): JSX.Element => {
             pages={companies?.data.companies.meta.last_page ?? 1}
             currentPage={companies?.data.companies.meta.current_page ?? 1}
           />
-        </Suspense>
+  
       </section>
 
       <SlideOver

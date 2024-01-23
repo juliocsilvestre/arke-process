@@ -1,6 +1,6 @@
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from '@tanstack/react-router'
+import { useNavigate, useRouter } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -43,6 +43,8 @@ export const EventsPage = (): JSX.Element => {
 
   const { mutateAsync: createEvent } = useCreateEvent()
   const { data: events } = useQuery(indexEventsQueryOption)
+
+  const navigate = useNavigate()
 
   const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
     try {
@@ -88,12 +90,18 @@ export const EventsPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[200px]">
+      <section className="mt-[30px]">
         <DataTable
           columns={eventsColumns}
           data={events?.data.events.data ?? []}
           count={events?.data.events_count}
           onQueryChange={(query) => console.log(query)}
+          onRowClick={({ id }) =>
+            navigate({
+              to: '/dashboard/eventos/$id',
+              params: { id },
+            })
+          }
         />
       </section>
 
