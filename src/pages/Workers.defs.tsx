@@ -177,7 +177,9 @@ export const workersColumns: ColumnDef<Worker>[] = [
     cell: ({ row }) => {
       const worker = row.original
 
-      return <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{worker.status}</Badge>
+      return (
+        <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{WORKER_STATUS_MAPPER[worker.status].label}</Badge>
+      )
     },
   },
   {
