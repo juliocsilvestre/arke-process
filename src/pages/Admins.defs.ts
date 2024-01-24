@@ -37,11 +37,11 @@ export const adminsColumns: ColumnDef<Admin>[] = [
   },
   {
     accessorKey: 'cpf',
-    header: 'Cpf',
+    header: 'CPF',
   },
   {
     accessorKey: 'email',
-    header: 'Email',
+    header: 'E-mail',
   },
   {
     accessorKey: 'created_at',

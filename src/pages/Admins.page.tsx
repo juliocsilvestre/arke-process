@@ -95,12 +95,6 @@ export const AdminsPage = (): JSX.Element => {
           onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }), params: {} })}
           pages={admins?.data.admins.meta.last_page ?? 1}
           currentPage={admins?.data.admins.meta.current_page ?? 1}
-          /* onRowClick={({ id }) =>
-                        navigate({
-                            to: "/dashboard/administradores/$id",
-                            params: { id },
-                        })
-                    } */
         />
       </section>
 
