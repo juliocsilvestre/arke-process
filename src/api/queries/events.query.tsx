@@ -17,10 +17,11 @@ export const getEvents = async (pagination?: Pagination) => {
   return await api.get(url)
 }
 
-export const indexEventsQueryOption = (pagination?: Pagination) => queryOptions({
-  queryKey: ['events', pagination],
-  queryFn: () => getEvents(pagination),
-})
+export const indexEventsQueryOption = (pagination?: Pagination) =>
+  queryOptions({
+    queryKey: ['events', pagination],
+    queryFn: () => getEvents(pagination),
+  })
 
 export const useIndexEvents = (pagination?: Pagination) => {
   return useQuery(indexEventsQueryOption(pagination))
