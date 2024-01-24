@@ -47,7 +47,7 @@ export const eventsColumns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: 'days',
+    accessorKey: 'first_day',
     header: 'Data de início',
     cell: ({ row }) => {
       const event = row.original
@@ -57,7 +57,7 @@ export const eventsColumns: ColumnDef<Event>[] = [
     },
   },
   {
-    accessorKey: 'days',
+    accessorKey: 'finish_day',
     header: 'Data de fim',
     cell: ({ row }) => {
       const event = row.original

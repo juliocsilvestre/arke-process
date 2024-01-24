@@ -27,8 +27,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import { useAttachWorkerToAnEventDay } from '@/api/mutations/events.mutation'
 import { checkError } from '@/utils/errors'
 import { toast } from 'sonner'
+import { ClockIcon } from '@heroicons/react/24/outline'
 
 export const EventDetailsPage = () => {
+  const { navigate } = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [isWorkersComboBoxOpen, setIsWorkersComboBoxOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
@@ -110,10 +112,25 @@ export const EventDetailsPage = () => {
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
         <h1 className="text-4xl text-primary font-bold">{event?.data.name}</h1>
 
-        <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)} disabled={!activeDayId}>
-          <PlusIcon className="h-6 w-6" aria-hidden="true" />
-          Adicionar funcionários ao dia {selectedDay + 1}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="mt-4"
+            onClick={() => {
+              navigate({ to: '/dashboard/eventos/$id/dias/$day/relogio', params: { id: eventId, day: activeDayId } })
+            }}
+            disabled={!activeDayId}
+          >
+            <ClockIcon className="h-6 w-6" aria-hidden="true" />
+            Registro de Presença do dia {selectedDay + 1}
+          </Button>
+
+          <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)} disabled={!activeDayId}>
+            <PlusIcon className="h-6 w-6" aria-hidden="true" />
+            Adicionar funcionários ao dia {selectedDay + 1}
+          </Button>
+        </div>
       </div>
       <div className="details mt-[30px]">
         <p className="text-gray-600 text-sm">
