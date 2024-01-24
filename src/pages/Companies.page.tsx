@@ -88,7 +88,7 @@ export const CompaniesPage = (): JSX.Element => {
           columns={companiesColumns}
           data={companies?.data.companies.data ?? []}
           count={companies?.data.companies_count}
-          onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }), params: {} })}
+          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
           pages={companies?.data.companies.meta.last_page ?? 1}
           currentPage={companies?.data.companies.meta.current_page ?? 1}
         />

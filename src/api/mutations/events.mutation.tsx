@@ -22,3 +22,16 @@ export const useCreateEvent = () => {
 
   return { ...mutation }
 }
+
+export const useAttachWorkerToAnEventDay = () => {
+  const mutation = useMutation({
+    mutationFn: (assignement: { eventId: string; workers_id: string[]; event_day_id: string }) => {
+      return api.post(`/events/${assignement.eventId}/attach`, {
+        workers_id: assignement.workers_id,
+        event_day_id: assignement.event_day_id,
+      })
+    },
+  })
+
+  return { ...mutation }
+}
