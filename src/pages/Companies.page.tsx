@@ -84,15 +84,14 @@ export const CompaniesPage = (): JSX.Element => {
       </div>
 
       <section className="mt-[200px]">
-          <DataTable
-            columns={companiesColumns}
-            data={companies?.data.companies.data ?? []}
-            count={companies?.data.companies_count}
-            onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
-            pages={companies?.data.companies.meta.last_page ?? 1}
-            currentPage={companies?.data.companies.meta.current_page ?? 1}
-          />
-  
+        <DataTable
+          columns={companiesColumns}
+          data={companies?.data.companies.data ?? []}
+          count={companies?.data.companies_count}
+          onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
+          pages={companies?.data.companies.meta.last_page ?? 1}
+          currentPage={companies?.data.companies.meta.current_page ?? 1}
+        />
       </section>
 
       <SlideOver
