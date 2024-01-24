@@ -4,6 +4,7 @@ import { WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { Company } from './Companies.defs'
+import { z } from 'zod'
 
 export type EventDay = {
   id: string
@@ -33,7 +34,7 @@ export const workersByEventDayColumns: ColumnDef<EventDayWithWorkers>[] = [
     header: 'Fornecedor',
     cell: ({ row }) => {
       const worker = row.original
-      const { data: companies } = useQuery(indexCompaniesQueryOptions)
+      const { data: companies } = useQuery(indexCompaniesQueryOptions({ page: '1', q: '' }))
       const companyName = companies?.data.companies?.data.find(
         (company: Company) => company.id === worker.company_id,
       )?.name
@@ -54,3 +55,12 @@ export const workersByEventDayColumns: ColumnDef<EventDayWithWorkers>[] = [
     },
   },
 ]
+
+export const AttachWorkerToEventDaySchema = z.object({
+  eventId: z.string(),
+  workers_id: z.array(z.string()),
+  event_day_id: z.string(),
+})
+
+export type AttachWorkerToEventDayBody = z.infer<typeof AttachWorkerToEventDaySchema>
+export type AttachWorkerToEventDayKeys = keyof AttachWorkerToEventDayBody

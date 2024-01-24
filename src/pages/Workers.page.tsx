@@ -169,7 +169,7 @@ export const WorkersPage = (): JSX.Element => {
     }
   }
 
-  const { data: companies, refetch } = useIndexCompanies({ q: queryString, page: '1' })
+  const { data: companies } = useIndexCompanies({ q: queryString, page: '1' })
 
   const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios' }) as { q: string; page: string }
   const options = indexWorkersQueryOptions(search)
@@ -200,7 +200,7 @@ export const WorkersPage = (): JSX.Element => {
           data={workers?.data.workers.data ?? []}
           count={workers?.data.workers_count}
           onRowClick={(worker) => console.log(worker)}
-          onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }) })}
+          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
           pages={workers?.data.workers.meta.last_page ?? 1}
           currentPage={workers?.data.workers.meta.current_page ?? 1}
         />
