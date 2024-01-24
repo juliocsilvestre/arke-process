@@ -12,6 +12,7 @@ import { cn } from '@/utils/styles'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 import { Input } from './Input'
+import type { Pagination as PaginationProps } from '@/utils/types'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -96,7 +97,9 @@ export const DataTable = <TData, TValue>({
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                search={(prev: { q: string; page: number }) => ({
+                disabled={currentPage === 1}
+                params=""
+                search={(prev: PaginationProps) => ({
                   ...prev,
                   page: Number(prev.page) > 1 ? Number(prev.page) - 1 : 1,
                 })}
@@ -107,8 +110,9 @@ export const DataTable = <TData, TValue>({
                 .fill(0)
                 .map((_, index) => (
                   <PaginationLink
+                    params=""
                     key={`page-${index}`}
-                    search={(prev) => ({ ...prev, page: index + 1 })}
+                    search={(prev: PaginationProps) => ({ ...prev, page: index + 1 })}
                     isActive={currentPage === index + 1}
                     className="mx-1"
                   >
@@ -121,7 +125,12 @@ export const DataTable = <TData, TValue>({
             </PaginationItem>
             <PaginationItem>
               <PaginationNext
-                search={(prev: { q: string; page: number }) => ({ ...prev, page: Number(prev.page) + 1 })}
+                disabled={currentPage === pages}
+                params=""
+                search={(prev: PaginationProps) => ({
+                  ...prev,
+                  page: Number(prev.page) + 1 > (pages ?? 0) ? pages : Number(prev.page) + 1,
+                })}
               />
             </PaginationItem>
           </PaginationContent>
