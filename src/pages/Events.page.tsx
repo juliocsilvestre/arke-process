@@ -1,6 +1,6 @@
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -22,7 +22,7 @@ import { cn } from '@utils/styles'
 
 import { indexEventsQueryOption } from '@/api/queries/events.query'
 import { DataTable } from '@/components/ui/DataTable'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { CreateEventBody, CreateEventSchema, eventsColumns } from './Events.defs'
 
 export const EventsPage = (): JSX.Element => {
@@ -42,7 +42,9 @@ export const EventsPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createEvent } = useCreateEvent()
-  const { data: events } = useQuery(indexEventsQueryOption)
+  const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/' }) as { q: string; page: string }
+  const options = indexEventsQueryOption(search)
+  const { data: events } = useSuspenseQuery(options)
 
   const navigate = useNavigate()
 
@@ -95,7 +97,9 @@ export const EventsPage = (): JSX.Element => {
           columns={eventsColumns}
           data={events?.data.events.data ?? []}
           count={events?.data.events_count}
-          onQueryChange={(query) => console.log(query)}
+          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
+          pages={events?.data.events.meta.last_page ?? 1}
+          currentPage={events?.data.events.meta.current_page ?? 1}
           onRowClick={({ id }) =>
             navigate({
               to: '/dashboard/eventos/$id',

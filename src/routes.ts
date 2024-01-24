@@ -151,8 +151,19 @@ const eventsPageRoute = new Route({
   getParentRoute: () => eventsRoute,
   path: '/',
   component: EventsPage,
-  loader: async ({ context: { queryClient } }) => {
-    queryClient.ensureQueryData(indexEventsQueryOption)
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q,
+      page: String(search.page || 1),
+    }
+  },
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+
+  loader: async ({ context: { queryClient }, deps: { page, q } }) => {
+    const options = indexEventsQueryOption({ page, q })
+    return queryClient.ensureQueryData(options)
   },
 })
 
