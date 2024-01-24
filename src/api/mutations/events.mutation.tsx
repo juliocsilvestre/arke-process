@@ -16,7 +16,7 @@ export const useCreateEvent = () => {
       return api.post('/events', { ...event, dates: arrayOfDates })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(indexEventsQueryOption)
+      queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
     },
   })
 
@@ -29,6 +29,19 @@ export const useAttachWorkerToAnEventDay = () => {
       return api.post(`/events/${assignement.eventId}/attach`, {
         workers_id: assignement.workers_id,
         event_day_id: assignement.event_day_id,
+      })
+    },
+  })
+
+  return { ...mutation }
+}
+
+export const useClockWorkerOnEventDay = () => {
+  const mutation = useMutation({
+    mutationFn: (assignement: { event_day_id: string; worker_id: string }) => {
+      return api.post('/workers/clocks', {
+        event_day_id: assignement.event_day_id,
+        worker_id: assignement.worker_id,
       })
     },
   })

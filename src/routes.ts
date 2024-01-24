@@ -19,6 +19,7 @@ import { WorkersPage } from './pages/Workers.page'
 import { useAuthStore } from './store/auth.store'
 import { EventDetailsPage } from './pages/EventDetails.page'
 import { indexAdminsQueryOption } from './api/queries/admin.query'
+import { ClockPage } from './pages/Clock.page'
 
 const rootRoute = rootRouteWithContext<{
   queryClient: QueryClient
@@ -179,6 +180,12 @@ const eventDetailsRoute = new Route({
   },
 })
 
+const eventDayClockRoute = new Route({
+  getParentRoute: () => eventsRoute,
+  component: ClockPage,
+  path: '$id/dias/$day/relogio',
+})
+
 const reportsRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: ReportsPage,
@@ -203,7 +210,7 @@ const routeTree = rootRoute.addChildren([
       adminsRoute,
       workersRoute,
       companiesRoute,
-      eventsRoute.addChildren([eventsPageRoute, eventDetailsRoute]),
+      eventsRoute.addChildren([eventsPageRoute, eventDetailsRoute, eventDayClockRoute]),
       reportsRoute,
     ]),
   ]),
