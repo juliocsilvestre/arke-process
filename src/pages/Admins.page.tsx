@@ -8,12 +8,15 @@ import { maskCPF } from '@/utils/strings'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from '@tanstack/react-router'
+import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { AdminBodyKeys, CreateAdminBody, CreateAdminSchema } from './Admins.defs'
+import { AdminBodyKeys, CreateAdminBody, CreateAdminSchema, adminsColumns } from './Admins.defs'
 import { checkError } from '@/utils/errors'
+import { DataTable } from '@/components/ui/DataTable'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { indexAdminsQueryOption } from '@/api/queries/admin.query'
 
 export const AdminsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -31,6 +34,13 @@ export const AdminsPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createAdmin } = useCreateAdmin()
+  const search = useSearch({ from: '/dashboard-layout/dashboard/administradores' }) as {
+    q: string
+    page: string
+  }
+  const options = indexAdminsQueryOption(search)
+  const { data: admins } = useSuspenseQuery(options)
+  const navigate = useNavigate()
 
   const onSignUp = async (values: CreateAdminBody): Promise<void> => {
     try {
@@ -77,8 +87,15 @@ export const AdminsPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[14%]">
-        <div className="w-full h-[500px] bg-gray-200">,</div>
+      <section className="mt-[30px]">
+        <DataTable
+          columns={adminsColumns}
+          data={admins?.data.admins.data ?? []}
+          count={admins?.data.admins_count}
+          onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }), params: {} })}
+          pages={admins?.data.admins.meta.last_page ?? 1}
+          currentPage={admins?.data.admins.meta.current_page ?? 1}
+        />
       </section>
 
       <SlideOver

@@ -18,6 +18,7 @@ import { SignIn } from './pages/SignIn.page'
 import { WorkersPage } from './pages/Workers.page'
 import { useAuthStore } from './store/auth.store'
 import { EventDetailsPage } from './pages/EventDetails.page'
+import { indexAdminsQueryOption } from './api/queries/admin.query'
 
 const rootRoute = rootRouteWithContext<{
   queryClient: QueryClient
@@ -76,10 +77,20 @@ const adminsRoute = new Route({
   component: AdminsPage,
   path: 'administradores',
   // TODO: force loading or fetch lists...
-  loader: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1200))
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q,
+      page: String(search.page || 1),
+    }
   },
-  pendingComponent: Loading,
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+
+  loader: async ({ context: { queryClient }, deps: { page, q } }) => {
+    const options = indexAdminsQueryOption({ page, q })
+    return queryClient.ensureQueryData(options)
+  },
 })
 
 // const workersRoute = new Route({
