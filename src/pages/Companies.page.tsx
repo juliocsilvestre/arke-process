@@ -83,7 +83,7 @@ export const CompaniesPage = (): JSX.Element => {
         </Button>
       </div>
 
-      <section className="mt-[200px]">
+      <section className="mt-[30px]">
         <DataTable
           columns={companiesColumns}
           data={companies?.data.companies.data ?? []}
