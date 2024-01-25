@@ -80,7 +80,7 @@ const adminsRoute = new Route({
   // TODO: force loading or fetch lists...
   validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
     return {
-      q: search.q,
+      q: search.q ?? '',
       page: String(search.page || 1),
     }
   },
@@ -109,7 +109,7 @@ const workersRoute = new Route({
   path: 'funcionarios',
   validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
     return {
-      q: search.q,
+      q: search.q ?? '',
       page: String(search.page || 1),
     }
   },
@@ -129,7 +129,7 @@ const companiesRoute = new Route({
   path: 'fornecedores',
   validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
     return {
-      q: search.q,
+      q: search.q ?? '',
       page: String(search.page || 1),
     }
   },
@@ -154,7 +154,7 @@ const eventsPageRoute = new Route({
   component: EventsPage,
   validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
     return {
-      q: search.q,
+      q: search.q ?? '',
       page: String(search.page || 1),
     }
   },

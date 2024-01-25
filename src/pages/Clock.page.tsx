@@ -76,8 +76,12 @@ export const ClockPage = (): JSX.Element => {
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
-      <Link to="/dashboard/eventos/$id" params={{ id }} className='flex items-center gap-2 mb-10 text-primary-500 hover:underline'>
-      <ArrowLeftIcon className="w-6 h-6 text-primary-600" />
+      <Link
+        to="/dashboard/eventos/$id"
+        params={{ id }}
+        className="flex items-center gap-2 mb-10 text-primary-500 hover:underline"
+      >
+        <ArrowLeftIcon className="w-6 h-6 text-primary-600" />
         Voltar para o evento
       </Link>
 
