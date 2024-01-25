@@ -1,45 +1,45 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 
-import { api } from "../api";
-import { Pagination } from "@/utils/types";
+import { api } from '../api'
+import { Pagination } from '@/utils/types'
 
 export const useGetAddresByCep = (cep: string) => {
-    const query = useQuery({
-        queryKey: ["address", cep],
-        queryFn: async () => {
-            const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-            return data;
-        },
-        refetchOnWindowFocus: false,
-        enabled: cep.length === 9,
-    });
+  const query = useQuery({
+    queryKey: ['address', cep],
+    queryFn: async () => {
+      const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json/`)
+      return data
+    },
+    refetchOnWindowFocus: false,
+    enabled: cep.length === 9,
+  })
 
-    return { ...query };
-};
+  return { ...query }
+}
 
 export const getWorkers = async (pagination?: Pagination) => {
-    // Construct the base path with optional query parameters
-    const path = "/workers";
-    const queryParams = new URLSearchParams({
-        q: pagination?.q || "", // Use empty string if q is not provided
-        page: pagination?.page || "1", // Use empty string if page is not provided
-    });
+  // Construct the base path with optional query parameters
+  const path = '/workers'
+  const queryParams = new URLSearchParams({
+    q: pagination?.q || '', // Use empty string if q is not provided
+    page: pagination?.page || '1', // Use empty string if page is not provided
+  })
 
-    // Combine the base path with query parameters
-    const url = `${path}?${queryParams.toString()}`;
+  // Combine the base path with query parameters
+  const url = `${path}?${queryParams.toString()}`
 
-    // Perform the API request
-    return await api.get(url);
-};
+  // Perform the API request
+  return await api.get(url)
+}
 
 export const indexWorkersQueryOptions = (pagination?: Pagination) =>
-    queryOptions({
-        queryKey: ["workers", pagination],
-        queryFn: () => getWorkers(pagination),
-        refetchOnWindowFocus: false,
-    });
+  queryOptions({
+    queryKey: ['workers', pagination],
+    queryFn: () => getWorkers(pagination),
+    refetchOnWindowFocus: false,
+  })
 
 export const useIndexWorkers = (pagination?: Pagination) => {
-    return useQuery(indexWorkersQueryOptions(pagination));
-};
+  return useQuery(indexWorkersQueryOptions(pagination))
+}
