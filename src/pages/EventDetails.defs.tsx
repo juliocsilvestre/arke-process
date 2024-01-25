@@ -1,9 +1,7 @@
-import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { Badge } from '@/components/ui/Badge'
 import { WORKER_STATUS_MAPPER } from '@/utils/constants'
-import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { Company } from './Companies.defs'
+import { Worker } from './Workers.defs'
 import { z } from 'zod'
 
 export type EventDay = {
@@ -14,17 +12,7 @@ export type EventDay = {
   updated_at: string
 }
 
-interface EventDayWithWorkers {
-  id: string
-  event_id: string
-  full_name: string
-  cpf: string
-  company_id: string
-  role: string
-  status: string
-}
-
-export const workersByEventDayColumns: ColumnDef<EventDayWithWorkers>[] = [
+export const workersByEventDayColumns: ColumnDef<Worker>[] = [
   {
     accessorKey: 'full_name',
     header: 'Nome completo',
@@ -34,12 +22,8 @@ export const workersByEventDayColumns: ColumnDef<EventDayWithWorkers>[] = [
     header: 'Fornecedor',
     cell: ({ row }) => {
       const worker = row.original
-      const { data: companies } = useQuery(indexCompaniesQueryOptions({ page: '1', q: '' }))
-      const companyName = companies?.data.companies?.data.find(
-        (company: Company) => company.id === worker.company_id,
-      )?.name
 
-      return <span>{companyName}</span>
+      return <span>{worker.company?.name}</span>
     },
   },
   {

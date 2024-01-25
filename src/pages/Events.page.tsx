@@ -22,8 +22,9 @@ import { cn } from '@utils/styles'
 
 import { indexEventsQueryOption } from '@/api/queries/events.query'
 import { DataTable } from '@/components/ui/DataTable'
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { CreateEventBody, CreateEventSchema, eventsColumns } from './Events.defs'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { CreateEventBody, CreateEventSchema, EventDay, eventsColumns } from './Events.defs'
+import _ from 'lodash'
 
 export const EventsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -100,12 +101,15 @@ export const EventsPage = (): JSX.Element => {
           onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
           pages={events?.data.events.meta.last_page ?? 1}
           currentPage={events?.data.events.meta.current_page ?? 1}
-          onRowClick={({ id }) =>
+          onRowClick={({ id, days }) => {
+            const sortedDates = _.sortBy(days, (d: EventDay) => new Date(d.date))
+
             navigate({
-              to: '/dashboard/eventos/$id',
-              params: { id },
+              to: '/dashboard/eventos/$id/dias/$day',
+              params: { id, day: sortedDates?.at?.(0)?.id ?? 'undefined' },
+              search: { page: '1', q: '' },
             })
-          }
+          }}
         />
       </section>
 
