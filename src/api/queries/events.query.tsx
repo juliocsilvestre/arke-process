@@ -33,7 +33,11 @@ export const getSingleEvent = async (id: string) => {
 }
 
 export const useSingleEvent = (id: string) => {
-  const event = useQuery({ queryKey: ['eventDetail', id], queryFn: () => getSingleEvent(id) })
+  const event = useQuery({
+    queryKey: ['eventDetail', id],
+    queryFn: () => getSingleEvent(id),
+    refetchOnWindowFocus: false,
+  })
 
   return { event }
 }
