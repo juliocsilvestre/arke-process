@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { useCallback, useEffect, useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { WorkerBodyKeys} from './Workers.defs'
+import { WorkerBodyKeys } from './Workers.defs'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -27,30 +27,26 @@ import { useIndexCompanies } from '@/api/queries/companies.query'
 import { EditWorkerBody, EditWorkerSchema, SingleWorkerResponse, editWorkerInitialValues } from './WorkerDetails.defs'
 import { useEditWorker } from '@/api/mutations/workers.mutation'
 
-
 export const WorkerDetailsPage = () => {
-    const [isOpen, setIsOpen] = useState(false)
-    const [picturePreview, setPicturePreview] = useState<File | null>(null)
-    const [previewImageURL, setPreviewImageURL] = useState<string>('')
-    const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [picturePreview, setPicturePreview] = useState<File | null>(null)
+  const [previewImageURL, setPreviewImageURL] = useState<string>('')
+  const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
 
   const workerId = useParams({
     from: '/dashboard-layout/dashboard/funcionarios/$id',
     select: (params) => params.id,
   })
 
-    const {data: worker} = useQuery(getSingleWorkerQueryOptions(workerId))
-    const { mutateAsync: editWorker } = useEditWorker(workerId)
+  const { data: worker } = useQuery(getSingleWorkerQueryOptions(workerId))
+  const { mutateAsync: editWorker } = useEditWorker(workerId)
 
-
-    const { data: companies } = useIndexCompanies()
-
-
+  const { data: companies } = useIndexCompanies()
 
   // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
   const form = useForm<EditWorkerBody>({
     resolver: zodResolver(EditWorkerSchema),
-    defaultValues: editWorkerInitialValues(worker as SingleWorkerResponse)
+    defaultValues: editWorkerInitialValues(worker as SingleWorkerResponse),
   })
 
   const onEditWorker = useCallback(
@@ -60,9 +56,9 @@ export const WorkerDetailsPage = () => {
         form.reset()
         handleOnClose()
         toast.success(
-            <p>
-              O funcionário <strong>{values.full_name}</strong> foi editado com sucesso!
-            </p>
+          <p>
+            O funcionário <strong>{values.full_name}</strong> foi editado com sucesso!
+          </p>,
         )
       } catch (error: unknown) {
         const errors = checkError<WorkerBodyKeys>(error)
@@ -99,7 +95,6 @@ export const WorkerDetailsPage = () => {
 
   const { data } = useGetAddresByCep(form.watch('cep'))
 
-
   const cep = form.watch('cep')
 
   const handleOnClose = () => {
@@ -119,7 +114,7 @@ export const WorkerDetailsPage = () => {
       form.setValue('uf', data.uf)
     }
   }, [cep, data, form, worker])
-  
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center">
@@ -136,31 +131,42 @@ export const WorkerDetailsPage = () => {
           <div className="mt-[8px] md:ml-[16px] md:mt-0">
             <div className="flex items-center">
               <h1 className="text-center md:text-left text-3xl text-primary font-bold">{worker?.data.full_name}</h1>
-              <Button variant="ghost" size="sm" className="md:ml-[16px] text-primary-700 hover:text-primary-500 hover:bg-transparent focus-visible:ring-primary-600" onClick={() => setIsOpen(true)} disabled={!workerId}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:ml-[16px] text-primary-700 hover:text-primary-500 hover:bg-transparent focus-visible:ring-primary-600"
+                onClick={() => setIsOpen(true)}
+                disabled={!workerId}
+              >
                 <EditIcon className="h-7 w-7" aria-hidden="true" />
-              </Button> 
+              </Button>
             </div>
             <h3 className="text-center md:text-left text-lg text-gray-500">
               {worker?.data.role} em <span>{worker?.data.company.name}</span>
             </h3>
           </div>
         </div>
-       
       </div>
       <div className="worker-body mt-[32px]">
         <div className="worker-body__header">
           <h2 className="text-center md:text-left text-2xl text-primary font-bold">Dados Pessoais</h2>
           <div className="grid grid-cols-1 justify-items-center md:justify-items-start md:grid-cols-2 2xl:grid-cols-3 gap-y-4 gap-x-3 mt-[16px]">
             <div className="md:text-left worker-detail-field">
-              <Label label="Nome Completo" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <Label
+                label="Nome Completo"
+                className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
+              />
               <span className="text-gray-600 font-normal">{worker?.data.full_name}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="CPF" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <Label label="CPF" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
               <span className="text-gray-600 font-normal">{worker?.data.cpf}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="E-mail" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <Label
+                label="E-mail"
+                className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
+              />
               <span className="text-gray-600 font-normal">{worker?.data.email}</span>
             </div>
             <div className="md:text-left worker-detail-field">
@@ -168,7 +174,10 @@ export const WorkerDetailsPage = () => {
               <span className="text-gray-600 font-normal">{worker?.data.rg}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="Telefone" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <Label
+                label="Telefone"
+                className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
+              />
               <span className="text-gray-600 font-normal">{worker?.data.phone_number}</span>
             </div>
           </div>
@@ -179,11 +188,14 @@ export const WorkerDetailsPage = () => {
           <h2 className="text-center md:text-left text-2xl text-primary font-bold">Endereço</h2>
           <div className="grid grid-cols-1 justify-items-center md:justify-items-start md:grid-cols-2 2xl:grid-cols-3 gap-y-2 gap-x-3 mt-[16px]">
             <div className="md:text-left worker-detail-field">
-              <Label label="Rua" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <Label label="Rua" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
               <span className="text-gray-600 font-normal">{worker?.data.address.street}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="Complemento" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold">
+              <Label
+                label="Complemento"
+                className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
+              >
                 Complemento:
               </Label>
               <span className="text-gray-600 font-normal">{worker?.data.address.complement}</span>
@@ -193,15 +205,21 @@ export const WorkerDetailsPage = () => {
               <span className="text-gray-600 font-normal">{worker?.data.address.uf}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="CEP" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <Label label="CEP" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
               <span className="text-gray-600 font-normal">{worker?.data.address.cep}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="Bairro" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <Label
+                label="Bairro"
+                className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
+              />
               <span className="text-gray-600 font-normal">{worker?.data.address.neighborhood}</span>
             </div>
             <div className="md:text-left worker-detail-field">
-              <Label label="Cidade" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <Label
+                label="Cidade"
+                className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
+              />
               <span className="text-gray-600 font-normal">{worker?.data.address.city}</span>
             </div>
           </div>
@@ -444,7 +462,7 @@ export const WorkerDetailsPage = () => {
                                   onSelect={() => {
                                     form.setValue('company_id', company.id)
                                     setIsCompanySelectOpen(false)
-                                  }}    
+                                  }}
                                 >
                                   <Check
                                     className={cn(

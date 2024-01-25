@@ -1,5 +1,5 @@
-import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF, UF_LIST, WORKER_STATUS } from "@/utils/constants"
-import { z } from "zod"
+import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF, UF_LIST, WORKER_STATUS } from '@/utils/constants'
+import { z } from 'zod'
 
 export const EditWorkerSchema = z.object({
   full_name: z.string().min(2, { message: 'Nome deve conter pelo menos 2 caracteres.' }),
@@ -38,42 +38,41 @@ export const EditWorkerSchema = z.object({
 })
 export type EditWorkerBody = z.infer<typeof EditWorkerSchema>
 
-
 export interface WorkerDetails {
-      id: string | undefined,
-      full_name: string | undefined,
-      email: string | undefined,
-      cpf: string | undefined,
-      rg: string | undefined,
-      role: string | undefined,
-      phone_number: string | undefined,
-      picture_url:string | undefined,
-      status: string | undefined,
-      company_id: string | undefined,
-      admin_id: string | undefined,
-      created_at: string | undefined,
-      updated_at: string | undefined,
-      company: {
-        id: string | undefined,
-        cnpj: string | undefined,
-        name: string | undefined,
-        admin_id: string | undefined,
-        created_at: string | undefined,
-        updated_at: string | undefined
-      },
-        address: {
-        id: string | undefined,
-        cep: string | undefined,
-        city: string | undefined,
-        uf: UF,
-        neighborhood: string | undefined,
-        street: string | undefined,
-        number: number | undefined,
-        complement: string | undefined,
-        worker_id: string | undefined,
-        created_at: string | undefined,
-        updated_at: string | undefined
-      }
+  id: string | undefined
+  full_name: string | undefined
+  email: string | undefined
+  cpf: string | undefined
+  rg: string | undefined
+  role: string | undefined
+  phone_number: string | undefined
+  picture_url: string | undefined
+  status: string | undefined
+  company_id: string | undefined
+  admin_id: string | undefined
+  created_at: string | undefined
+  updated_at: string | undefined
+  company: {
+    id: string | undefined
+    cnpj: string | undefined
+    name: string | undefined
+    admin_id: string | undefined
+    created_at: string | undefined
+    updated_at: string | undefined
+  }
+  address: {
+    id: string | undefined
+    cep: string | undefined
+    city: string | undefined
+    uf: UF
+    neighborhood: string | undefined
+    street: string | undefined
+    number: number | undefined
+    complement: string | undefined
+    worker_id: string | undefined
+    created_at: string | undefined
+    updated_at: string | undefined
+  }
 }
 
 export interface SingleWorkerResponse {
@@ -81,21 +80,21 @@ export interface SingleWorkerResponse {
 }
 
 export const editWorkerInitialValues = (worker: SingleWorkerResponse) => {
-  const initialValues =  {
-      full_name: worker?.data.full_name,
-      cpf: worker?.data.cpf,
-      rg: worker?.data.rg,
-      phone_number: worker?.data.phone_number,
-      email: worker?.data.email,
-      role: worker?.data.role,
-      company_id: worker?.data.company.id,
-      street: worker?.data.address.street,
-      complement: worker?.data.address.complement,
-      number: worker?.data.address.number,
-      cep: worker?.data.address.cep,
-      neighborhood: worker?.data.address.neighborhood,
-      city: worker?.data.address.city,
-      uf: worker?.data.address.uf,
+  const initialValues = {
+    full_name: worker?.data.full_name,
+    cpf: worker?.data.cpf,
+    rg: worker?.data.rg,
+    phone_number: worker?.data.phone_number,
+    email: worker?.data.email,
+    role: worker?.data.role,
+    company_id: worker?.data.company.id,
+    street: worker?.data.address.street,
+    complement: worker?.data.address.complement,
+    number: worker?.data.address.number,
+    cep: worker?.data.address.cep,
+    neighborhood: worker?.data.address.neighborhood,
+    city: worker?.data.address.city,
+    uf: worker?.data.address.uf,
   }
 
   return initialValues
