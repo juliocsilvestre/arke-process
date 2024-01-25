@@ -2,17 +2,15 @@ import { Sidebar } from '@/components/Sidebar'
 import { Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 
-export const DashboardLayout = () => {
-  return (
-    <main className="flex">
-      <Sidebar>
-        <div className="w-screen lg:pl-72">
-          <div className="w-full">
-            <Outlet />
-          </div>
+export const DashboardLayout = () => (
+  <main className="flex">
+    <Sidebar>
+      <div className="w-screen lg:pl-72">
+        <div className="w-full">
+          <Outlet />
         </div>
-      </Sidebar>
-      <TanStackRouterDevtools position="bottom-right" />
-    </main>
-  )
-}
+      </div>
+    </Sidebar>
+    <TanStackRouterDevtools position="bottom-right" />
+  </main>
+)
