@@ -1,102 +1,68 @@
-import { useCreateWorker, useCreateWorkersBulk } from '@/api/mutations/workers.mutation'
-import { indexCompaniesQueryOptions, useIndexCompanies } from '@/api/queries/companies.query'
-import { indexWorkersQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
-import { Button } from '@/components/ui/Button'
+import { getSingleWorkerQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
+// import { BRAND } from 'zod'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
-import { DataTable } from '@/components/ui/DataTable'
-import { DropZone } from '@/components/ui/DropZone'
+import { Check, ChevronsUpDown, EditIcon } from 'lucide-react'
+import { UserIcon, PaperClipIcon } from '@heroicons/react/24/solid'
+import { Button } from '@/components/ui/Button'
+import { useCallback, useEffect, useState } from 'react'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form'
+import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
+import { WorkerBodyKeys} from './Workers.defs'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
-import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
-import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
-import { cn } from '@/utils/styles'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { useRouter, useSearch } from '@tanstack/react-router'
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as xlsx from 'xlsx'
-import { Company } from './Companies.defs'
+import { MAX_FILE_SIZE, ACCEPTED_IMAGE_TYPES, UF_LIST } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
-import {
-  CreateWorkerBody,
-  CreateWorkerRow,
-  WorkerBodyKeys,
-  CreateWorkerSchema,
-  WorkerSheet,
-  workerInitialValues,
-  workersColumns,
-  workersSheetMapper,
-} from './Workers.defs'
+import { maskCPF, maskPhoneNumber, maskCEP } from '@/utils/strings'
+import { cn } from '@/utils/styles'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
+import { Company } from './Companies.defs'
+import { useIndexCompanies } from '@/api/queries/companies.query'
+import { EditWorkerBody, EditWorkerSchema, SingleWorkerResponse, editWorkerInitialValues } from './WorkerDetails.defs'
+import { useEditWorker } from '@/api/mutations/workers.mutation'
 
-export type UploadFileProps = {
-  e?: ChangeEvent<HTMLInputElement>
-  f?: File
-}
 
-export const WorkersPage = (): JSX.Element => {
-  const { latestLocation, navigate } = useRouter()
-  const [picturePreview, setPicturePreview] = useState<File | null>(null)
-  const [previewImageURL, setPreviewImageURL] = useState<string>('')
-  const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSpreadsheetManagerOpen, setIsSpreadsheetManagerOpen] = useState(false)
-  const [workersToUpload, setWorkersToUpload] = useState<CreateWorkerRow[]>([])
-  const [companyToBulkUpload, setCompanyToBulkUpload] = useState<string>('')
-  const [isBulkComboBoxOpen, setIsBulkComboBoxOpen] = useState(false)
-  const [queryString, setQueryString] = useState('')
+export const WorkerDetailsPage = () => {
+    const [isOpen, setIsOpen] = useState(false)
+    const [picturePreview, setPicturePreview] = useState<File | null>(null)
+    const [previewImageURL, setPreviewImageURL] = useState<string>('')
+    const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
 
-  const form = useForm<CreateWorkerBody>({
-    resolver: zodResolver(CreateWorkerSchema),
-    defaultValues: workerInitialValues,
+  const workerId = useParams({
+    from: '/dashboard-layout/dashboard/funcionarios/$id',
+    select: (params) => params.id,
   })
 
-  const { mutateAsync: createWorker } = useCreateWorker()
-  const { mutateAsync: createWorkersBulk } = useCreateWorkersBulk()
+    const {data: worker} = useQuery(getSingleWorkerQueryOptions(workerId))
+    const { mutateAsync: editWorker } = useEditWorker(workerId)
 
-  const onCreateWorkersBulk = useCallback(async () => {
-    try {
-      await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
-      handleOnClose()
-      toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
-    } catch (error: unknown) {
-      const errors = checkError<WorkerBodyKeys>(error)
-      if (Array.isArray(errors) && errors.length > 0) {
-        for (const e of errors) {
-          form.setError(e.field, { message: e.message })
-          toast.error(
-            <p>
-              Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
-            </p>,
-          )
-        }
-      } else if (typeof errors === 'string') {
-        toast.error(errors)
-      }
-    }
-  }, [workersToUpload, companyToBulkUpload, createWorkersBulk])
 
-  const onCreateWorker = useCallback(
-    async (values: CreateWorkerBody): Promise<void> => {
+    const { data: companies } = useIndexCompanies()
+
+
+
+  // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+  const form = useForm<EditWorkerBody>({
+    resolver: zodResolver(EditWorkerSchema),
+    defaultValues: editWorkerInitialValues(worker as SingleWorkerResponse)
+  })
+
+  const onEditWorker = useCallback(
+    async (values: EditWorkerBody): Promise<void> => {
       try {
-        await createWorker({ ...values, picture: picturePreview })
+        await editWorker({ ...values, picture: picturePreview })
         form.reset()
         handleOnClose()
         toast.success(
-          Array.isArray(values) && values.length > 0 ? (
-            <p>{values.length} funcionários foram criados com sucesso!</p>
-          ) : (
             <p>
-              O funcionário <strong>{values.full_name}</strong> foi criado com sucesso!
+              O funcionário <strong>{values.full_name}</strong> foi editado com sucesso!
             </p>
-          ),
         )
       } catch (error: unknown) {
         const errors = checkError<WorkerBodyKeys>(error)
@@ -114,8 +80,27 @@ export const WorkersPage = (): JSX.Element => {
         }
       }
     },
-    [picturePreview, form, createWorker],
+    [picturePreview, form],
   )
+
+  useEffect(() => {
+    console.log('picture preview ', picturePreview)
+    console.log('preview image url', previewImageURL)
+    if (picturePreview instanceof File) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewImageURL(reader.result as string)
+      }
+      reader.readAsDataURL(picturePreview)
+    } else {
+      setPreviewImageURL(worker?.data.picture_url)
+    }
+  }, [picturePreview])
+
+  const { data } = useGetAddresByCep(form.watch('cep'))
+
+
+  const cep = form.watch('cep')
 
   const handleOnClose = () => {
     setIsOpen(false)
@@ -125,19 +110,6 @@ export const WorkersPage = (): JSX.Element => {
   }
 
   useEffect(() => {
-    if (picturePreview instanceof File) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewImageURL(reader.result as string)
-      }
-      reader.readAsDataURL(picturePreview)
-    }
-  }, [picturePreview])
-
-  const { data } = useGetAddresByCep(form.watch('cep'))
-
-  const cep = form.watch('cep')
-  useEffect(() => {
     if (cep.length !== 9) return
 
     if (Object.keys(data ?? {})?.length > 0) {
@@ -146,159 +118,113 @@ export const WorkersPage = (): JSX.Element => {
       form.setValue('city', data.localidade)
       form.setValue('uf', data.uf)
     }
-  }, [cep, data, form])
-
-  const readUploadFile = ({ e, f }: UploadFileProps) => {
-    e?.preventDefault()
-    const file = e?.target.files?.[0] ?? f
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const data = e?.target?.result
-
-        const workbook = xlsx.read(data, { type: 'array' })
-        const sheetName = workbook.SheetNames[0]
-        const worksheet = workbook.Sheets[sheetName]
-        const json = xlsx.utils.sheet_to_json(worksheet)
-        const serializedJson = workersSheetMapper(json as WorkerSheet[])
-
-        setWorkersToUpload(serializedJson)
-      }
-
-      reader.readAsArrayBuffer(file)
-    }
-  }
-
-  const { data: companies } = useIndexCompanies({ q: queryString, page: '1' })
-
-  const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios/' }) as { q: string; page: string }
-  const options = indexWorkersQueryOptions(search)
-  const { data: workers } = useSuspenseQuery(options)
-
+  }, [cep, data, form, worker])
+  
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
-      <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
-        <h1 className="text-4xl text-primary font-bold">
-          {NAVIGATION.find((n) => n.href === latestLocation.pathname)?.name ?? ''}
-        </h1>
-
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm" className="mt-4" onClick={() => setIsSpreadsheetManagerOpen(true)}>
-            <PaperClipIcon className="h-5 w-5" aria-hidden="true" />
-            Importar funcionários
-          </Button>
-          <Button variant="default" size="sm" className="mt-4" onClick={() => setIsOpen(true)}>
-            <PlusIcon className="h-6 w-6" aria-hidden="true" />
-            Novo funcionário
-          </Button>
+      <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center">
+        <div className="flex flex-col justify-center items-center  md:flex-row md:justify-start md:items-center">
+          <Avatar className="w-[136px] h-[136px]">
+            <AvatarImage src={worker?.data.picture_url} />
+            <AvatarFallback>
+              {worker?.data.full_name
+                .split(' ')
+                .map((name: string[]) => name[0])
+                .join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div className="mt-[8px] md:ml-[16px] md:mt-0">
+            <div className="flex items-center">
+              <h1 className="text-center md:text-left text-3xl text-primary font-bold">{worker?.data.full_name}</h1>
+              <Button variant="ghost" size="sm" className="md:ml-[16px] text-primary-700 hover:text-primary-500 hover:bg-transparent focus-visible:ring-primary-600" onClick={() => setIsOpen(true)} disabled={!workerId}>
+                <EditIcon className="h-7 w-7" aria-hidden="true" />
+              </Button> 
+            </div>
+            <h3 className="text-center md:text-left text-lg text-gray-500">
+              {worker?.data.role} em <span>{worker?.data.company.name}</span>
+            </h3>
+          </div>
+        </div>
+       
+      </div>
+      <div className="worker-body mt-[32px]">
+        <div className="worker-body__header">
+          <h2 className="text-center md:text-left text-2xl text-primary font-bold">Dados Pessoais</h2>
+          <div className="grid grid-cols-1 justify-items-center md:justify-items-start md:grid-cols-2 2xl:grid-cols-3 gap-y-4 gap-x-3 mt-[16px]">
+            <div className="md:text-left worker-detail-field">
+              <Label label="Nome Completo" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <span className="text-gray-600 font-normal">{worker?.data.full_name}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="CPF" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <span className="text-gray-600 font-normal">{worker?.data.cpf}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="E-mail" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <span className="text-gray-600 font-normal">{worker?.data.email}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="RG" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <span className="text-gray-600 font-normal">{worker?.data.rg}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="Telefone" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <span className="text-gray-600 font-normal">{worker?.data.phone_number}</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <section className="mt-[30px]">
-        <DataTable
-          columns={workersColumns}
-          data={workers?.data.workers.data ?? []}
-          count={workers?.data.workers_count}
-          onRowClick={({ id }) =>
-            navigate({
-              to: '/dashboard/funcionarios/$id',
-              params: { id },
-            })
-          }
-          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
-          pages={workers?.data.workers.meta.last_page ?? 1}
-          currentPage={workers?.data.workers.meta.current_page ?? 1}
-        />
-      </section>
-
-      <SlideOver
-        title="Importar funcionários de uma planilha"
-        subtitle="Se o fornecedor não estiver cadastrado, cadastre-o primeiro."
-        isOpen={isSpreadsheetManagerOpen}
-        close={() => setIsSpreadsheetManagerOpen(false)}
-      >
-        <div className="flex flex-col gap-2 p-4 h-[89%]">
-          <Label label="Fornecedor" isrequired />
-          <Popover open={isBulkComboBoxOpen} onOpenChange={setIsBulkComboBoxOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                size="select"
-                className={cn(
-                  'w-full justify-between border-slate-200 hover:bg-transparent text-gray-600 hover:text-gray-600',
-                  !companyToBulkUpload && 'opacity-50 text-muted-foreground',
-                )}
-              >
-                {companyToBulkUpload
-                  ? companies?.data.companies.data.find((company: Company) => company.id === companyToBulkUpload)?.name
-                  : 'Selecione um fornecedor'}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[420px] p-0">
-              <Command className="w-full">
-                <CommandInput
-                  placeholder="Fornecedor..."
-                  className="w-full"
-                  onValueChange={(s) => {
-                    setQueryString(s)
-                  }}
-                />
-                <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
-                <CommandGroup>
-                  {companies?.data.companies.data.map((company: Company) => (
-                    <CommandItem
-                      value={company.name}
-                      key={company.id}
-                      onSelect={() => {
-                        setCompanyToBulkUpload(company.id)
-                        setIsBulkComboBoxOpen(false)
-                      }}
-                    >
-                      <Check
-                        className={cn('mr-2 h-4 w-4', company.id === companyToBulkUpload ? 'opacity-100' : 'opacity-0')}
-                      />
-                      {company.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <DropZone readFile={readUploadFile} />
-        </div>
-
-        <SlideOverFooter>
-          <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
-            <Button type="button" variant="outline" onClick={() => setIsSpreadsheetManagerOpen(false)}>
-              Cancelar
-            </Button>
-            <Button variant="default" type="button" onClick={onCreateWorkersBulk}>
-              Criar funcionários
-            </Button>
+      <div className="worker-body mt-[32px]">
+        <div className="worker-body__header">
+          <h2 className="text-center md:text-left text-2xl text-primary font-bold">Endereço</h2>
+          <div className="grid grid-cols-1 justify-items-center md:justify-items-start md:grid-cols-2 2xl:grid-cols-3 gap-y-2 gap-x-3 mt-[16px]">
+            <div className="md:text-left worker-detail-field">
+              <Label label="Rua" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <span className="text-gray-600 font-normal">{worker?.data.address.street}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="Complemento" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold">
+                Complemento:
+              </Label>
+              <span className="text-gray-600 font-normal">{worker?.data.address.complement}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="UF" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
+              <span className="text-gray-600 font-normal">{worker?.data.address.uf}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="CEP" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <span className="text-gray-600 font-normal">{worker?.data.address.cep}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="Bairro" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <span className="text-gray-600 font-normal">{worker?.data.address.neighborhood}</span>
+            </div>
+            <div className="md:text-left worker-detail-field">
+              <Label label="Cidade" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"/>
+              <span className="text-gray-600 font-normal">{worker?.data.address.city}</span>
+            </div>
           </div>
-        </SlideOverFooter>
-      </SlideOver>
-
+        </div>
+      </div>
       <SlideOver
-        title="Novo funcionário"
-        subtitle="Preencha os campos abaixo para criar um novo funcionário."
+        title="Editar funcionário"
+        subtitle="Edite os dados do funcionário."
         isOpen={isOpen}
         classNames="max-w-4xl"
         close={handleOnClose}
       >
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onCreateWorker)} className="h-full flex flex-col gap-2 justify-between">
+          <form onSubmit={form.handleSubmit(onEditWorker)} className="h-full flex flex-col gap-2 justify-between">
             <div className="px-5 py-6 flex flex-col">
               {/* <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4> */}
 
               <div className="flex flex-row gap-10">
                 <div className="flex flex-col items-center">
                   <div className="w-full !shrink-0">
-                    {previewImageURL ? (
+                    {previewImageURL || picturePreview ? (
                       <img
-                        src={previewImageURL}
+                        src={previewImageURL || picturePreview}
                         alt="Foto do funcionário"
                         className="mx-auto w-[200px] h-[200px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg !shrink-0"
                       />
@@ -321,7 +247,7 @@ export const WorkersPage = (): JSX.Element => {
                           <PaperClipIcon className="w-5 text-primary-700" />
                           <Label
                             htmlFor="picture"
-                            label={picturePreview ? 'Trocar foto' : 'Fazer upload de foto'}
+                            label={picturePreview || previewImageURL ? 'Trocar foto' : 'Fazer upload de foto'}
                             className="italic font-normal"
                           />
                         </div>
@@ -518,7 +444,7 @@ export const WorkersPage = (): JSX.Element => {
                                   onSelect={() => {
                                     form.setValue('company_id', company.id)
                                     setIsCompanySelectOpen(false)
-                                  }}
+                                  }}    
                                 >
                                   <Check
                                     className={cn(
@@ -704,7 +630,7 @@ export const WorkersPage = (): JSX.Element => {
                   Cancelar
                 </Button>
                 <Button variant="default" type="submit">
-                  Criar funcionário
+                  Salvar
                 </Button>
               </div>
             </SlideOverFooter>
