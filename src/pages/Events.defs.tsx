@@ -29,6 +29,7 @@ export interface Event {
   admin_id: string
   start_date: Date
   finish_date: Date
+  days: EventDay[]
   created_at: Date
   updated_at: Date
   deleted_at: Date

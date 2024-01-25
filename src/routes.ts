@@ -6,7 +6,7 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
 import { indexWorkersQueryOptions } from './api/queries/workers.query'
-import { getSingleEvent, indexEventsQueryOption } from './api/queries/events.query'
+import { indexEventsQueryOption, indexWorkersPerEventDayQueryOptions } from './api/queries/events.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
 import { NotFoundPage } from './pages/404.page'
@@ -94,15 +94,6 @@ const adminsRoute = new Route({
   },
 })
 
-// const workersRoute = new Route({
-//   getParentRoute: () => dashboardRoute,
-//   component: WorkersPage,
-//   path: 'funcionarios',
-//   loader: async ({ context: { queryClient } }) => {
-//     return queryClient.ensureQueryData(indexWorkersQueryOption)
-//   },
-// })
-
 const workersRoute = new Route({
   getParentRoute: () => dashboardRoute,
   component: WorkersPage,
@@ -170,13 +161,21 @@ const eventsPageRoute = new Route({
 
 const eventDetailsRoute = new Route({
   getParentRoute: () => eventsRoute,
-  path: '$id',
+  path: '$id/dias/$day',
   component: EventDetailsPage,
-  loader: async ({ context: { queryClient }, params }) => {
-    queryClient.ensureQueryData({
-      queryKey: ['events', 'single', params.id],
-      queryFn: () => getSingleEvent(params.id),
-    })
+  validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
+    return {
+      q: search.q ?? '',
+      page: String(search.page || 1),
+    }
+  },
+  loaderDeps(opts) {
+    return { q: opts.search.q, page: opts.search.page }
+  },
+  loader: async ({ context: { queryClient }, deps: { page, q }, params }) => {
+    return queryClient.ensureQueryData(
+      indexWorkersPerEventDayQueryOptions({ eventId: params.id, eventDayId: params.day, page, q }),
+    )
   },
 })
 
