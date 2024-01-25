@@ -16,6 +16,7 @@ export const indexAdminsQueryOption = (pagination?: Pagination) =>
   queryOptions({
     queryKey: ['admins', pagination],
     queryFn: () => getAdmins(pagination),
+    refetchOnWindowFocus: false,
   })
 
 export const useIndexAdmins = (pagination?: Pagination) => {
@@ -27,7 +28,11 @@ export const getSingleAdmin = async (id: string) => {
 }
 
 export const useSingleAdmin = (id: string) => {
-  const admin = useQuery({ queryKey: ['adminDetail', id], queryFn: () => getSingleAdmin(id) })
+  const admin = useQuery({
+    queryKey: ['adminDetail', id],
+    queryFn: () => getSingleAdmin(id),
+    refetchOnWindowFocus: false,
+  })
 
   return { admin }
 }

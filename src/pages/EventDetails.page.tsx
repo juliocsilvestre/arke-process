@@ -45,7 +45,11 @@ export const EventDetailsPage = () => {
     return date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: '2-digit' })
   }
 
-  const { data: event } = useQuery({ queryKey: ['event', eventId], queryFn: () => getSingleEvent(eventId) })
+  const { data: event } = useQuery({
+    queryKey: ['event', eventId],
+    queryFn: () => getSingleEvent(eventId),
+    refetchOnWindowFocus: false,
+  })
 
   const days = event?.data.days as EventDay[]
 
@@ -118,7 +122,10 @@ export const EventDetailsPage = () => {
             size="sm"
             className="mt-4"
             onClick={() => {
-              navigate({ to: '/dashboard/eventos/$id/dias/$day/relogio', params: { id: eventId, day: activeDayId } })
+              navigate({
+                to: '/dashboard/eventos/$id/dias/$day/relogio',
+                params: { id: eventId, day: activeDayId },
+              })
             }}
             disabled={!activeDayId}
           >

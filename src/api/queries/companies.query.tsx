@@ -21,6 +21,7 @@ export const indexCompaniesQueryOptions = (pagination?: Pagination) =>
   queryOptions({
     queryKey: ['companies', pagination],
     queryFn: () => getCompanies(pagination),
+    refetchOnWindowFocus: false,
   })
 
 export const useIndexCompanies = (pagination?: Pagination) => {
