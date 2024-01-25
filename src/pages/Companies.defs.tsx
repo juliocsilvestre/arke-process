@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { useDeleteCompany } from '@/api/mutations/companies.mutation'
 import { Button } from '@/components/ui/Button'
 import { TrashIcon } from '@heroicons/react/24/solid'
-import { CNPJ_REGEXP } from '@utils/constants'
+import { CNPJ_REGEXP, formatDate } from '@utils/constants'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '@/components/ConfirmationModal'
@@ -87,7 +87,7 @@ export const companiesColumns: ColumnDef<Company>[] = [
     header: 'Criado em',
     cell: ({ row }) => {
       const date = new Date(row.getValue('created_at'))
-      return date.toLocaleDateString('pt-BR')
+      return formatDate(date)
     },
   },
   {
@@ -95,7 +95,7 @@ export const companiesColumns: ColumnDef<Company>[] = [
     header: 'Atualizado em',
     cell: ({ row }) => {
       const date = new Date(row.getValue('updated_at'))
-      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+      return formatDate(date)
     },
   },
   {

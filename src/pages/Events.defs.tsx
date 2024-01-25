@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
+import { formatDate } from '@utils/constants'
 
 export const CreateEventSchema = z.object({
   name: z
@@ -43,7 +44,7 @@ export const eventsColumns: ColumnDef<Event>[] = [
     header: 'Criado em',
     cell: ({ row }) => {
       const date = new Date(row.getValue('created_at'))
-      return date.toLocaleDateString('pt-BR')
+      return formatDate(date)
     },
   },
   {
@@ -53,7 +54,7 @@ export const eventsColumns: ColumnDef<Event>[] = [
       const event = row.original
 
       const date = new Date(event?.start_date ?? null)
-      return date.toLocaleDateString('pt-BR')
+      return formatDate(date)
     },
   },
   {
@@ -62,7 +63,7 @@ export const eventsColumns: ColumnDef<Event>[] = [
     cell: ({ row }) => {
       const event = row.original
       const date = new Date(event?.finish_date ?? null)
-      return date.toLocaleDateString('pt-BR')
+      return formatDate(date)
     },
   },
   {
@@ -70,7 +71,7 @@ export const eventsColumns: ColumnDef<Event>[] = [
     header: 'Atualizado em',
     cell: ({ row }) => {
       const date = new Date(row.getValue('updated_at'))
-      return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+      return formatDate(date)
     },
   },
   // TODO: add actions
