@@ -11,6 +11,7 @@ export const useGetAddresByCep = (cep: string) => {
       const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json/`)
       return data
     },
+    refetchOnWindowFocus: false,
     enabled: cep.length === 9,
   })
 
@@ -36,6 +37,7 @@ export const indexWorkersQueryOptions = (pagination?: Pagination) =>
   queryOptions({
     queryKey: ['workers', pagination],
     queryFn: () => getWorkers(pagination),
+    refetchOnWindowFocus: false,
   })
 
 export const useIndexWorkers = (pagination?: Pagination) => {

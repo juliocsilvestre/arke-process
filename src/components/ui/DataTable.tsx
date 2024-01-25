@@ -127,10 +127,12 @@ export const DataTable = <TData, TValue>({
               <PaginationNext
                 disabled={currentPage === pages}
                 params=""
-                search={(prev: PaginationProps) => ({
-                  ...prev,
-                  page: Number(prev.page) + 1 > (pages ?? 0) ? pages : Number(prev.page) + 1,
-                })}
+                search={(prev: PaginationProps) => {
+                  return {
+                    ...prev,
+                    page: Number(prev.page) + 1 > (pages ?? 0) ? pages : Number(prev.page) + 1,
+                  }
+                }}
               />
             </PaginationItem>
           </PaginationContent>

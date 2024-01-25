@@ -9,7 +9,7 @@ export const useCreateCompany = () => {
       return api.post('/companies', company)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(indexCompaniesQueryOptions)
+      queryClient.invalidateQueries(indexCompaniesQueryOptions({ page: '1', q: '' }))
     },
   })
 
@@ -22,7 +22,7 @@ export const useDeleteCompany = () => {
       return api.delete(`/companies/${id}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(indexCompaniesQueryOptions)
+      queryClient.invalidateQueries(indexCompaniesQueryOptions({ page: '1', q: '' }))
     },
   })
 

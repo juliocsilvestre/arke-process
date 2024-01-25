@@ -1,4 +1,4 @@
-import { CPF_REGEXP } from '@utils/constants'
+import { CPF_REGEXP, formatDate } from '@utils/constants'
 import * as z from 'zod'
 import { ColumnDef } from '@tanstack/react-table'
 
@@ -48,7 +48,7 @@ export const adminsColumns: ColumnDef<Admin>[] = [
     header: 'Criado em',
     cell: ({ row }) => {
       const date = new Date(row.getValue('created_at'))
-      return date.toLocaleDateString('pt-BR')
+      return formatDate(date)
     },
   },
   {
@@ -56,11 +56,7 @@ export const adminsColumns: ColumnDef<Admin>[] = [
     header: 'Atualizado em',
     cell: ({ row }) => {
       const date = new Date(row.getValue('updated_at'))
-      return date.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
+      return formatDate(date)
     },
   },
   // TODO: add actions
