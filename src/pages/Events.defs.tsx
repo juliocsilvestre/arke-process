@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { useDeleteEvent } from '@/api/mutations/events.mutation'
 
+
 export const CreateEventSchema = z.object({
   name: z
     .string()

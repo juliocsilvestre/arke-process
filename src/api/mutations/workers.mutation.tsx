@@ -1,3 +1,4 @@
+import { EditWorkerBody } from '@/pages/WorkerDetails.defs'
 import { CreateWorkerBody, CreateWorkerRow } from '@/pages/Workers.defs'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
@@ -12,6 +13,25 @@ export const useCreateWorker = () => {
       }
 
       return api.post('/workers', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+    },
+  })
+
+  return { ...mutation }
+}
+export const useEditWorker = (workerId: string) => {
+  const mutation = useMutation({
+    mutationFn: (worker: EditWorkerBody) => {
+      const formData = new FormData()
+
+      for (const [key, value] of Object.entries(worker)) {
+        formData.append(key, value)
+      }
+
+      return api.put(`/workers/${workerId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

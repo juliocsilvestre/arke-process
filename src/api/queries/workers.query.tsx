@@ -1,8 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
-import { api } from '../api'
 import { Pagination } from '@/utils/types'
+import { api } from '../api'
 
 export const useGetAddresByCep = (cep: string) => {
   const query = useQuery({
@@ -42,4 +42,20 @@ export const indexWorkersQueryOptions = (pagination?: Pagination) =>
 
 export const useIndexWorkers = (pagination?: Pagination) => {
   return useQuery(indexWorkersQueryOptions(pagination))
+}
+
+export const getSingleWorkerQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: ['worker', 'single', id],
+    queryFn: () => getSingleWorker(id),
+  })
+
+export const getSingleWorker = async (id: string) => {
+  return await api.get(`/workers/${id}`)
+}
+
+export const useSingleWorker = (id: string) => {
+  const worker = useQuery(getSingleWorkerQueryOptions(id))
+
+  return { worker }
 }

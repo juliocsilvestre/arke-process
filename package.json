@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "format": "bunx @biomejs/biome format --write ./src",
+    "check": "bunx @biomejs/biome check --apply .",
     "lint": "bun biome lint . --apply-unsafe",
     "preview": "vite preview",
     "prepare": "husky install",
@@ -70,6 +70,7 @@
     "@vitejs/plugin-react-swc": "3.5.0",
     "cypress": "13.6.3",
     "husky": "8.0.0",
+    "lint-staged": "15.2.0",
     "typescript": "5.2.2",
     "vite": "5.0.8"
   }

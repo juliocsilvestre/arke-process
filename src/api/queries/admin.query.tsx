@@ -1,6 +1,6 @@
+import { Pagination } from '@/utils/types'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { api } from '../api'
-import { Pagination } from '@/utils/types'
 
 export const getAdmins = async (pagination?: Pagination) => {
   const path = '/admins'
