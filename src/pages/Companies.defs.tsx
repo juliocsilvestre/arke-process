@@ -56,7 +56,7 @@ const _DeleteCompanyButton = ({ company }: { company: Company }) => {
         </span>
       }
       description="Esta ação não pode ser desfeita. Isso excluirá permanentemente o fornecedor."
-      variant={'destructive'}
+      variant="destructive"
       actionButtonLabel="Apagar"
       onAction={() => void onDeleteCompany(company)}
     >
