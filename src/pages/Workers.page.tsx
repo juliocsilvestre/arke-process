@@ -211,7 +211,7 @@ export const WorkersPage = (): JSX.Element => {
           onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
           pages={workers?.data.workers.meta.last_page ?? 1}
           currentPage={workers?.data.workers.meta.current_page ?? 1}
-          actions={(row) => {
+          actions={(worker) => {
             return (
               <div className="flex justify-start">
                 <Button
@@ -226,7 +226,7 @@ export const WorkersPage = (): JSX.Element => {
                     }
 
                     const generatePdfDocument = async (qrCode: string) => {
-                      const blob = await pdf(<BraceletPDF qrcode={qrCode} />).toBlob()
+                      const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
 
                       // open in a new tab
                       const url = URL.createObjectURL(blob)
@@ -236,7 +236,7 @@ export const WorkersPage = (): JSX.Element => {
                       link.click()
                     }
 
-                    const qrCode = await getQRCode(row.id)
+                    const qrCode = await getQRCode(worker.id)
 
                     generatePdfDocument(qrCode)
                   }}

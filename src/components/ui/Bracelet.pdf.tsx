@@ -1,17 +1,19 @@
-import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Worker } from '@/pages/Workers.defs'
+import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 // Create styles
 const styles = StyleSheet.create({
   page: { backgroundColor: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   section: {
-    fontSize: 7,
+    fontSize: 18,
+    marginTop: 5,
   },
 })
 
 // Create Document Component
-export const BraceletPDF = ({ qrcode }: { qrcode: string }) => (
+export const BraceletPDF = ({ qrcode, worker }: { qrcode: string; worker: Worker }) => (
   <Document>
-    <Page size={[270.01, 25.01]} style={styles.page}>
+    <Page size={[765.35, 70.86]} style={styles.page}>
       <View
         style={{
           display: 'flex',
@@ -19,13 +21,16 @@ export const BraceletPDF = ({ qrcode }: { qrcode: string }) => (
           justifyContent: 'space-between',
         }}
       >
-        <View style={styles.section}>
-          <Text style={{ fontWeight: 'bold' }}>CESAR OLIVEIRA DOS SANTOS ARAUJO</Text>
-          <Text>123.123.123-02</Text>
-          <Text>VENDEDOR - CARVALHEIRA</Text>
-        </View>
         <View style={{ marginLeft: 20 }}>
-          <Image style={{ width: 25, height: 25 }} src={`data:image/png;base64, ${qrcode}`} />
+          <Image style={{ width: 69, height: 69 }} src={`data:image/png;base64, ${qrcode}`} />
+        </View>
+        <View style={styles.section}>
+          <Text style={{ fontFamily: 'Helvetica', fontWeight: 'black', marginTop: 10 }}>
+            {worker.full_name.toUpperCase()}
+          </Text>
+          <Text style={{ fontSize: 14 }}>
+            {worker.role} - {worker.company?.name}
+          </Text>
         </View>
       </View>
     </Page>
