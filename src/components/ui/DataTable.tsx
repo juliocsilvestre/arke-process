@@ -9,10 +9,10 @@ import {
 } from '@/components/ui/Pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 import { cn } from '@/utils/styles'
+import type { Pagination as PaginationProps } from '@/utils/types'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
 import { Input } from './Input'
-import type { Pagination as PaginationProps } from '@/utils/types'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

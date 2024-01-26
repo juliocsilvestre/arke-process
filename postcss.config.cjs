@@ -7,4 +7,4 @@ module.exports = {
       config: './postcss.config.js',
     },
   },
-};
+}

@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
 import { toast } from 'sonner'
+import * as z from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
@@ -12,11 +12,11 @@ import { Label } from '@components/ui/Label'
 
 import { useSignInMutation } from '@/api/mutations/auth.mutation'
 import { useAuthStore } from '@/store/auth.store'
+import { checkError } from '@/utils/errors'
 import { maskCPF } from '@/utils/strings'
 import Logo from '../assets/carvalogo.svg'
 import { SignInSchema, SigninBodyKeys } from './SignIn.defs'
 import { type SignInBody } from './SignIn.defs'
-import { checkError } from '@/utils/errors'
 
 export const SignIn = () => {
   const form = useForm<z.infer<typeof SignInSchema>>({

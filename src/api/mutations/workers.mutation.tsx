@@ -1,7 +1,7 @@
+import { EditWorkerBody } from '@/pages/WorkerDetails.defs'
 import { CreateWorkerBody, CreateWorkerRow } from '@/pages/Workers.defs'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
-import { EditWorkerBody } from '@/pages/WorkerDetails.defs'
 
 export const useCreateWorker = () => {
   const mutation = useMutation({

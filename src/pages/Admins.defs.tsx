@@ -1,6 +1,6 @@
+import { ColumnDef } from '@tanstack/react-table'
 import { CPF_REGEXP, formatDate } from '@utils/constants'
 import * as z from 'zod'
-import { ColumnDef } from '@tanstack/react-table'
 
 export const CreateAdminSchema = z.object({
   name: z

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/Label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
+import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
@@ -24,12 +25,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
-import { checkError } from '@/utils/errors'
 import {
   CreateWorkerBody,
   CreateWorkerRow,
-  WorkerBodyKeys,
   CreateWorkerSchema,
+  WorkerBodyKeys,
   WorkerSheet,
   workerInitialValues,
   workersColumns,

@@ -1,6 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { z } from 'zod'
 import { formatDate } from '@utils/constants'
+import { z } from 'zod'
 
 export const CreateEventSchema = z.object({
   name: z

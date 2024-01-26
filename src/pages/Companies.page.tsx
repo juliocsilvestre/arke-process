@@ -14,11 +14,11 @@ import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { NAVIGATION } from '@/utils/constants'
 import { maskCNPJ } from '@/utils/strings'
 
-import { checkError } from '@/utils/errors'
 import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { DataTable } from '@/components/ui/DataTable'
+import { checkError } from '@/utils/errors'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { CreateCompanyBody, CreateCompanySchema, companiesColumns, CompanyBodyKeys } from './Companies.defs'
+import { CompanyBodyKeys, CreateCompanyBody, CreateCompanySchema, companiesColumns } from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
   const { latestLocation, navigate } = useRouter()

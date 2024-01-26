@@ -1,4 +1,6 @@
+import { cn } from '@/utils/styles'
 import { VariantProps, cva } from 'class-variance-authority'
+import { ReactNode } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,8 +12,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/AlertDialog'
-import { ReactNode } from 'react'
-import { cn } from '@/utils/styles'
 
 const dialogVariants = cva('', {
   variants: {
