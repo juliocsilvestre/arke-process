@@ -1,6 +1,8 @@
+import { api } from '@/api/api'
 import { useCreateWorker, useCreateWorkersBulk } from '@/api/mutations/workers.mutation'
 import { indexCompaniesQueryOptions, useIndexCompanies } from '@/api/queries/companies.query'
-import { indexWorkersQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
+import { indexWorkersQueryOptions, useGetAddresByCep, useGetQRCode } from '@/api/queries/workers.query'
+import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
 import { DataTable } from '@/components/ui/DataTable'
@@ -15,8 +17,9 @@ import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { PaperClipIcon, PlusIcon, UserIcon } from '@heroicons/react/24/solid'
+import { PaperClipIcon, PlusIcon, QrCodeIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { pdf } from '@react-pdf/renderer'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { Check, ChevronsUpDown } from 'lucide-react'
@@ -208,6 +211,41 @@ export const WorkersPage = (): JSX.Element => {
           onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
           pages={workers?.data.workers.meta.last_page ?? 1}
           currentPage={workers?.data.workers.meta.current_page ?? 1}
+          actions={(worker) => {
+            return (
+              <div className="flex justify-start">
+                <Button
+                  size="icon"
+                  onClick={async (event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+
+                    const getQRCode = async (workerId: string) => {
+                      const { data } = await api.get(`/workers/${workerId}/qrcode`)
+                      return data as string
+                    }
+
+                    const generatePdfDocument = async (qrCode: string) => {
+                      const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
+
+                      // open in a new tab
+                      const url = URL.createObjectURL(blob)
+                      const link = document.createElement('a')
+                      link.href = url
+                      link.target = '_blank'
+                      link.click()
+                    }
+
+                    const qrCode = await getQRCode(worker.id)
+
+                    generatePdfDocument(qrCode)
+                  }}
+                >
+                  <QrCodeIcon className="w-6 h-6" />
+                </Button>
+              </div>
+            )
+          }}
         />
       </section>
 
