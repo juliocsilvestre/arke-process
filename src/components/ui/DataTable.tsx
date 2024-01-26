@@ -93,7 +93,7 @@ export const DataTable = <TData, TValue>({
 
       <div className="flex w-full justify-between mt-4">
         <p className="text-primary-600 font-semibold w-full">{count} Registros</p>
-        <Pagination className="!mx-0 !justify-end">
+        <Pagination className="!mx-0 !justify-end select-none">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
