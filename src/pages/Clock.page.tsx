@@ -1,15 +1,15 @@
-import { Input } from '@/components/ui/Input'
-import { Link, useParams } from '@tanstack/react-router'
-import Loader from 'react-spinners/BeatLoader'
-import { useEffect, useRef } from 'react'
 import { useClockWorkerOnEventDay } from '@/api/mutations/events.mutation'
+import { useSingleEvent } from '@/api/queries/events.query'
+import { Input } from '@/components/ui/Input'
 import { checkError } from '@/utils/errors'
+import { cn } from '@/utils/styles'
+import { Link, useParams } from '@tanstack/react-router'
+import { ArrowLeftIcon } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import Loader from 'react-spinners/BeatLoader'
 import { toast } from 'sonner'
 import { ENTRY_NAMES, Entry } from './Clock.defs'
-import { cn } from '@/utils/styles'
-import { useSingleEvent } from '@/api/queries/events.query'
 import { EventDay } from './Events.defs'
-import { ArrowLeftIcon } from 'lucide-react'
 
 export const ClockPage = (): JSX.Element => {
   const { id, day } = useParams({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day/relogio' })

@@ -1,6 +1,6 @@
+import { queryClient } from '@/routes'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
-import { queryClient } from '@/routes'
 import { indexAdminsQueryOption } from '../queries/admin.query'
 
 export const useCreateAdmin = () => {
