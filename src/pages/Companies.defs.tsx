@@ -3,12 +3,12 @@ import { Tooltip } from 'react-tooltip'
 import { z } from 'zod'
 
 import { useDeleteCompany } from '@/api/mutations/companies.mutation'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { Button } from '@/components/ui/Button'
 import { TrashIcon } from '@heroicons/react/24/solid'
 import { CNPJ_REGEXP, formatDate } from '@utils/constants'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
-import { ConfirmationModal } from '@/components/ConfirmationModal'
 
 export const CreateCompanySchema = z.object({
   name: z

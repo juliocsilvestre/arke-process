@@ -23,8 +23,8 @@ import { cn } from '@utils/styles'
 import { indexEventsQueryOption } from '@/api/queries/events.query'
 import { DataTable } from '@/components/ui/DataTable'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { CreateEventBody, CreateEventSchema, EventDay, eventsColumns } from './Events.defs'
 import _ from 'lodash'
+import { CreateEventBody, CreateEventSchema, EventDay, eventsColumns } from './Events.defs'
 
 export const EventsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()

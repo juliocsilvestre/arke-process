@@ -1,8 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
-import { api } from '../api'
 import { Pagination } from '@/utils/types'
+import { api } from '../api'
 
 export const useGetAddresByCep = (cep: string) => {
   const query = useQuery({

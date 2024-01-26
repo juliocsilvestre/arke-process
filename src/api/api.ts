@@ -1,7 +1,7 @@
-import axios from 'axios'
-import { useAuthStore } from '@/store/auth.store'
-import { toast } from 'sonner'
 import { router } from '@/routes'
+import { useAuthStore } from '@/store/auth.store'
+import axios from 'axios'
+import { toast } from 'sonner'
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
