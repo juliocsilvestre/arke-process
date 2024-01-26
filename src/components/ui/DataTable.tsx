@@ -12,10 +12,12 @@ import { cn } from '@/utils/styles'
 import type { Pagination as PaginationProps } from '@/utils/types'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
+import { ReactNode } from 'react'
 import { Input } from './Input'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
+  actions?: (row: TData) => ReactNode
   data: TData[]
   count: number
   pages?: number
@@ -26,6 +28,7 @@ interface DataTableProps<TData, TValue> {
 
 export const DataTable = <TData, TValue>({
   columns,
+  actions,
   data,
   count,
   pages,
@@ -63,6 +66,7 @@ export const DataTable = <TData, TValue>({
                     </TableHead>
                   )
                 })}
+                {actions && <TableHead className="bg-gray-200 font-semibold">Ações</TableHead>}
               </TableRow>
             ))}
           </TableHeader>
@@ -78,6 +82,7 @@ export const DataTable = <TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
+                  {actions && <TableCell>{actions(row.original)}</TableCell>}
                 </TableRow>
               ))
             ) : (

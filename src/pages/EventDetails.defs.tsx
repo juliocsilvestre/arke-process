@@ -35,7 +35,9 @@ export const workersByEventDayColumns: ColumnDef<Worker>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const worker = row.original
-      return <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{worker.status}</Badge>
+      return (
+        <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{WORKER_STATUS_MAPPER[worker.status].label}</Badge>
+      )
     },
   },
 ]
@@ -48,3 +50,13 @@ export const AttachWorkerToEventDaySchema = z.object({
 
 export type AttachWorkerToEventDayBody = z.infer<typeof AttachWorkerToEventDaySchema>
 export type AttachWorkerToEventDayKeys = keyof AttachWorkerToEventDayBody
+
+export const ReplacementSchema = z.object({
+  event_id: z.string(),
+  event_day_id: z.string(),
+  new_worker_id: z.string(),
+  worker_id: z.string(),
+})
+
+export type ReplacementBody = z.infer<typeof ReplacementSchema>
+export type ReplacementKeys = keyof ReplacementBody

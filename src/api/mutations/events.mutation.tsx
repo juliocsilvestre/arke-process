@@ -48,3 +48,16 @@ export const useClockWorkerOnEventDay = () => {
 
   return { ...mutation }
 }
+
+export const useReplaceWorkerOnEventDay = () => {
+  const mutation = useMutation({
+    mutationFn: (assignement: { event_id: string; event_day_id: string; worker_id: string; new_worker_id: string }) => {
+      return api.post(`/events/${assignement.event_id}/days/${assignement.event_day_id}/replacements`, {
+        worker_id: assignement.worker_id,
+        new_worker_id: assignement.new_worker_id,
+      })
+    },
+  })
+
+  return { ...mutation }
+}
