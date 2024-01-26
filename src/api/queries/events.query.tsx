@@ -28,18 +28,20 @@ export const useIndexEvents = (pagination?: Pagination) => {
   return useQuery(indexEventsQueryOption(pagination))
 }
 
+export const singleEventQueryOption = (id: string) => {
+  return queryOptions({
+    queryKey: ['eventDetail', id],
+    queryFn: () => getSingleEvent(id),
+    refetchOnWindowFocus: false,
+  })
+}
+
 export const getSingleEvent = async (id: string) => {
   return await api.get(`/events/${id}`)
 }
 
 export const useSingleEvent = (id: string) => {
-  const event = useQuery({
-    queryKey: ['eventDetail', id],
-    queryFn: () => getSingleEvent(id),
-    refetchOnWindowFocus: false,
-  })
-
-  return { event }
+  return useQuery(singleEventQueryOption(id))
 }
 
 export const getWorkersPerEventDay = async ({
