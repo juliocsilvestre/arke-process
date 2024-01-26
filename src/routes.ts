@@ -5,7 +5,7 @@ import { DashboardLayout } from '@layouts/dashboard.layout'
 
 import { QueryClient } from '@tanstack/react-query'
 import { indexCompaniesQueryOptions } from './api/queries/companies.query'
-import { indexWorkersQueryOptions } from './api/queries/workers.query'
+import { getSingleWorkerQueryOptions, indexWorkersQueryOptions } from './api/queries/workers.query'
 import { indexEventsQueryOption, indexWorkersPerEventDayQueryOptions } from './api/queries/events.query'
 import { Loading } from './components/ui/Loading'
 import { PublicLayout } from './layouts/public.layout'
@@ -20,6 +20,7 @@ import { useAuthStore } from './store/auth.store'
 import { EventDetailsPage } from './pages/EventDetails.page'
 import { indexAdminsQueryOption } from './api/queries/admin.query'
 import { ClockPage } from './pages/Clock.page'
+import { WorkerDetailsPage } from './pages/WorkerDetails.page'
 
 const rootRoute = rootRouteWithContext<{
   queryClient: QueryClient
@@ -96,8 +97,13 @@ const adminsRoute = new Route({
 
 const workersRoute = new Route({
   getParentRoute: () => dashboardRoute,
-  component: WorkersPage,
   path: 'funcionarios',
+})
+
+const workersPageRoute = new Route({
+  getParentRoute: () => workersRoute,
+  component: WorkersPage,
+  path: '/',
   validateSearch: (search: { q: string; page: number }): { q: string; page: string } => {
     return {
       q: search.q ?? '',
@@ -111,6 +117,16 @@ const workersRoute = new Route({
   loader: async ({ context: { queryClient }, deps: { page, q } }) => {
     const options = indexWorkersQueryOptions({ page, q })
     return queryClient.ensureQueryData(options)
+  },
+})
+
+const workerDetailsRoute = new Route({
+  getParentRoute: () => workersRoute,
+  path: '$id',
+  component: WorkerDetailsPage,
+  loader: async ({ context: { queryClient }, params }) => {
+    const options = getSingleWorkerQueryOptions(params.id)
+    await queryClient.ensureQueryData(options)
   },
 })
 
@@ -207,7 +223,7 @@ const routeTree = rootRoute.addChildren([
   dashboardLayout.addChildren([
     dashboardRoute.addChildren([
       adminsRoute,
-      workersRoute,
+      workersRoute.addChildren([workersPageRoute, workerDetailsRoute]),
       companiesRoute,
       eventsRoute.addChildren([eventsPageRoute, eventDetailsRoute, eventDayClockRoute]),
       reportsRoute,
