@@ -59,3 +59,16 @@ export const useSingleWorker = (id: string) => {
 
   return { worker }
 }
+
+export const useGetQRCode = (workerId: string) => {
+  const query = useQuery({
+    queryKey: ['worker', 'qrcode', workerId],
+    queryFn: async () => {
+      const { data } = await api.get(`/workers/${workerId}/qrcode`)
+      return data
+    },
+    refetchOnWindowFocus: false,
+  })
+
+  return { ...query }
+}
