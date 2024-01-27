@@ -2,14 +2,13 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Tooltip } from 'react-tooltip'
 import { z } from 'zod'
 
-import { formatDate } from '@utils/constants'
+import { useDeleteEvent } from '@/api/mutations/events.mutation'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { Button } from '@/components/ui/Button'
 import { TrashIcon } from '@heroicons/react/24/solid'
+import { formatDate } from '@utils/constants'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
-import { ConfirmationModal } from '@/components/ConfirmationModal'
-import { useDeleteEvent } from '@/api/mutations/events.mutation'
-
 
 export const CreateEventSchema = z.object({
   name: z

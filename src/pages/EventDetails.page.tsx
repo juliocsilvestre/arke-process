@@ -3,7 +3,7 @@ import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventD
 import { ReplacementSlideover } from '@/components/ReplacementSlideover'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
