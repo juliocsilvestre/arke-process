@@ -5,6 +5,7 @@ import { DataTable } from '@/components/ui/DataTable'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
+import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
 import { NAVIGATION } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { maskCPF } from '@/utils/strings'
@@ -22,6 +23,7 @@ export const AdminsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
+  const [queryString, setQueryString] = useState('')
 
   const form = useForm<CreateAdminBody>({
     resolver: zodResolver(CreateAdminSchema),
@@ -34,10 +36,18 @@ export const AdminsPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createAdmin } = useCreateAdmin()
+
+  const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
+    navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
+  }
+
+  useDebouncedSearchTerm({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+
   const search = useSearch({ from: '/dashboard-layout/dashboard/administradores' }) as {
     q: string
     page: string
   }
+
   const options = indexAdminsQueryOption(search)
   const { data: admins } = useSuspenseQuery(options)
   const navigate = useNavigate()
@@ -92,7 +102,7 @@ export const AdminsPage = (): JSX.Element => {
           columns={adminsColumns}
           data={admins?.data.admins.data ?? []}
           count={admins?.data.admins_count}
-          onQueryChange={(query) => navigate({ search: (prev) => ({ ...prev, q: query }), params: {} })}
+          onQueryChange={(query) => setQueryString(query)}
           pages={admins?.data.admins.meta.last_page ?? 1}
           currentPage={admins?.data.admins.meta.current_page ?? 1}
         />

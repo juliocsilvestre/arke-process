@@ -12,8 +12,10 @@ import { cn } from '@/utils/styles'
 import type { Pagination as PaginationProps } from '@/utils/types'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from '@tanstack/react-table'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
+import { Badge } from './Badge'
 import { Input } from './Input'
+import { Label } from './Label'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -43,6 +45,14 @@ export const DataTable = <TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
   })
 
+  const [query, setQuery] = useState('')
+  const formatQueryExibition = (query: string) => {
+    if (query.length > 10) {
+      return `${query.split('').slice(0, 10).join('')}...`
+    }
+    return query
+  }
+
   return (
     <div className="flex flex-col justify-end	gap-4">
       <div className="relative ml-auto">
@@ -51,8 +61,19 @@ export const DataTable = <TData, TValue>({
           className="w-full mt-4 md:w-64 md:mt-0 pl-10"
           type="search"
           placeholder="Pesquisar"
-          onChange={(e) => onQueryChange?.(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            onQueryChange?.(e.target.value)
+          }}
         />
+      </div>
+      <div className={`${query !== '' ? 'opacity-1' : 'opacity-0'}`}>
+        <Label label="Resultados da busca por: " />
+        <span className="text-gray-500 font-thin italic text-sm p-2">
+          <Badge variant="secondary" size="md">
+            {formatQueryExibition(query)}
+          </Badge>
+        </span>
       </div>
       <div className="rounded-md border">
         <Table>
