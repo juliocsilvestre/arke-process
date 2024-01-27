@@ -46,12 +46,6 @@ export const DataTable = <TData, TValue>({
   })
 
   const [query, setQuery] = useState('')
-  const formatQueryExibition = (query: string) => {
-    if (query.length > 10) {
-      return `${query.split('').slice(0, 10).join('')}...`
-    }
-    return query
-  }
 
   return (
     <div className="flex flex-col justify-end	gap-4">
@@ -69,9 +63,9 @@ export const DataTable = <TData, TValue>({
       </div>
       <div className={`${query !== '' ? 'opacity-1' : 'opacity-0'}`}>
         <Label label="Resultados da busca por: " />
-        <span className="text-gray-500 font-thin italic text-sm p-2">
-          <Badge variant="secondary" size="md">
-            {formatQueryExibition(query)}
+        <span className="ml-[4px] font-thin italic text-sm p-2">
+          <Badge variant="search" size="md">
+            {query}
           </Badge>
         </span>
       </div>

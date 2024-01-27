@@ -11,6 +11,7 @@ const badgeVariants = cva(_baseStyle, {
       success: 'bg-success-100 text-success-600',
       error: 'bg-error-100 text-error-600',
       secondary: 'bg-secondary-100 text-secondary-600 ',
+      search: 'bg-gray-200 text-gray-600',
     },
     size: {
       sm: 'px-2 py-0 text-[10px]',

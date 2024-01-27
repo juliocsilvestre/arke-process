@@ -20,7 +20,7 @@ export const useDebouncedSearchTerm = ({ searchTerm, callback, delay = 400 }: us
     toast.promise(callbackPromise, {
       loading: 'Carregando... ⏳',
       success: 'Carregado com sucesso! 🚀',
-      error: 'Erro ao carregar. Tente novamente.',
+      error: 'Erro ao carregar. Tente novamente. 🤯',
       duration: delay,
       dismissible: true,
     })
