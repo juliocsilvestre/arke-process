@@ -25,7 +25,11 @@ export const useCreateEvent = () => {
 
 export const useAttachWorkerToAnEventDay = () => {
   const mutation = useMutation({
-    mutationFn: (assignement: { eventId: string; workers_id: string[]; event_day_id: string }) => {
+    mutationFn: (assignement: {
+      eventId: string
+      workers_id: string[]
+      event_day_id: string
+    }) => {
       return api.post(`/events/${assignement.eventId}/attach`, {
         workers_id: assignement.workers_id,
         event_day_id: assignement.event_day_id,
@@ -42,6 +46,32 @@ export const useClockWorkerOnEventDay = () => {
       return api.post('/workers/clocks', {
         event_day_id: assignement.event_day_id,
         worker_id: assignement.worker_id,
+      })
+    },
+  })
+
+  return { ...mutation }
+}
+
+export const useDeleteEvent = () => {
+  const mutation = useMutation({
+    mutationFn: (id: string) => {
+      return api.delete(`/events/${id}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
+    },
+  })
+
+  return { ...mutation }
+}
+
+export const useReplaceWorkerOnEventDay = () => {
+  const mutation = useMutation({
+    mutationFn: (assignement: { event_id: string; event_day_id: string; worker_id: string; new_worker_id: string }) => {
+      return api.post(`/events/${assignement.event_id}/days/${assignement.event_day_id}/replacements`, {
+        worker_id: assignement.worker_id,
+        new_worker_id: assignement.new_worker_id,
       })
     },
   })

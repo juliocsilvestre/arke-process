@@ -1,7 +1,9 @@
 import { Badge } from '@/components/ui/Badge'
+import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { QrCodeIcon } from '@heroicons/react/24/solid'
+import { pdf } from '@react-pdf/renderer'
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 import { Company } from './Companies.defs'
@@ -173,29 +175,6 @@ export const workersColumns: ColumnDef<Worker>[] = [
 
       return (
         <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{WORKER_STATUS_MAPPER[worker.status].label}</Badge>
-      )
-    },
-  },
-  {
-    header: 'Ações',
-    id: 'actions',
-    cell: ({ row }) => {
-      const worker = row.original
-
-      return (
-        <div className="flex justify-start">
-          {/* TODO: create actions */}
-          <Button
-            size="icon"
-            onClick={(event) => {
-              event.stopPropagation()
-              // TODO: Generate QR CODE
-              console.log('QR CODE')
-            }}
-          >
-            <QrCodeIcon className="w-6 h-6" />
-          </Button>
-        </div>
       )
     },
   },

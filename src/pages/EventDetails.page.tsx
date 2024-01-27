@@ -1,20 +1,26 @@
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
 import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventDaySlideover'
+import { ReplacementSlideover } from '@/components/ReplacementSlideover'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
 import { ClockIcon } from '@heroicons/react/24/outline'
+import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
 import { PlusIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { Tooltip } from 'react-tooltip'
 import { EventDay, workersByEventDayColumns } from './EventDetails.defs'
+import { Worker } from './Workers.defs'
 
 export const EventDetailsPage = () => {
   const { navigate } = useRouter()
+
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
+  const [workerToReplace, setWorkerToReplace] = useState<Worker | null>(null)
   const { day: eventDayId, id: eventId } = useParams({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' })
   const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' }) as {
     q: string
@@ -56,6 +62,17 @@ export const EventDetailsPage = () => {
         <h1 className="text-4xl text-primary font-bold">{event?.data.name}</h1>
 
         <div className="flex gap-2">
+          <Button
+            variant="destructive"
+            size="sm"
+            className="mt-4"
+            onClick={() => setIsOpen(true)}
+            disabled={!eventDayId}
+          >
+            <ArrowsRightLeftIcon className="h-6 w-6" aria-hidden="true" />
+            Substituições
+          </Button>
+
           <Button
             variant="secondary"
             size="sm"
@@ -115,6 +132,27 @@ export const EventDetailsPage = () => {
         onQueryChange={(q) => {
           setQueryString(q)
         }}
+        actions={(worker: Worker) => {
+          return (
+            <>
+              <Button
+                data-tooltip-id={`replace-worker-${worker.id}`}
+                data-tooltip-content={`Substituir "${worker.full_name}"`}
+                onClick={() => setWorkerToReplace(worker)}
+              >
+                <ArrowsRightLeftIcon className="w-6" />
+              </Button>
+              <Tooltip id={`replace-worker-${worker.id}`} place="top" />
+            </>
+          )
+        }}
+      />
+
+      <ReplacementSlideover
+        eventId={eventId}
+        eventDayId={eventDayId}
+        workerToReplace={workerToReplace}
+        onClose={() => setWorkerToReplace(null)}
       />
 
       <AttachWorkerToEventDaySlideover
