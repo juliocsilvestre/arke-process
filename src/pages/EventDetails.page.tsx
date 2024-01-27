@@ -3,10 +3,10 @@ import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventD
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
-import { useDebounce } from '@uidotdev/usehooks'
 import { PlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { EventDay, workersByEventDayColumns } from './EventDetails.defs'
@@ -15,12 +15,22 @@ export const EventDetailsPage = () => {
   const { navigate } = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
-  const debouncedSearchTerm = useDebounce(queryString, 1000)
   const { day: eventDayId, id: eventId } = useParams({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' })
   const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' }) as {
     q: string
     page: string
   }
+
+  const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
+    navigate({
+      to: '/dashboard/eventos/$id/dias/$day',
+      params: { id: eventId, day: eventDayId },
+      search: { page: '1', q: debouncedSearchTerm },
+    })
+  }
+
+  useDebouncedSearchTerm({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+
   const formatEventPeriod = (day: string) => {
     const date = new Date(day)
     return date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: '2-digit' })
@@ -40,14 +50,6 @@ export const EventDetailsPage = () => {
 
   const workers = workersData?.data.workers.data
 
-  useEffect(() => {
-    navigate({
-      to: '/dashboard/eventos/$id/dias/$day',
-      params: { id: eventId, day: eventDayId },
-      search: { page: '1', q: debouncedSearchTerm },
-    })
-  }, [debouncedSearchTerm])
-
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
@@ -61,7 +63,7 @@ export const EventDetailsPage = () => {
             onClick={() => {
               navigate({
                 to: '/dashboard/eventos/$id/dias/$day/relogio',
-                params: { id: eventId, day: activeDayId },
+                params: { id: eventId, day: eventDayId },
               })
             }}
             disabled={!eventDayId}
