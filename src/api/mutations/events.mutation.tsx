@@ -3,7 +3,7 @@ import { queryClient } from '@/routes'
 import { useMutation } from '@tanstack/react-query'
 import { eachDayOfInterval } from 'date-fns'
 import { api } from '../api'
-import { indexEventsQueryOption } from '../queries/events.query'
+import { indexEventsQueryOption, indexReplacementsPerEventDayQueryOptions } from '../queries/events.query'
 
 export const useCreateEvent = () => {
   const mutation = useMutation({
@@ -74,6 +74,10 @@ export const useReplaceWorkerOnEventDay = () => {
         new_worker_id: assignement.new_worker_id,
       })
     },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
+      queryClient.invalidateQueries(indexReplacementsPerEventDayQueryOptions({ eventDayId: variables.event_day_id, eventId: variables.event_id }))
+    }
   })
 
   return { ...mutation }

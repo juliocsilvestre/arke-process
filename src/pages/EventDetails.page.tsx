@@ -3,7 +3,7 @@ import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventD
 import { ReplacementSlideover } from '@/components/ReplacementSlideover'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { Tooltip } from 'react-tooltip'
 import { EventDay, workersByEventDayColumns } from './EventDetails.defs'
 import { Worker } from './Workers.defs'
+import { ClockEntryModal } from '@/components/ClockEntryLogModal'
 
 export const EventDetailsPage = () => {
   const { navigate } = useRouter()
@@ -61,16 +62,12 @@ export const EventDetailsPage = () => {
         <h1 className="text-4xl text-primary font-bold">{event?.data.name}</h1>
 
         <div className="flex gap-2">
-          <Button
-            variant="destructive"
-            size="sm"
-            className="mt-4"
-            onClick={() => setIsOpen(true)}
-            disabled={!eventDayId}
-          >
-            <ArrowsRightLeftIcon className="h-6 w-6" aria-hidden="true" />
-            Substituições
-          </Button>
+          <ClockEntryModal title="Substituições ao longo do dia">
+            <Button variant="destructive" size="sm" className="mt-4" disabled={!eventDayId}>
+              <ArrowsRightLeftIcon className="h-6 w-6" aria-hidden="true" />
+              Substituições
+            </Button>
+          </ClockEntryModal>
 
           <Button
             variant="secondary"

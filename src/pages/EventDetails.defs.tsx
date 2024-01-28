@@ -3,6 +3,7 @@ import { WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 import { Worker } from './Workers.defs'
+import { Admin } from './Admins.defs'
 
 export type EventDay = {
   id: string
@@ -60,3 +61,15 @@ export const ReplacementSchema = z.object({
 
 export type ReplacementBody = z.infer<typeof ReplacementSchema>
 export type ReplacementKeys = keyof ReplacementBody
+
+export type Replacement = {
+  admin_id: string
+  created_at: string
+  event_day_id: string
+  id: string
+  newWorker: Worker
+  new_worker_id: string
+  replacedBy: Admin
+  worker: Worker
+  worker_id: string
+}
