@@ -43,7 +43,6 @@ export const WorkerDetailsPage = () => {
 
   const { data: companies } = useIndexCompanies()
 
-  // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
   const form = useForm<EditWorkerBody>({
     resolver: zodResolver(EditWorkerSchema),
     defaultValues: editWorkerInitialValues(worker as SingleWorkerResponse),
