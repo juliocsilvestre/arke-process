@@ -12,7 +12,7 @@ RUN bun install
 
 COPY . .
 
-ARG host_ip 
+ARG host_ip
 
 ENV VITE_API_URL=http://$host_ip:8080/v1
 
@@ -24,4 +24,5 @@ FROM nginx AS app
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /builder/dist /usr/share/nginx/html
 
-EXPOSE 80
+COPY /scripts/env.sh /docker-entrypoint.d/env.sh
+RUN chmod +x /docker-entrypoint.d/env.sh
