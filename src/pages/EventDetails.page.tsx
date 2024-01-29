@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { ClockIcon } from '@heroicons/react/24/outline'
-import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
+import { ArrowsRightLeftIcon, QrCodeIcon } from '@heroicons/react/24/solid'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
@@ -15,6 +15,9 @@ import { Tooltip } from 'react-tooltip'
 import { EventDay, workersByEventDayColumns } from './EventDetails.defs'
 import { Worker } from './Workers.defs'
 import { ClockEntryModal } from '@/components/ClockEntryLogModal'
+import { api } from '@/api/api'
+import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
+import { pdf } from '@react-pdf/renderer'
 
 export const EventDetailsPage = () => {
   const { navigate } = useRouter()
@@ -130,7 +133,7 @@ export const EventDetailsPage = () => {
         }}
         actions={(worker: Worker) => {
           return (
-            <>
+            <div className="flex justify-start gap-2">
               <Button
                 data-tooltip-id={`replace-worker-${worker.id}`}
                 data-tooltip-content={`Substituir "${worker.full_name}"`}
@@ -139,7 +142,47 @@ export const EventDetailsPage = () => {
                 <ArrowsRightLeftIcon className="w-6" />
               </Button>
               <Tooltip id={`replace-worker-${worker.id}`} place="top" />
-            </>
+
+              <Button
+                  size="icon"
+                  onClick={async (event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+
+                    const getQRCode = async (workerId: string) => {
+                      const { data } = await api.get(`/workers/${workerId}/qrcode`)
+                      return data as string
+                    }
+
+                    const generatePdfDocument = async (qrCode: string) => {
+                      const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
+
+                      // open in a new tab
+                      // const url = URL.createObjectURL(blob)
+                      // const link = document.createElement('a')
+                      // link.href = url
+                      // link.target = '_blank'
+                      // link.click()
+
+                      // print
+
+                      const url = URL.createObjectURL(blob)
+                      const iframe = document.createElement('iframe')
+                      iframe.src = url
+                      iframe.style.display = 'none'
+                      document.body.appendChild(iframe)
+                      iframe.contentWindow?.print()
+                      
+                    }
+
+                    const qrCode = await getQRCode(worker.id)
+
+                    generatePdfDocument(qrCode)
+                  }}
+                >
+                  <QrCodeIcon className="w-6 h-6" />
+                </Button>
+            </div>
           )
         }}
       />

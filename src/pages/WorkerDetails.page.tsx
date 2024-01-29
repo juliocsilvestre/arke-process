@@ -79,8 +79,6 @@ export const WorkerDetailsPage = () => {
   )
 
   useEffect(() => {
-    console.log('picture preview ', picturePreview)
-    console.log('preview image url', previewImageURL)
     if (picturePreview instanceof File) {
       const reader = new FileReader()
       reader.onloadend = () => {
