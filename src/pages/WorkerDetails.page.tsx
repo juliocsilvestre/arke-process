@@ -43,7 +43,6 @@ export const WorkerDetailsPage = () => {
 
   const { data: companies } = useIndexCompanies()
 
-  // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
   const form = useForm<EditWorkerBody>({
     resolver: zodResolver(EditWorkerSchema),
     defaultValues: editWorkerInitialValues(worker as SingleWorkerResponse),
@@ -235,14 +234,12 @@ export const WorkerDetailsPage = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onEditWorker)} className="h-full flex flex-col gap-2 justify-between">
             <div className="px-5 py-6 flex flex-col">
-              {/* <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4> */}
-
               <div className="flex flex-row gap-10">
                 <div className="flex flex-col items-center">
                   <div className="w-full !shrink-0">
                     {previewImageURL || picturePreview ? (
                       <img
-                        src={previewImageURL || picturePreview}
+                        src={previewImageURL ?? picturePreview ?? ''}
                         alt="Foto do funcionário"
                         className="mx-auto w-[200px] h-[200px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg !shrink-0"
                       />
@@ -496,7 +493,7 @@ export const WorkerDetailsPage = () => {
                   )}
                 />
               </div>
-              {/* <h4 className="text-2xl text-primary font-bold">Endereço</h4> */}
+
               <div className="flex gap-2">
                 <FormField
                   control={form.control}

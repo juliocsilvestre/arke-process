@@ -74,7 +74,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                 {/* Sidebar component, swap this element with another sidebar if you like */}
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-6 pb-2">
                   <div className="flex my-10 h-16 shrink-0 items-center  hover:opacity-80">
-                    <Link to="/dashboard/eventos">
+                    <Link to="/dashboard/eventos" search={{ page: '1', q: '' }}>
                       <img className="w-auto" src={Logo} alt="Carvalheira, Criando Memórias" />
                     </Link>
                   </div>
@@ -86,6 +86,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                             <li key={item.name}>
                               <Link
                                 to={item.href}
+                                search={{ page: '1', q: '' }}
                                 activeOptions={{ exact: true }}
                                 className={classNames(
                                   '[&.active]:bg-white [&.active]:text-primary [&.active_.icon]:text-primary text-white hover:text-primary hover:bg-white group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold',
@@ -120,7 +121,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
         {/* Sidebar component, swap this element with another sidebar if you like */}
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-primary px-4">
           <div className="my-10 flex h-16 shrink-0 items-center hover:opacity-80">
-            <Link to="/dashboard/eventos">
+            <Link to="/dashboard/eventos" search={{ page: '1', q: '' }}>
               <img className="w-auto" src={Logo} alt="Carvalheira, Criando Memórias" />
             </Link>
           </div>
@@ -132,6 +133,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
                     <li key={item.name}>
                       <Link
                         to={item.href}
+                        search={{ page: '1', q: '' }}
                         disabled={!item.released}
                         activeOptions={{ exact: true }}
                         className={classNames(

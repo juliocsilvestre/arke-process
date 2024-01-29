@@ -62,7 +62,7 @@ export const useDeleteEvent = () => {
       queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
     },
   })
-  
+
   return { ...mutation }
 }
 
