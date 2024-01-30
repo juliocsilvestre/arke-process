@@ -1,12 +1,16 @@
+import { api } from '@/api/api'
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
 import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventDaySlideover'
+import { ClockEntryModal } from '@/components/ClockEntryLogModal'
 import { ReplacementSlideover } from '@/components/ReplacementSlideover'
+import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ClockIcon } from '@heroicons/react/24/outline'
-import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
+import { ArrowsRightLeftIcon, QrCodeIcon } from '@heroicons/react/24/solid'
+import { pdf } from '@react-pdf/renderer'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
 import { PlusIcon } from 'lucide-react'
@@ -62,16 +66,12 @@ export const EventDetailsPage = () => {
         <h1 className="text-4xl text-primary font-bold">{event?.data.name}</h1>
 
         <div className="flex gap-2">
-          <Button
-            variant="destructive"
-            size="sm"
-            className="mt-4"
-            onClick={() => setIsOpen(true)}
-            disabled={!eventDayId}
-          >
-            <ArrowsRightLeftIcon className="h-6 w-6" aria-hidden="true" />
-            Substituições
-          </Button>
+          <ClockEntryModal title="Substituições ao longo do dia">
+            <Button variant="destructive" size="sm" className="mt-4" disabled={!eventDayId}>
+              <ArrowsRightLeftIcon className="h-6 w-6" aria-hidden="true" />
+              Substituições
+            </Button>
+          </ClockEntryModal>
 
           <Button
             variant="secondary"
@@ -134,7 +134,7 @@ export const EventDetailsPage = () => {
         }}
         actions={(worker: Worker) => {
           return (
-            <>
+            <div className="flex justify-start gap-2">
               <Button
                 data-tooltip-id={`replace-worker-${worker.id}`}
                 data-tooltip-content={`Substituir "${worker.full_name}"`}
@@ -143,7 +143,37 @@ export const EventDetailsPage = () => {
                 <ArrowsRightLeftIcon className="w-6" />
               </Button>
               <Tooltip id={`replace-worker-${worker.id}`} place="top" />
-            </>
+
+              <Button
+                size="icon"
+                onClick={async (event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+
+                  const getQRCode = async (workerId: string) => {
+                    const { data } = await api.get(`/workers/${workerId}/qrcode`)
+                    return data as string
+                  }
+
+                  const generatePdfDocument = async (qrCode: string) => {
+                    const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
+
+                    const url = URL.createObjectURL(blob)
+                    const iframe = document.createElement('iframe')
+                    iframe.src = url
+                    iframe.style.display = 'none'
+                    document.body.appendChild(iframe)
+                    iframe.contentWindow?.print()
+                  }
+
+                  const qrCode = await getQRCode(worker.id)
+
+                  generatePdfDocument(qrCode)
+                }}
+              >
+                <QrCodeIcon className="w-6 h-6" />
+              </Button>
+            </div>
           )
         }}
       />

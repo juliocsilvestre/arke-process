@@ -1,5 +1,5 @@
 import { Worker } from '@/pages/Workers.defs'
-import { Document, Font, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 // Create styles
 const styles = StyleSheet.create({

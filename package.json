@@ -4,12 +4,12 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "bun vite",
     "build": "tsc && vite build",
     "check": "bunx @biomejs/biome check --apply .",
     "lint": "bun biome lint . --apply-unsafe",
     "preview": "vite preview",
-    "prepare": "husky install",
+    "prepare": "bunx husky install",
     "test:e2e": "cypress open",
     "test:e2e:ci": "cypress run --headless"
   },
@@ -56,7 +56,8 @@
     "tailwindcss-animate": "1.0.7",
     "xlsx": "0.18.5",
     "zod": "3.22.4",
-    "zustand": "4.4.7"
+    "zustand": "4.4.7",
+    "vite": "5.0.8"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.1",
@@ -72,7 +73,6 @@
     "cypress": "13.6.3",
     "husky": "8.0.0",
     "lint-staged": "15.2.0",
-    "typescript": "5.2.2",
-    "vite": "5.0.8"
+    "typescript": "5.2.2"
   }
 }

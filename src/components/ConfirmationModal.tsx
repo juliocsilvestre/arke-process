@@ -42,17 +42,32 @@ export const ConfirmationModal = ({
 }: ConfirmationModalProps): JSX.Element => {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>{children}</AlertDialogTrigger>
+      <AlertDialogTrigger
+        onClick={(event) => {
+          event.stopPropagation()
+        }}
+      >
+        {children}
+      </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="border-gray-300 text-gray-500 hover:bg-gray-500 hover:text-white">
+          <AlertDialogCancel
+            className="border-gray-300 text-gray-500 hover:bg-gray-500 hover:text-white"
+            onClick={(event) => event.stopPropagation()}
+          >
             Cancelar
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onAction} className={cn(dialogVariants({ variant }))}>
+          <AlertDialogAction
+            onClick={(event) => {
+              event.stopPropagation()
+              onAction()
+            }}
+            className={cn(dialogVariants({ variant }))}
+          >
             {actionButtonLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

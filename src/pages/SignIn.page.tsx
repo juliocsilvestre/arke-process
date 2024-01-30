@@ -37,7 +37,7 @@ export const SignIn = () => {
       setUser(user.data)
 
       if (user.data.cpf) {
-        await navigate({ to: '/dashboard/eventos' })
+        await navigate({ to: '/dashboard/eventos', search: { page: '1', q: '' } })
       }
     } catch (error: unknown) {
       const errors = checkError<SigninBodyKeys>(error)

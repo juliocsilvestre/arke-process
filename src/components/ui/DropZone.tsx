@@ -7,7 +7,7 @@ import { Input } from './Input'
 export const DropZone = ({ readFile }: { readFile: (props: UploadFileProps) => void }): JSX.Element => {
   const [dropzone, setDropzone] = useState<Dropzone | null>(null)
   const [file, setFile] = useState<File | null>(null)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+
   useEffect(() => {
     Dropzone.autoDiscover = true
     const myDropzone = new Dropzone('.dropzone', {

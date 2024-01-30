@@ -87,7 +87,7 @@ export const editWorkerInitialValues = (worker: SingleWorkerResponse) => {
     phone_number: worker?.data.phone_number,
     email: worker?.data.email,
     role: worker?.data.role,
-    company_id: worker?.data.company.id,
+    company_id: worker?.data.company?.id,
     street: worker?.data.address.street,
     complement: worker?.data.address.complement,
     number: worker?.data.address.number,

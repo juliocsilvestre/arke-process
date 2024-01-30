@@ -1,7 +1,8 @@
 import { api } from '@/api/api'
-import { useCreateWorker, useCreateWorkersBulk } from '@/api/mutations/workers.mutation'
+import { useCreateWorker, useCreateWorkersBulk, useDeleteWorker } from '@/api/mutations/workers.mutation'
 import { useIndexCompanies } from '@/api/queries/companies.query'
-import { indexWorkersQueryOptions, useGetAddresByCep, useGetQRCode } from '@/api/queries/workers.query'
+import { indexWorkersQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
@@ -18,14 +19,16 @@ import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { PaperClipIcon, PlusIcon, QrCodeIcon, UserIcon } from '@heroicons/react/24/solid'
+import { PaperClipIcon, PlusIcon, QrCodeIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { pdf } from '@react-pdf/renderer'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
+import { AxiosError } from 'axios'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
@@ -33,6 +36,7 @@ import {
   CreateWorkerBody,
   CreateWorkerRow,
   CreateWorkerSchema,
+  Worker,
   WorkerBodyKeys,
   WorkerSheet,
   workerInitialValues,
@@ -220,9 +224,10 @@ export const WorkersPage = (): JSX.Element => {
           onQueryChange={(query) => setTableQueryString(query)}
           pages={workers?.data.workers.meta.last_page ?? 1}
           currentPage={workers?.data.workers.meta.current_page ?? 1}
-          actions={(worker) => {
+          actions={(worker: Worker) => {
             return (
-              <div className="flex justify-start">
+              <div className="flex justify-start gap-2">
+                <_DeleteEventButton worker={worker} />
                 <Button
                   size="icon"
                   onClick={async (event) => {
@@ -237,12 +242,12 @@ export const WorkersPage = (): JSX.Element => {
                     const generatePdfDocument = async (qrCode: string) => {
                       const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
 
-                      // open in a new tab
                       const url = URL.createObjectURL(blob)
-                      const link = document.createElement('a')
-                      link.href = url
-                      link.target = '_blank'
-                      link.click()
+                      const iframe = document.createElement('iframe')
+                      iframe.src = url
+                      iframe.style.display = 'none'
+                      document.body.appendChild(iframe)
+                      iframe.contentWindow?.print()
                     }
 
                     const qrCode = await getQRCode(worker.id)
@@ -759,5 +764,44 @@ export const WorkersPage = (): JSX.Element => {
         </Form>
       </SlideOver>
     </section>
+  )
+}
+
+const _DeleteEventButton = ({ worker }: { worker: Worker }) => {
+  const { mutateAsync: deleteWorker } = useDeleteWorker()
+
+  const onDeleteWorker = async (worker: Worker): Promise<void> => {
+    try {
+      await deleteWorker(worker.id)
+      toast.success(<p>O funcionário "{worker.full_name}" foi excluído com sucesso!</p>)
+    } catch (error: unknown) {
+      if (!(error instanceof AxiosError)) return
+      console.error(error.response?.data.message)
+    }
+  }
+
+  return (
+    <ConfirmationModal
+      title={
+        <span>
+          Você tem certeza de que deseja apagar <strong>"{worker.full_name}"</strong>?
+        </span>
+      }
+      description="Esta ação não pode ser desfeita. Isso excluirá permanentemente o funcionário."
+      variant={'destructive'}
+      actionButtonLabel="Apagar"
+      onAction={() => void onDeleteWorker(worker)}
+    >
+      <Button
+        data-tooltip-id={`delete-worker-${worker.id}`}
+        data-tooltip-content={`Apagar "${worker.full_name}"`}
+        variant="destructive"
+        size="icon"
+        onClick={(event) => {}}
+      >
+        <TrashIcon className="w-4 h-4" />
+      </Button>
+      <Tooltip id={`delete-worker-${worker.id}`} place="top" />
+    </ConfirmationModal>
   )
 }
