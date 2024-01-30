@@ -157,14 +157,6 @@ export const EventDetailsPage = () => {
                     const generatePdfDocument = async (qrCode: string) => {
                       const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
 
-                      // open in a new tab
-                      // const url = URL.createObjectURL(blob)
-                      // const link = document.createElement('a')
-                      // link.href = url
-                      // link.target = '_blank'
-                      // link.click()
-
-                      // print
 
                       const url = URL.createObjectURL(blob)
                       const iframe = document.createElement('iframe')
