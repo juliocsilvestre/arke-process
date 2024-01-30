@@ -33,6 +33,7 @@ export const singleEventQueryOption = (id: string) => {
     queryKey: ['eventDetail', id],
     queryFn: () => getSingleEvent(id),
     refetchOnWindowFocus: false,
+    enabled: !!id,
   })
 }
 

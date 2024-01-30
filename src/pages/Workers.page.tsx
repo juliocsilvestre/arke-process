@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
@@ -180,9 +180,10 @@ export const WorkersPage = (): JSX.Element => {
     navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
   }
 
-  useDebouncedSearchTerm({ searchTerm: tableQueryString, callback: filterByDebouncedSearchTerm })
+  useDebounceSearch({ searchTerm: tableQueryString, callback: filterByDebouncedSearchTerm })
 
   const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios/' }) as { q: string; page: string }
+
   const options = indexWorkersQueryOptions(search)
   const { data: workers } = useSuspenseQuery(options)
 

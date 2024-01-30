@@ -4,7 +4,7 @@ import { ReplacementSlideover } from '@/components/ReplacementSlideover'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
@@ -35,7 +35,7 @@ export const EventDetailsPage = () => {
     })
   }
 
-  useDebouncedSearchTerm({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
 
   const formatEventPeriod = (day: string) => {
     const date = new Date(day)

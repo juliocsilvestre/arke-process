@@ -1,4 +1,4 @@
-import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -41,7 +41,7 @@ export const CompaniesPage = (): JSX.Element => {
     navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
   }
 
-  useDebouncedSearchTerm({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
 
   const search = useSearch({ from: '/dashboard-layout/dashboard/fornecedores' }) as { q: string; page: string }
 

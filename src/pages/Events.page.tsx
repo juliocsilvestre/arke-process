@@ -1,4 +1,4 @@
-import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
@@ -50,7 +50,7 @@ export const EventsPage = (): JSX.Element => {
     navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
   }
 
-  useDebouncedSearchTerm({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
 
   const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/' }) as { q: string; page: string }
   const options = indexEventsQueryOption(search)

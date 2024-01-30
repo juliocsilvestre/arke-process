@@ -5,7 +5,7 @@ import { DataTable } from '@/components/ui/DataTable'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
-import { useDebouncedSearchTerm } from '@/hooks/useDebouncedSearchTerm'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { NAVIGATION } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { maskCPF } from '@/utils/strings'
@@ -41,7 +41,7 @@ export const AdminsPage = (): JSX.Element => {
     navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
   }
 
-  useDebouncedSearchTerm({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
 
   const search = useSearch({ from: '/dashboard-layout/dashboard/administradores' }) as {
     q: string
