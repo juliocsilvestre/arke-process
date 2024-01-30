@@ -789,8 +789,6 @@ const _DeleteEventButton = ({ worker }: { worker: Worker }) => {
         variant="destructive"
         size="icon"
         onClick={(event) => {
-          // event.preventDefault()
-          // event.stopPropagation()
         }}
       >
         <TrashIcon className="w-4 h-4" />
