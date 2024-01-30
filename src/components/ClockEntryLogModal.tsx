@@ -1,4 +1,8 @@
+import { useIndexReplacementsPerEventDayQuery } from '@/api/queries/events.query'
+import { Replacement } from '@/pages/EventDetails.defs'
 import { cn } from '@/utils/styles'
+import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
+import { useParams } from '@tanstack/react-router'
 import { VariantProps, cva } from 'class-variance-authority'
 import { ReactNode } from 'react'
 import {
@@ -12,10 +16,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/AlertDialog'
-import { useIndexReplacementsPerEventDayQuery } from '@/api/queries/events.query'
-import { useParams } from '@tanstack/react-router'
-import { Replacement } from '@/pages/EventDetails.defs'
-import { ArrowsRightLeftIcon } from '@heroicons/react/24/solid'
 import { Badge } from './ui/Badge'
 
 const dialogVariants = cva('', {
@@ -64,7 +64,7 @@ export const ClockEntryModal = ({
                 <time className="text-xs font-medium text-gray-400">
                   {new Date(replacement.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </time>
-                <span className="text-xs text-gray-400">{replacement.replacedBy.name}</span>
+                <span className="text-xs text-gray-400">{replacement.replacedBy?.name}</span>
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-md text-error-700">

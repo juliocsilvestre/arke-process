@@ -2,8 +2,8 @@ import { Badge } from '@/components/ui/Badge'
 import { WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
-import { Worker } from './Workers.defs'
 import { Admin } from './Admins.defs'
+import { Worker } from './Workers.defs'
 
 export type EventDay = {
   id: string

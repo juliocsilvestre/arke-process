@@ -2,6 +2,7 @@ import { api } from '@/api/api'
 import { useCreateWorker, useCreateWorkersBulk, useDeleteWorker } from '@/api/mutations/workers.mutation'
 import { useIndexCompanies } from '@/api/queries/companies.query'
 import { indexWorkersQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
@@ -22,26 +23,25 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { pdf } from '@react-pdf/renderer'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
+import { AxiosError } from 'axios'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
-  Worker,
   CreateWorkerBody,
   CreateWorkerRow,
   CreateWorkerSchema,
+  Worker,
   WorkerBodyKeys,
   WorkerSheet,
   workerInitialValues,
   workersColumns,
   workersSheetMapper,
 } from './Workers.defs'
-import { AxiosError } from 'axios'
-import { ConfirmationModal } from '@/components/ConfirmationModal'
-import { Tooltip } from 'react-tooltip'
 
 export type UploadFileProps = {
   e?: ChangeEvent<HTMLInputElement>
@@ -239,7 +239,6 @@ export const WorkersPage = (): JSX.Element => {
                       iframe.style.display = 'none'
                       document.body.appendChild(iframe)
                       iframe.contentWindow?.print()
-                      
                     }
 
                     const qrCode = await getQRCode(worker.id)
@@ -789,8 +788,7 @@ const _DeleteEventButton = ({ worker }: { worker: Worker }) => {
         data-tooltip-content={`Apagar "${worker.full_name}"`}
         variant="destructive"
         size="icon"
-        onClick={(event) => {
-        }}
+        onClick={(event) => {}}
       >
         <TrashIcon className="w-4 h-4" />
       </Button>

@@ -76,8 +76,10 @@ export const useReplaceWorkerOnEventDay = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
-      queryClient.invalidateQueries(indexReplacementsPerEventDayQueryOptions({ eventDayId: variables.event_day_id, eventId: variables.event_id }))
-    }
+      queryClient.invalidateQueries(
+        indexReplacementsPerEventDayQueryOptions({ eventDayId: variables.event_day_id, eventId: variables.event_id }),
+      )
+    },
   })
 
   return { ...mutation }

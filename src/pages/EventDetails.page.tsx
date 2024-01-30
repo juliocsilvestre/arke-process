@@ -1,11 +1,15 @@
+import { api } from '@/api/api'
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
 import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventDaySlideover'
+import { ClockEntryModal } from '@/components/ClockEntryLogModal'
 import { ReplacementSlideover } from '@/components/ReplacementSlideover'
+import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon, QrCodeIcon } from '@heroicons/react/24/solid'
+import { pdf } from '@react-pdf/renderer'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
 import { useDebounce } from '@uidotdev/usehooks'
@@ -14,10 +18,6 @@ import { useEffect, useState } from 'react'
 import { Tooltip } from 'react-tooltip'
 import { EventDay, workersByEventDayColumns } from './EventDetails.defs'
 import { Worker } from './Workers.defs'
-import { ClockEntryModal } from '@/components/ClockEntryLogModal'
-import { api } from '@/api/api'
-import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
-import { pdf } from '@react-pdf/renderer'
 
 export const EventDetailsPage = () => {
   const { navigate } = useRouter()
@@ -144,36 +144,34 @@ export const EventDetailsPage = () => {
               <Tooltip id={`replace-worker-${worker.id}`} place="top" />
 
               <Button
-                  size="icon"
-                  onClick={async (event) => {
-                    event.preventDefault()
-                    event.stopPropagation()
+                size="icon"
+                onClick={async (event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
 
-                    const getQRCode = async (workerId: string) => {
-                      const { data } = await api.get(`/workers/${workerId}/qrcode`)
-                      return data as string
-                    }
+                  const getQRCode = async (workerId: string) => {
+                    const { data } = await api.get(`/workers/${workerId}/qrcode`)
+                    return data as string
+                  }
 
-                    const generatePdfDocument = async (qrCode: string) => {
-                      const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
+                  const generatePdfDocument = async (qrCode: string) => {
+                    const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
 
+                    const url = URL.createObjectURL(blob)
+                    const iframe = document.createElement('iframe')
+                    iframe.src = url
+                    iframe.style.display = 'none'
+                    document.body.appendChild(iframe)
+                    iframe.contentWindow?.print()
+                  }
 
-                      const url = URL.createObjectURL(blob)
-                      const iframe = document.createElement('iframe')
-                      iframe.src = url
-                      iframe.style.display = 'none'
-                      document.body.appendChild(iframe)
-                      iframe.contentWindow?.print()
-                      
-                    }
+                  const qrCode = await getQRCode(worker.id)
 
-                    const qrCode = await getQRCode(worker.id)
-
-                    generatePdfDocument(qrCode)
-                  }}
-                >
-                  <QrCodeIcon className="w-6 h-6" />
-                </Button>
+                  generatePdfDocument(qrCode)
+                }}
+              >
+                <QrCodeIcon className="w-6 h-6" />
+              </Button>
             </div>
           )
         }}
