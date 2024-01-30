@@ -1,5 +1,5 @@
 import { type DialogProps } from '@radix-ui/react-dialog'
-import { Command as CommandPrimitive } from 'cmdk'
+import { Command as CommandPrimitive, useCommandState } from 'cmdk'
 import { Search } from 'lucide-react'
 import * as React from 'react'
 
@@ -67,10 +67,26 @@ const CommandList = React.forwardRef<
 
 CommandList.displayName = CommandPrimitive.List.displayName
 
-const CommandEmpty = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => <CommandPrimitive.Empty ref={ref} className="py-6 text-center text-sm" {...props} />)
+interface EmptyProps {
+  searchTarget?: string
+}
+interface CommandEmptyProps extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>, EmptyProps {
+  searchTarget?: string
+}
+
+const CommandEmpty = React.forwardRef<React.ElementRef<typeof CommandPrimitive.Empty>, CommandEmptyProps>(
+  ({ searchTarget, ...props }, ref) => {
+    const search = useCommandState((state) => state.search)
+    const hasSearchString = search.trim().length
+    return hasSearchString ? (
+      <CommandPrimitive.Empty ref={ref} {...props} className="py-6 text-center text-sm">
+        Nenhum {searchTarget} encontrado para "<strong>{search}</strong>".
+      </CommandPrimitive.Empty>
+    ) : (
+      <CommandPrimitive.Empty ref={ref} {...props} className="py-6 text-center text-sm" />
+    )
+  },
+)
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
@@ -81,7 +97,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden p-1 text-slate-950 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-slate-500 dark:text-slate-50 dark:[&_[cmdk-group-heading]]:text-slate-400',
+      'command-group-area max-h-[500px] overflow-x-hidden p-1 text-slate-950 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-slate-500 dark:text-slate-50 dark:[&_[cmdk-group-heading]]:text-slate-400',
       className,
     )}
     {...props}

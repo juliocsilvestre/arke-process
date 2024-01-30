@@ -7,14 +7,14 @@ import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon, QrCodeIcon } from '@heroicons/react/24/solid'
 import { pdf } from '@react-pdf/renderer'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
-import { useDebounce } from '@uidotdev/usehooks'
 import { PlusIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Tooltip } from 'react-tooltip'
 import { EventDay, workersByEventDayColumns } from './EventDetails.defs'
 import { Worker } from './Workers.defs'
@@ -25,13 +25,22 @@ export const EventDetailsPage = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
   const [workerToReplace, setWorkerToReplace] = useState<Worker | null>(null)
-
-  const debouncedSearchTerm = useDebounce(queryString, 1000)
   const { day: eventDayId, id: eventId } = useParams({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' })
   const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' }) as {
     q: string
     page: string
   }
+
+  const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
+    navigate({
+      to: '/dashboard/eventos/$id/dias/$day',
+      params: { id: eventId, day: eventDayId },
+      search: { page: '1', q: debouncedSearchTerm },
+    })
+  }
+
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+
   const formatEventPeriod = (day: string) => {
     const date = new Date(day)
     return date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: '2-digit' })
@@ -50,14 +59,6 @@ export const EventDetailsPage = () => {
   const { data: workersData } = useSuspenseQuery(options)
 
   const workers = workersData?.data.workers.data
-
-  useEffect(() => {
-    navigate({
-      to: '/dashboard/eventos/$id/dias/$day',
-      params: { id: eventId, day: eventDayId },
-      search: { page: '1', q: debouncedSearchTerm },
-    })
-  }, [debouncedSearchTerm])
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">

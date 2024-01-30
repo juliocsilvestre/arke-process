@@ -1,6 +1,7 @@
 export type Pagination = {
   page?: string
   q?: string
+  limit?: string
 }
 
 export type DateFormatOptions = {

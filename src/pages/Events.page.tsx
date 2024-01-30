@@ -1,3 +1,4 @@
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
@@ -30,6 +31,7 @@ export const EventsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
+  const [queryString, setQueryString] = useState('')
 
   const form = useForm<CreateEventBody>({
     resolver: zodResolver(CreateEventSchema),
@@ -43,6 +45,13 @@ export const EventsPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createEvent } = useCreateEvent()
+
+  const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
+    navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
+  }
+
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+
   const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/' }) as { q: string; page: string }
   const options = indexEventsQueryOption(search)
   const { data: events } = useSuspenseQuery(options)
@@ -98,7 +107,7 @@ export const EventsPage = (): JSX.Element => {
           columns={eventsColumns}
           data={events?.data.events.data ?? []}
           count={events?.data.events_count}
-          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
+          onQueryChange={(query) => setQueryString(query)}
           pages={events?.data.events.meta.last_page ?? 1}
           currentPage={events?.data.events.meta.current_page ?? 1}
           onRowClick={({ id, days }) => {

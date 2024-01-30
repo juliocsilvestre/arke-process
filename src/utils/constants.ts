@@ -92,6 +92,21 @@ export const WORKER_STATUS_MAPPER: {
   },
 } as const
 
+export const WORKER_STATUS_FOR_SEARCHQUERY: { [key: string]: string } = {
+  ativo: 'active',
+  expulso: 'expelled',
+  banido: 'banished',
+} as const
+
+export const WORKER_STATUS_FOR_COMBOBOX_TRANSLATE: { [key: string]: string } = {
+  active: 'ativo',
+  expelled: 'expulso',
+  banished: 'banido',
+} as const
+
+const STATUS_SEARCHQUERY_KEYWORDS = ['ativo', 'expulso', 'banido']
+const STATUS_COMBOBOX_KEYWORDS = ['active', 'expelled', 'banished']
+
 export const formatDate = (dateString: string | number | Date) => {
   const options: DateFormatOptions = {
     day: '2-digit',
@@ -101,4 +116,20 @@ export const formatDate = (dateString: string | number | Date) => {
   const rawDate = new Date(dateString)
   const sanitizedDate = rawDate.toLocaleDateString('pt-BR', options)
   return sanitizedDate
+}
+
+export const checkIfStatusKeyword = ({
+  value,
+  hasColumnStatus,
+  isCombobox = false,
+}: { value: string; hasColumnStatus?: boolean; isCombobox?: boolean }) => {
+  if (hasColumnStatus && STATUS_SEARCHQUERY_KEYWORDS.includes(value)) {
+    return WORKER_STATUS_FOR_SEARCHQUERY[value]
+  }
+
+  if (isCombobox && STATUS_COMBOBOX_KEYWORDS.includes(value)) {
+    return WORKER_STATUS_FOR_COMBOBOX_TRANSLATE[value]
+  }
+
+  return value
 }

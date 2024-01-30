@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
 import { Pagination } from '@/utils/types'
@@ -24,6 +24,7 @@ export const getWorkers = async (pagination?: Pagination) => {
   const queryParams = new URLSearchParams({
     q: pagination?.q || '', // Use empty string if q is not provided
     page: pagination?.page || '1', // Use empty string if page is not provided
+    limit: pagination?.limit || '10',
   })
 
   // Combine the base path with query parameters
@@ -31,6 +32,38 @@ export const getWorkers = async (pagination?: Pagination) => {
 
   // Perform the API request
   return await api.get(url)
+}
+
+export const infiniteWorkersQueryOptions = (isComboboxOpen: boolean, pagination?: Pagination) => {
+  return infiniteQueryOptions({
+    queryKey: ['infinite', pagination],
+    queryFn: async () => await getWorkers(pagination),
+    initialPageParam: 1,
+    enabled: isComboboxOpen,
+    select: (data) => {
+      return {
+        workers: [...data.pages[0].data.workers.data],
+        currentPage: data.pages[0].data.workers.meta.current_page,
+        nextPage: data.pages[0].data.workers.meta.next_page_url,
+        lastPage: data.pages[0].data.workers.meta.last_page,
+      }
+    },
+    getNextPageParam: (nextPage) => {
+      return nextPage.data.workers.meta.next_page_url
+        ? nextPage.data.workers.meta.next_page_url.split('/page=')[1]
+        : null
+    },
+    getPreviousPageParam: (previousPage) => {
+      return previousPage.data.workers.meta.previous_page
+        ? previousPage.data.workers.meta.previous_page.split('/page=')[1]
+        : null
+    },
+    refetchOnWindowFocus: false,
+  })
+}
+
+export const useInfiniteWorkers = (pagination?: Pagination) => {
+  return useInfiniteQuery(infiniteWorkersQueryOptions(pagination))
 }
 
 export const indexWorkersQueryOptions = (pagination?: Pagination) =>

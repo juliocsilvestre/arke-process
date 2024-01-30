@@ -1,3 +1,4 @@
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,6 +25,7 @@ export const CompaniesPage = (): JSX.Element => {
   const { latestLocation, navigate } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
+  const [queryString, setQueryString] = useState('')
 
   const form = useForm<CreateCompanyBody>({
     resolver: zodResolver(CreateCompanySchema),
@@ -34,7 +36,15 @@ export const CompaniesPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createCompany } = useCreateCompany()
+
+  const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
+    navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
+  }
+
+  useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
+
   const search = useSearch({ from: '/dashboard-layout/dashboard/fornecedores' }) as { q: string; page: string }
+
   const options = indexCompaniesQueryOptions(search)
   const { data: companies } = useSuspenseQuery(options)
 
@@ -88,7 +98,7 @@ export const CompaniesPage = (): JSX.Element => {
           columns={companiesColumns}
           data={companies?.data.companies.data ?? []}
           count={companies?.data.companies_count}
-          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
+          onQueryChange={(query) => setQueryString(query)}
           pages={companies?.data.companies.meta.last_page ?? 1}
           currentPage={companies?.data.companies.meta.current_page ?? 1}
         />

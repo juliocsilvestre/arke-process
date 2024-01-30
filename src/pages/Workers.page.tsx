@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
@@ -59,6 +60,7 @@ export const WorkersPage = (): JSX.Element => {
   const [companyToBulkUpload, setCompanyToBulkUpload] = useState<string>('')
   const [isBulkComboBoxOpen, setIsBulkComboBoxOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
+  const [tableQueryString, setTableQueryString] = useState('')
 
   const form = useForm<CreateWorkerBody>({
     resolver: zodResolver(CreateWorkerSchema),
@@ -178,7 +180,14 @@ export const WorkersPage = (): JSX.Element => {
 
   const { data: companies } = useIndexCompanies({ q: queryString, page: '1' })
 
+  const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
+    navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
+  }
+
+  useDebounceSearch({ searchTerm: tableQueryString, callback: filterByDebouncedSearchTerm })
+
   const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios/' }) as { q: string; page: string }
+
   const options = indexWorkersQueryOptions(search)
   const { data: workers } = useSuspenseQuery(options)
 
@@ -212,7 +221,7 @@ export const WorkersPage = (): JSX.Element => {
               params: { id },
             })
           }
-          onQueryChange={(query) => navigate({ params: '', search: (prev) => ({ ...prev, q: query }) })}
+          onQueryChange={(query) => setTableQueryString(query)}
           pages={workers?.data.workers.meta.last_page ?? 1}
           currentPage={workers?.data.workers.meta.current_page ?? 1}
           actions={(worker: Worker) => {

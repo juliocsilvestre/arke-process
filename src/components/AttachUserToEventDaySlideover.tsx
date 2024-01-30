@@ -1,6 +1,7 @@
 import { useAttachWorkerToAnEventDay } from '@/api/mutations/events.mutation'
-import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
-import { indexWorkersQueryOptions } from '@/api/queries/workers.query'
+import { indexWorkersPerEventDayQueryOptions, singleEventQueryOption } from '@/api/queries/events.query'
+import { infiniteWorkersQueryOptions } from '@/api/queries/workers.query'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import {
   AttachWorkerToEventDayBody,
   AttachWorkerToEventDayKeys,
@@ -9,12 +10,13 @@ import {
 import { EventDay } from '@/pages/Events.defs'
 import { Worker } from '@/pages/Workers.defs'
 import { queryClient } from '@/routes'
+import { checkIfStatusKeyword } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { cn } from '@/utils/styles'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Form, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
@@ -40,9 +42,19 @@ export const AttachWorkerToEventDaySlideover = ({
 }: AttachWorkerToEventDaySlideoverProps): JSX.Element => {
   const [queryString, setQueryString] = useState('')
   const [isWorkersComboBoxOpen, setIsWorkersComboBoxOpen] = useState(false)
-
-  const { data: event } = useQuery({ queryKey: ['event', eventId], queryFn: () => getSingleEvent(eventId) })
+  const [hasMoreData, setHasMoreData] = useState(false)
+  const eventOptions = singleEventQueryOption(eventId)
+  const { data: event } = useQuery(eventOptions)
   const days = event?.data.days as EventDay[]
+  const [workersPage, setWorkersPage] = useState('1')
+  const [workers, setWorkers] = useState<Worker[]>([])
+
+  const {
+    comboboxParameters: { debouncedSearchTerm },
+  } = useDebounceSearch({
+    searchTerm: checkIfStatusKeyword({ value: queryString?.toLowerCase(), hasColumnStatus: true }),
+    isComboboxOpen: isWorkersComboBoxOpen,
+  })
 
   const form = useForm<AttachWorkerToEventDayBody>({
     resolver: zodResolver(AttachWorkerToEventDaySchema),
@@ -54,6 +66,7 @@ export const AttachWorkerToEventDaySlideover = ({
   })
 
   const { mutateAsync: doAttachWorkersToAnEventDay } = useAttachWorkerToAnEventDay()
+
   const handleAttachWorkerToEventDay = useCallback(
     async (data: AttachWorkerToEventDayBody) => {
       try {
@@ -81,10 +94,63 @@ export const AttachWorkerToEventDaySlideover = ({
     [doAttachWorkersToAnEventDay, form, eventDayId],
   )
 
-  const options = indexWorkersQueryOptions({ page: '1', q: queryString })
-  const { data: allWorkersData } = useQuery(options)
+  useEffect(() => {
+    if (!isOpen) {
+      setQueryString('')
+      setWorkersPage('1')
+    }
+  }, [isOpen])
 
-  const allWorkers = allWorkersData?.data.workers.data as Worker[]
+  const {
+    data: pages,
+    fetchNextPage,
+    fetchPreviousPage,
+  } = useInfiniteQuery(infiniteWorkersQueryOptions(isOpen, { page: workersPage, q: debouncedSearchTerm, limit: '20' }))
+
+  useEffect(() => {
+    if (pages?.workers) {
+      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+      setWorkers([...pages?.workers] as Worker[])
+    }
+  }, [pages?.workers])
+
+  useEffect(() => {
+    if (pages?.currentPage < pages?.lastPage) {
+      setHasMoreData(pages?.nextPage !== null)
+    }
+  }, [pages?.nextPage])
+
+  useEffect(() => {
+    setWorkersPage('1')
+  }, [debouncedSearchTerm])
+
+  const isScrolledToBottom = (offsetHeight: number, scrollTop: number, scrollHeight: number) => {
+    return offsetHeight + scrollTop >= scrollHeight
+  }
+
+  const isScrolledToTop = (scrollTop: number) => {
+    return scrollTop <= 0
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const handleScroll = (target: any) => {
+    const { offsetHeight, scrollTop, scrollHeight } = target
+    if (hasMoreData && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
+      try {
+        setWorkersPage((page) => String(Number(page) + 1))
+        fetchNextPage()
+      } catch (error) {
+        toast.error('Erro ao buscar funcionários. Tente novamente.')
+      }
+    } else if (isScrolledToTop(scrollTop)) {
+      try {
+        setWorkersPage((page) => (Number(page) > 1 ? String(Number(page) - 1) : '1'))
+        fetchPreviousPage()
+      } catch (error) {
+        toast.error('Erro ao buscar funcionários. Tente novamente.')
+      }
+    }
+  }
 
   return (
     <SlideOver
@@ -117,7 +183,7 @@ export const AttachWorkerToEventDaySlideover = ({
                         {field.value.length > 1
                           ? 'Mais de um funcionário selecionado'
                           : field.value.length === 1
-                            ? allWorkers.find((worker) => worker.id === field.value[0])?.full_name
+                            ? workers.find((worker) => worker.id === field.value[0])?.full_name
                             : 'Selecione um ou mais funcionários'}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -126,14 +192,15 @@ export const AttachWorkerToEventDaySlideover = ({
                       <Command className="w-full">
                         <CommandInput
                           placeholder="Funcionário..."
-                          className="w-full"
+                          className="w-full combobox-worker-search"
+                          minLength={3}
                           onValueChange={(s) => {
                             setQueryString(s)
                           }}
                         />
-                        <CommandEmpty>Funcionário não encontrado.</CommandEmpty>
-                        <CommandGroup>
-                          {allWorkers?.map((worker: Worker) => (
+                        <CommandEmpty searchTarget="funcionário">Funcionário não encontrado.</CommandEmpty>
+                        <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                          {workers.map((worker: Worker) => (
                             <CommandItem
                               value={JSON.stringify([
                                 worker.full_name,
@@ -141,6 +208,8 @@ export const AttachWorkerToEventDaySlideover = ({
                                 worker.role,
                                 worker.company?.name,
                                 worker.rg,
+                                worker.email,
+                                checkIfStatusKeyword({ value: worker.status.toLowerCase(), isCombobox: true }),
                               ])}
                               key={worker.id}
                               className={cn(
@@ -178,7 +247,7 @@ export const AttachWorkerToEventDaySlideover = ({
                               </Avatar>
                               <div className="flex flex-col">
                                 <span>
-                                  <strong>{worker.full_name}</strong>{' '}
+                                  <strong>{worker.full_name}</strong>
                                   <span className="text-xs text-gray-500 group-hover:text-white">({worker.cpf})</span>
                                 </span>
                                 <span className="text-xs">
