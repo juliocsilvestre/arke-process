@@ -139,7 +139,7 @@ export const WorkerDetailsPage = () => {
               </Button>
             </div>
             <h3 className="text-center md:text-left text-lg text-gray-500">
-              {worker?.data.role} em <span>{worker?.data.company.name}</span>
+              {worker?.data.role} em <span>{worker?.data.company?.name}</span>
             </h3>
           </div>
         </div>
