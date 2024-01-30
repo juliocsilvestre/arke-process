@@ -15,7 +15,7 @@ import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
-import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
+import { maskCEP, maskCPF, maskDate, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
@@ -25,11 +25,13 @@ import { pdf } from '@react-pdf/renderer'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
+import { Calendar } from '@components/ui/Calendar'
+import { format } from 'date-fns'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
@@ -43,6 +45,7 @@ import {
   workersColumns,
   workersSheetMapper,
 } from './Workers.defs'
+import { ptBR } from 'date-fns/locale'
 
 export type UploadFileProps = {
   e?: ChangeEvent<HTMLInputElement>
@@ -95,7 +98,7 @@ export const WorkersPage = (): JSX.Element => {
   const onCreateWorker = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
-        await createWorker({ ...values, picture: picturePreview })
+        await createWorker({ ...values, issuing_date: new Date(values.issuing_date), picture: picturePreview })
         form.reset()
         handleOnClose()
         toast.success(
@@ -321,6 +324,28 @@ export const WorkersPage = (): JSX.Element => {
           <DropZone readFile={readUploadFile} />
         </div>
 
+        <div className="w-full flex justify-center">
+          <Button
+            variant="secondary"
+            className="mx-auto mb-4"
+            onClick={async () => {
+              await api
+                .get(`${import.meta.env.VITE_API_URL.replace('v1/', '')}/planilha-modelo.xlsx`, {
+                  responseType: 'blob',
+                })
+                .then((response) => {
+                  const url = window.URL.createObjectURL(new Blob([response.data]))
+                  const link = document.createElement('a')
+                  link.href = url
+                  link.setAttribute('download', 'planilha-modelo.xlsx')
+                  document.body.appendChild(link)
+                  link.click()
+                })
+            }}
+          >
+            Baixe o modelo de planilha clicando aqui
+          </Button>
+        </div>
         <SlideOverFooter>
           <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
             <Button type="button" variant="outline" onClick={() => setIsSpreadsheetManagerOpen(false)}>
@@ -421,7 +446,7 @@ export const WorkersPage = (): JSX.Element => {
                       control={form.control}
                       name="full_name"
                       render={({ field }) => (
-                        <FormItem className="w-[100%]">
+                        <FormItem className="w-[60%]">
                           <Label htmlFor="full_name" label="Nome Completo" isrequired />
                           <FormControl>
                             <Input id="full_name" placeholder="Insira o nome completo" {...field} size="md" />
@@ -430,19 +455,16 @@ export const WorkersPage = (): JSX.Element => {
                         </FormItem>
                       )}
                     />
-                  </div>
-
-                  <div className="flex gap-2">
                     <FormField
                       control={form.control}
                       name="cpf"
                       render={({ field }) => (
-                        <FormItem className="w-[50%]">
+                        <FormItem className="w-[40%]">
                           <Label htmlFor="cpf" label="CPF" isrequired />
                           <FormControl>
                             <Input
                               id="cpf"
-                              placeholder="Insira seu CPF"
+                              placeholder="Insira o CPF"
                               {...field}
                               size="md"
                               onBlur={(event) => {
@@ -460,22 +482,91 @@ export const WorkersPage = (): JSX.Element => {
                         </FormItem>
                       )}
                     />
+                  </div>
+
+                  <div className="flex gap-2">
                     <FormField
                       control={form.control}
                       name="rg"
                       render={({ field }) => (
-                        <FormItem className="w-[50%]">
+                        <FormItem className="w-[30%]">
                           <Label htmlFor="rg" label="RG" isrequired />
                           <FormControl>
                             <Input
                               id="rg"
-                              placeholder="Insira seu RG"
+                              placeholder="Insira o RG"
                               {...field}
                               size="md"
                               onBlur={(event) => {
                                 if (event.target.value) {
                                   form.trigger('rg')
                                 }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="issuing_agency"
+                      render={({ field }) => (
+                        <FormItem className="w-[25%]">
+                          <Label htmlFor="issuing_agency" label="Órgão expedidor" isrequired />
+                          <FormControl>
+                            <Input id="issuing_agency" placeholder="ex: SDS" {...field} size="md" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="issuing_state"
+                      render={({ field }) => (
+                        <FormItem className="w-[10%]">
+                          <Label htmlFor="issuing_state" label="UF" isrequired />
+                          <FormControl>
+                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="UF" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  {Object.values(UF_LIST).map((uf) => (
+                                    <SelectItem key={uf} value={uf}>
+                                      {uf}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="issuing_date"
+                      render={({ field }) => (
+                        <FormItem className="w-[25%]">
+                          <Label htmlFor="issuing_date" label="Data de emissão" isrequired />
+                          <FormControl>
+                            <Input
+                              id="issuing_date"
+                              placeholder="DD/MM/YYYY"
+                              {...field}
+                              size="md"
+                              onBlur={(event) => {
+                                if (event.target.value) {
+                                  form.trigger('issuing_date')
+                                }
+                              }}
+                              onChange={(event) => {
+                                const date = maskDate(event.target.value)
+                                form.setValue('issuing_date', date)
                               }}
                             />
                           </FormControl>
@@ -493,7 +584,7 @@ export const WorkersPage = (): JSX.Element => {
                         <FormItem className="w-[60%]">
                           <Label htmlFor="email" label="E-mail" />
                           <FormControl>
-                            <Input id="email" placeholder="Insira seu e-mail" {...field} size="md" />
+                            <Input id="email" placeholder="Insira o e-mail" {...field} size="md" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -509,7 +600,7 @@ export const WorkersPage = (): JSX.Element => {
                           <FormControl>
                             <Input
                               id="phone_number"
-                              placeholder="Insira seu celular/whatsapp"
+                              placeholder="Insira o celular/whatsapp"
                               {...field}
                               size="md"
                               onBlur={(event) => {
@@ -604,6 +695,51 @@ export const WorkersPage = (): JSX.Element => {
                   )}
                 />
               </div>
+
+              <div className="flex gap-2">
+                <FormField
+                  control={form.control}
+                  name="emergency_name"
+                  render={({ field }) => (
+                    <FormItem className="w-[40%]">
+                      <Label htmlFor="emergency_name" label="Nome do contato de emergência" isrequired />
+                      <FormControl>
+                        <Input id="emergency_name" placeholder="Insira o nome" {...field} size="md" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="emergency_number"
+                  render={({ field }) => (
+                    <FormItem className="w-[40%]">
+                      <Label htmlFor="emergency_number" label="Número do contato de emergência" isrequired />
+                      <FormControl>
+                        <Input
+                          id="emergency_number"
+                          placeholder="Insira o celular/whatsapp"
+                          {...field}
+                          size="md"
+                          onBlur={(event) => {
+                            if (event.target.value) {
+                              form.trigger('emergency_number')
+                            }
+                          }}
+                          onChange={(event) => {
+                            const phoneNumber = maskPhoneNumber(event.target.value)
+                            form.setValue('emergency_number', phoneNumber)
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               {/* <h4 className="text-2xl text-primary font-bold">Endereço</h4> */}
               <div className="flex gap-2">
                 <FormField

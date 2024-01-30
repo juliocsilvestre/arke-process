@@ -22,6 +22,16 @@ export const CreateWorkerSchema = z.object({
   ),
   role: z.string().min(2, { message: 'Cargo inválido.' }),
   status: z.nativeEnum(WORKER_STATUS),
+  issuing_agency: z.string(),
+  issuing_state: z.nativeEnum(UF_LIST),
+  issuing_date: z.string(),
+  emergency_name: z.string(),
+  emergency_number: z.string().refine(
+    (v) => {
+      return PHONE_REGEXP.test(v.toString())
+    },
+    { message: 'Celular inválido' },
+  ),
   company_id: z.string().uuid({ message: 'Empresa inválida.' }).min(1, { message: 'Empresa inválida.' }),
   street: z.string().min(2, { message: 'Rua deve conter pelo menos 2 caracteres.' }),
   complement: z.string(),
@@ -52,6 +62,11 @@ export const workerInitialValues: CreateWorkerBody = {
   company_id: '',
   role: '',
   status: 'active',
+  issuing_agency: '',
+  issuing_state: 'AC',
+  issuing_date: '',
+  emergency_name: '',
+  emergency_number: '',
   street: '',
   complement: '',
   cep: '',
@@ -68,13 +83,18 @@ export interface WorkerSheet {
   Cargo: string
   Cidade: string
   Complemento: string
-  'E-mail': string
-  'Nome completo': string
   Número: string
   RG: string
   Rua: string
-  'Telefone/Whatsapp': string
   UF: string
+  'E-mail': string
+  'Nome completo': string
+  'Orgão emissor': string
+  'Local de emissão': string
+  'Data de emissão': string
+  'Nome do contato de emergência': string
+  'Telefone celular do contato de emergência': string
+  'Telefone/Whatsapp': string
 }
 
 export interface Worker {
@@ -83,6 +103,11 @@ export interface Worker {
   cpf: string
   rg: string
   email: string
+  issuing_agency: string
+  issuing_state: string
+  issuing_date: Date
+  emergency_name: string
+  emergency_number: string
   phone_number: string
   picture_url: string
   status: string
@@ -105,6 +130,11 @@ export interface CreateWorkerRow {
   picture_url: string
   role: string
   status: string
+  issuing_agency: string
+  issuing_state: string
+  issuing_date: Date
+  emergency_name: string
+  emergency_number: string
   address: {
     street: string
     complement: string
@@ -127,6 +157,12 @@ export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
       picture_url: '',
       role: row.Cargo,
       status: WORKER_STATUS.active,
+      issuing_agency: row['Orgão emissor'],
+      issuing_state: row['Local de emissão'],
+      issuing_date: new Date(row['Data de emissão']),
+      emergency_name: row['Nome do contato de emergência'],
+      emergency_number: row['Telefone celular do contato de emergência'],
+
       address: {
         street: row.Rua,
         complement: row.Complemento,

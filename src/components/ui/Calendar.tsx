@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import * as React from 'react'
 import { DayPicker } from 'react-day-picker'
+import 'react-day-picker/dist/style.css';
 
 import { buttonVariants } from '@components/ui/Button'
 import { cn } from '@utils/styles'
@@ -17,10 +18,16 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         // today: 'today',
       }}
       classNames={{
+        caption_label: 'flex items-center text-sm font-medium',
+        dropdown: 'rdp-dropdown bg-card',
+        dropdown_icon: 'ml-2',
+        dropdown_year: 'rdp-dropdown_year ml-3',
+        button: '',
+        button_reset: '',
         months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
         month: 'space-y-4',
         caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium',
+        // caption_label: 'text-sm font-medium',
         nav: 'space-x-1 flex items-center',
         nav_button: cn(
           buttonVariants({ variant: 'outline' }),
@@ -39,7 +46,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ),
         day_range_end: 'day-range-end !bg-secondary-300 rounded-l-none text-white',
         day_selected:
-          'bg-primary-700 text-slate-50 hover:bg-slate-900 hover:text-slate-50 focus:bg-slate-900 focus:text-slate-50 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50 dark:hover:text-slate-900 dark:focus:bg-slate-50 dark:focus:text-slate-900',
+          'bg-primary-700 text-slate-50 hover:bg-slate-900 hover:text-slate-50 focus:bg-slate-900 focus:text-slate-50 dark:bg-slate-500 dark:text-slate-900 dark:hover:bg-slate-50 dark:hover:text-slate-900 dark:focus:bg-slate-50 dark:focus:text-slate-900',
         day_today: 'bg-secondary-300 text-primary dark:bg-slate-800 dark:text-slate-50',
         day_outside:
           'day-outside text-slate-500 opacity-50 aria-selected:bg-slate-100/50 aria-selected:text-slate-500 aria-selected:opacity-30 dark:text-slate-400 dark:aria-selected:bg-slate-800/50 dark:aria-selected:text-slate-400',
