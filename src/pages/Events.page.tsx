@@ -52,7 +52,10 @@ export const EventsPage = (): JSX.Element => {
 
   useDebounceSearch({ searchTerm: queryString, callback: filterByDebouncedSearchTerm })
 
-  const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/' }) as { q: string; page: string }
+  const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/' }) as {
+    q: string
+    page: string
+  }
   const options = indexEventsQueryOption(search)
   const { data: events } = useSuspenseQuery(options)
 
