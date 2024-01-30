@@ -51,3 +51,14 @@ export const useCreateWorkersBulk = () => {
 
   return { ...mutation }
 }
+
+
+export const useDeleteWorker = () => {
+  const mutation = useMutation({
+    mutationFn: (workerId: string) => {
+      return api.delete(`/workers/${workerId}`)
+    },
+  })
+
+  return { ...mutation }
+}
