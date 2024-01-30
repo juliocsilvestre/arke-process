@@ -228,12 +228,13 @@ export const WorkersPage = (): JSX.Element => {
                     const generatePdfDocument = async (qrCode: string) => {
                       const blob = await pdf(<BraceletPDF qrcode={qrCode} worker={worker} />).toBlob()
 
-                      // open in a new tab
                       const url = URL.createObjectURL(blob)
-                      const link = document.createElement('a')
-                      link.href = url
-                      link.target = '_blank'
-                      link.click()
+                      const iframe = document.createElement('iframe')
+                      iframe.src = url
+                      iframe.style.display = 'none'
+                      document.body.appendChild(iframe)
+                      iframe.contentWindow?.print()
+                      
                     }
 
                     const qrCode = await getQRCode(worker.id)

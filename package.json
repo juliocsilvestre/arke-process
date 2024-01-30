@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite",
+    "dev": "bun vite",
     "build": "tsc && vite build",
     "check": "bunx @biomejs/biome check --apply .",
     "lint": "bun biome lint . --apply-unsafe",
