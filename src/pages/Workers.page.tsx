@@ -26,13 +26,13 @@ import { pdf } from '@react-pdf/renderer'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
+import { parse, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
@@ -97,12 +97,10 @@ export const WorkersPage = (): JSX.Element => {
 
   const onCreateWorker = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
+      const date = parse(values.issuing_date, 'dd/MM/yyyy', new Date()).toISOString()
+      
       try {
-        await createWorker({
-          ...values,
-          issuing_date: new Date(values.issuing_date).toISOString(),
-          picture: picturePreview,
-        })
+        await createWorker({ ...values, issuing_date: date, picture: picturePreview })
         form.reset()
         handleOnClose()
         toast.success(
