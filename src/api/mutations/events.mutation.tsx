@@ -66,6 +66,19 @@ export const useDeleteEvent = () => {
   return { ...mutation }
 }
 
+export const useUpdateEvent = () => {
+  const mutation = useMutation({
+    mutationFn: (event: CreateEventBody & { id: string }) => {
+      return api.put(`/events/${event.id}`, event)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
+    },
+  })
+
+  return { ...mutation }
+}
+
 export const useReplaceWorkerOnEventDay = () => {
   const mutation = useMutation({
     mutationFn: (assignement: { event_id: string; event_day_id: string; worker_id: string; new_worker_id: string }) => {
