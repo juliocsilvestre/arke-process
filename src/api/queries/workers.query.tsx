@@ -81,6 +81,7 @@ export const getSingleWorkerQueryOptions = (id: string) =>
   queryOptions({
     queryKey: ['worker', 'single', id],
     queryFn: () => getSingleWorker(id),
+    enabled: !!id,
   })
 
 export const getSingleWorker = async (id: string) => {
