@@ -105,7 +105,7 @@ export interface Worker {
   email: string
   issuing_agency: string
   issuing_state: string
-  issuing_date: Date
+  issuing_date: string
   emergency_name: string
   emergency_number: string
   phone_number: string
@@ -132,7 +132,7 @@ export interface CreateWorkerRow {
   status: string
   issuing_agency: string
   issuing_state: string
-  issuing_date: Date
+  issuing_date: string
   emergency_name: string
   emergency_number: string
   address: {
@@ -159,7 +159,7 @@ export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
       status: WORKER_STATUS.active,
       issuing_agency: row['Orgão emissor'],
       issuing_state: row['Local de emissão'],
-      issuing_date: new Date(row['Data de emissão']),
+      issuing_date: new Date(row['Data de emissão']).toISOString(),
       emergency_name: row['Nome do contato de emergência'],
       emergency_number: row['Telefone celular do contato de emergência'],
 
