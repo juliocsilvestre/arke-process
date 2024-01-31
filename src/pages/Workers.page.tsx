@@ -272,7 +272,7 @@ export const WorkersPage = (): JSX.Element => {
         isOpen={isSpreadsheetManagerOpen}
         close={() => setIsSpreadsheetManagerOpen(false)}
       >
-        <div className="flex flex-col gap-2 p-4 h-[89%]">
+        <div className="flex flex-col gap-2 p-4 h-[calc(100svh_-_247px)]">
           <Label label="Fornecedor" isrequired />
           <Popover open={isBulkComboBoxOpen} onOpenChange={setIsBulkComboBoxOpen}>
             <PopoverTrigger asChild>
