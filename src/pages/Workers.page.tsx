@@ -933,7 +933,6 @@ const _DeleteEventButton = ({ worker }: { worker: Worker }) => {
         data-tooltip-content={`Apagar "${worker.full_name}"`}
         variant="destructive"
         size="icon"
-        onClick={(event) => {}}
       >
         <TrashIcon className="w-4 h-4" />
       </Button>
