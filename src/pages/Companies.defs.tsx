@@ -35,7 +35,7 @@ export interface Company {
   updated_at: string
 }
 
-const _DeleteCompanyButton = ({ company }: { company: Company }) => {
+export const DeleteCompanyButton = ({ company }: { company: Company }) => {
   const { mutateAsync: deleteCompany } = useDeleteCompany()
 
   const onDeleteCompany = async (company: Company): Promise<void> => {
@@ -98,17 +98,17 @@ export const companiesColumns: ColumnDef<Company>[] = [
       return formatDate(date)
     },
   },
-  {
-    header: 'Ações',
-    id: 'actions',
-    cell: ({ row }) => {
-      const company = row.original
+  // {
+  //   header: 'Ações',
+  //   id: 'actions',
+  //   cell: ({ row }) => {
+  //     const company = row.original
 
-      return (
-        <div className="flex justify-start">
-          <_DeleteCompanyButton company={company} />
-        </div>
-      )
-    },
-  },
+  //     return (
+  //       <div className="flex justify-start">
+  //         <DeleteCompanyButton company={company} />
+  //       </div>
+  //     )
+  //   },
+  // },
 ]
