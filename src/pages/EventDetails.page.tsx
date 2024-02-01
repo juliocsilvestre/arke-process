@@ -25,7 +25,9 @@ export const EventDetailsPage = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
   const [workerToReplace, setWorkerToReplace] = useState<Worker | null>(null)
-  const { day: eventDayId, id: eventId } = useParams({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' })
+  const { day: eventDayId, id: eventId } = useParams({
+    from: '/dashboard-layout/dashboard/eventos/$id/dias/$day',
+  })
   const search = useSearch({ from: '/dashboard-layout/dashboard/eventos/$id/dias/$day' }) as {
     q: string
     page: string
@@ -55,7 +57,12 @@ export const EventDetailsPage = () => {
   const startDate = event?.data.days?.[0].date
   const endDate = event?.data.days?.at?.(-1)?.date
 
-  const options = indexWorkersPerEventDayQueryOptions({ eventDayId, eventId, page: search.page, q: search.q })
+  const options = indexWorkersPerEventDayQueryOptions({
+    eventDayId,
+    eventId,
+    page: search.page,
+    q: search.q,
+  })
   const { data: workersData } = useSuspenseQuery(options)
 
   const workers = workersData?.data.workers.data
@@ -140,7 +147,7 @@ export const EventDetailsPage = () => {
                 data-tooltip-content={`Substituir "${worker.full_name}"`}
                 onClick={() => setWorkerToReplace(worker)}
               >
-                <ArrowsRightLeftIcon className="w-6" />
+                <ArrowsRightLeftIcon className="w-5" />
               </Button>
               <Tooltip id={`replace-worker-${worker.id}`} place="top" />
 
