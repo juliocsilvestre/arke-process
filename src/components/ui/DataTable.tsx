@@ -155,7 +155,10 @@ export const DataTable = <TData, TValue>({
           type="search"
           placeholder="Pesquisar"
           onChange={(e) => {
-            const filteredValue = checkIfStatusKeyword({ value: e.target.value.toLowerCase(), hasColumnStatus })
+            const filteredValue = checkIfStatusKeyword({
+              value: e.target.value.toLowerCase(),
+              hasColumnStatus,
+            })
             onQueryChange?.(filteredValue)
             setQuery(e.target.value)
           }}
@@ -192,7 +195,10 @@ export const DataTable = <TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   className={cn('even:bg-gray-100', onRowClick && 'cursor-pointer hover:bg-gray-200')}
-                  onClick={() => onRowClick?.(row.original)}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onRowClick?.(row.original)
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
