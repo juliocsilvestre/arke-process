@@ -1,6 +1,6 @@
 import { api } from '@/api/api'
 import { useCreateWorker, useCreateWorkersBulk, useDeleteWorker, useEditWorker } from '@/api/mutations/workers.mutation'
-import { useIndexCompanies } from '@/api/queries/companies.query'
+import { infiniteCompaniesQueryOptions, useIndexCompanies } from '@/api/queries/companies.query'
 import { indexWorkersQueryOptions, useGetAddresByCep, useSingleWorker } from '@/api/queries/workers.query'
 import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
@@ -23,16 +23,16 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { PaperClipIcon, PencilSquareIcon, PlusIcon, QrCodeIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { pdf } from '@react-pdf/renderer'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
+import { format, parse, parseISO } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
-import { parse, format, parseISO } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
@@ -65,6 +65,32 @@ export const WorkersPage = (): JSX.Element => {
   const [queryString, setQueryString] = useState('')
   const [tableQueryString, setTableQueryString] = useState('')
   const [workerToEdit, setWorkerToEdit] = useState<Worker | null>(null)
+  const [hasMoreData, setHasMoreData] = useState(false)
+  const [companiesPage, setCompaniesPage] = useState('1')
+  const [companies, setCompanies] = useState<Company[]>([])
+
+  const hasComboboxVisible = isOpen || isSpreadsheetManagerOpen
+
+  const { comboboxParameters } = useDebounceSearch({
+    searchTerm: queryString,
+    isComboboxOpen: hasComboboxVisible,
+  })
+
+  const {
+    data: pages,
+    fetchNextPage,
+    fetchPreviousPage,
+  } = useInfiniteQuery(
+    infiniteCompaniesQueryOptions(hasComboboxVisible, {
+      page: companiesPage,
+      q: comboboxParameters.debouncedSearchTerm,
+      limit: '20',
+    }),
+  )
+
+  useEffect(() => {
+    setCompaniesPage('1')
+  }, [comboboxParameters.debouncedSearchTerm])
 
   const form = useForm<CreateWorkerBody>({
     resolver: zodResolver(CreateWorkerSchema),
@@ -150,6 +176,56 @@ export const WorkersPage = (): JSX.Element => {
   }
 
   useEffect(() => {
+    if (!isOpen || !isSpreadsheetManagerOpen) {
+      setQueryString('')
+      setCompaniesPage('1')
+    }
+  }, [isOpen, isSpreadsheetManagerOpen])
+
+  useEffect(() => {
+    if (pages?.companies) {
+      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+      setCompanies([...pages?.companies])
+    }
+  }, [pages?.companies])
+
+  useEffect(() => {
+    if (pages?.currentPage < pages?.lastPage) {
+      setHasMoreData(pages?.nextPage !== null)
+    } else {
+      setHasMoreData(false)
+    }
+  }, [pages?.nextPage])
+
+  const isScrolledToBottom = (offsetHeight: number, scrollTop: number, scrollHeight: number) => {
+    return offsetHeight + scrollTop >= scrollHeight
+  }
+
+  const isScrolledToTop = (scrollTop: number) => {
+    return scrollTop <= 0
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const handleScroll = (target: any) => {
+    const { offsetHeight, scrollTop, scrollHeight } = target
+    if (pages?.nextPage && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
+      try {
+        fetchNextPage()
+        setCompaniesPage((page) => (parseInt(page) + 1).toString())
+      } catch (error) {
+        toast.error('Erro ao buscar fornecedores. Tente novamente.')
+      }
+    } else if (pages?.currentPage > 1 && isScrolledToTop(scrollTop)) {
+      try {
+        fetchPreviousPage()
+        setCompaniesPage((page) => (parseInt(page) - 1).toString())
+      } catch (error) {
+        toast.error('Erro ao buscar fornecedores. Tente novamente.')
+      }
+    }
+  }
+
+  useEffect(() => {
     if (picturePreview instanceof File) {
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -193,8 +269,6 @@ export const WorkersPage = (): JSX.Element => {
       reader.readAsArrayBuffer(file)
     }
   }
-
-  const { data: companies } = useIndexCompanies({ q: queryString, page: '1' })
 
   const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
     navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
@@ -339,7 +413,7 @@ export const WorkersPage = (): JSX.Element => {
                 )}
               >
                 {companyToBulkUpload
-                  ? companies?.data.companies.data.find((company: Company) => company.id === companyToBulkUpload)?.name
+                  ? companies.find((company: Company) => company.id === companyToBulkUpload)?.name
                   : 'Selecione um fornecedor'}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
@@ -353,9 +427,9 @@ export const WorkersPage = (): JSX.Element => {
                     setQueryString(s)
                   }}
                 />
-                <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
-                <CommandGroup>
-                  {companies?.data.companies.data.map((company: Company) => (
+                <CommandEmpty searchTarget="fornecedor">Fornecedor não encontrado.</CommandEmpty>
+                <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                  {companies.map((company: Company) => (
                     <CommandItem
                       value={company.name}
                       key={company.id}
@@ -693,8 +767,7 @@ export const WorkersPage = (): JSX.Element => {
                               )}
                             >
                               {field.value
-                                ? companies?.data.companies.data.find((company: Company) => company.id === field.value)
-                                    ?.name
+                                ? companies.find((company: Company) => company.id === field.value)?.name
                                 : 'Fornecedor'}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -702,10 +775,16 @@ export const WorkersPage = (): JSX.Element => {
                         </PopoverTrigger>
                         <PopoverContent className="w-[420px] p-0">
                           <Command className="w-full">
-                            <CommandInput placeholder="Fornecedor..." className="w-full" />
-                            <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
-                            <CommandGroup>
-                              {companies?.data.companies.data.map((company: Company) => (
+                            <CommandInput
+                              placeholder="Fornecedor..."
+                              className="w-full"
+                              onValueChange={(s) => {
+                                setQueryString(s)
+                              }}
+                            />
+                            <CommandEmpty searchTarget="fornecedor">Fornecedor não encontrado.</CommandEmpty>
+                            <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                              {companies.map((company: Company) => (
                                 <CommandItem
                                   value={company.name}
                                   key={company.id}
