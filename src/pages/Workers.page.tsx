@@ -1,7 +1,7 @@
 import { api } from '@/api/api'
-import { useCreateWorker, useCreateWorkersBulk, useDeleteWorker } from '@/api/mutations/workers.mutation'
+import { useCreateWorker, useCreateWorkersBulk, useDeleteWorker, useEditWorker } from '@/api/mutations/workers.mutation'
 import { useIndexCompanies } from '@/api/queries/companies.query'
-import { indexWorkersQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
+import { indexWorkersQueryOptions, useGetAddresByCep, useSingleWorker } from '@/api/queries/workers.query'
 import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
@@ -20,19 +20,19 @@ import { cn } from '@/utils/styles'
 import { Calendar } from '@components/ui/Calendar'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { PaperClipIcon, PlusIcon, QrCodeIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid'
+import { PaperClipIcon, PencilSquareIcon, PlusIcon, QrCodeIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { pdf } from '@react-pdf/renderer'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
-import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
+import { parse, format, parseISO } from 'date-fns'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
@@ -64,6 +64,7 @@ export const WorkersPage = (): JSX.Element => {
   const [isBulkComboBoxOpen, setIsBulkComboBoxOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
   const [tableQueryString, setTableQueryString] = useState('')
+  const [workerToEdit, setWorkerToEdit] = useState<Worker | null>(null)
 
   const form = useForm<CreateWorkerBody>({
     resolver: zodResolver(CreateWorkerSchema),
@@ -95,18 +96,29 @@ export const WorkersPage = (): JSX.Element => {
     }
   }, [workersToUpload, companyToBulkUpload, createWorkersBulk])
 
+  const { mutateAsync: updateWorker } = useEditWorker(workerToEdit?.id)
+
   const onCreateWorker = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
-        await createWorker({ ...values, issuing_date: new Date(values.issuing_date), picture: picturePreview })
-        form.reset()
+        const date = format(parse(values.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd')
+
+        if (workerToEdit) {
+          console.log({ issuing_date: date, d: values.issuing_date })
+          await updateWorker({ ...values, issuing_date: date })
+        } else {
+          await createWorker({ ...values, issuing_date: date })
+          form.reset()
+        }
+
         handleOnClose()
         toast.success(
           Array.isArray(values) && values.length > 0 ? (
             <p>{values.length} funcionários foram criados com sucesso!</p>
           ) : (
             <p>
-              O funcionário <strong>{values.full_name}</strong> foi criado com sucesso!
+              O funcionário <strong>{values.full_name}</strong> foi {workerToEdit ? 'atualizado' : 'criado'} com
+              sucesso!
             </p>
           ),
         )
@@ -126,13 +138,14 @@ export const WorkersPage = (): JSX.Element => {
         }
       }
     },
-    [picturePreview, form, createWorker],
+    [picturePreview, form, createWorker, workerToEdit, updateWorker],
   )
 
   const handleOnClose = () => {
     setIsOpen(false)
     setPicturePreview(null)
     setPreviewImageURL('')
+    setWorkerToEdit(null)
     form.reset()
   }
 
@@ -194,6 +207,36 @@ export const WorkersPage = (): JSX.Element => {
   const options = indexWorkersQueryOptions(search)
   const { data: workers } = useSuspenseQuery(options)
 
+  const { worker: workerData } = useSingleWorker(workerToEdit?.id ?? '')
+  const singleWorkerToEdit = workerData.data?.data
+
+  useEffect(() => {
+    if (singleWorkerToEdit) {
+      form.setValue('full_name', singleWorkerToEdit.full_name)
+      form.setValue('cpf', singleWorkerToEdit.cpf)
+      form.setValue('rg', singleWorkerToEdit.rg)
+      form.setValue('issuing_agency', singleWorkerToEdit.issuing_agency)
+      form.setValue('issuing_state', singleWorkerToEdit.issuing_state as keyof typeof UF_LIST)
+      form.setValue(
+        'issuing_date',
+        format(parse(singleWorkerToEdit.issuing_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy'),
+      )
+      form.setValue('email', singleWorkerToEdit.email)
+      form.setValue('phone_number', singleWorkerToEdit.phone_number)
+      form.setValue('company_id', singleWorkerToEdit.company_id)
+      form.setValue('role', singleWorkerToEdit.role)
+      form.setValue('emergency_name', singleWorkerToEdit.emergency_name)
+      form.setValue('emergency_number', singleWorkerToEdit.emergency_number)
+      form.setValue('cep', singleWorkerToEdit.address.cep)
+      form.setValue('street', singleWorkerToEdit.address.street)
+      form.setValue('number', singleWorkerToEdit.address.number)
+      form.setValue('neighborhood', singleWorkerToEdit.address.neighborhood)
+      form.setValue('complement', singleWorkerToEdit.address.complement)
+      form.setValue('city', singleWorkerToEdit.address.city)
+      form.setValue('uf', singleWorkerToEdit.address.uf)
+    }
+  }, [singleWorkerToEdit])
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
@@ -230,7 +273,6 @@ export const WorkersPage = (): JSX.Element => {
           actions={(worker: Worker) => {
             return (
               <div className="flex justify-start gap-2">
-                <_DeleteEventButton worker={worker} />
                 <Button
                   size="icon"
                   onClick={async (event) => {
@@ -260,6 +302,17 @@ export const WorkersPage = (): JSX.Element => {
                 >
                   <QrCodeIcon className="w-6 h-6" />
                 </Button>
+                <Button
+                  size="icon"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setWorkerToEdit(worker)
+                    setIsOpen(true)
+                  }}
+                >
+                  <PencilSquareIcon className="w-5" />
+                </Button>
+                <_DeleteEventButton worker={worker} />
               </div>
             )
           }}
@@ -272,7 +325,7 @@ export const WorkersPage = (): JSX.Element => {
         isOpen={isSpreadsheetManagerOpen}
         close={() => setIsSpreadsheetManagerOpen(false)}
       >
-        <div className="flex flex-col gap-2 p-4 h-[89%]">
+        <div className="flex flex-col gap-2 p-4 h-[calc(100svh_-_247px)]">
           <Label label="Fornecedor" isrequired />
           <Popover open={isBulkComboBoxOpen} onOpenChange={setIsBulkComboBoxOpen}>
             <PopoverTrigger asChild>
@@ -359,8 +412,8 @@ export const WorkersPage = (): JSX.Element => {
       </SlideOver>
 
       <SlideOver
-        title="Novo funcionário"
-        subtitle="Preencha os campos abaixo para criar um novo funcionário."
+        title={workerToEdit ? 'Editar funcionário' : 'Novo funcionário'}
+        subtitle={`Preencha os campos abaixo para ${workerToEdit ? 'editar o' : 'criar um novo'} funcionário.`}
         isOpen={isOpen}
         classNames="max-w-4xl"
         close={handleOnClose}
@@ -368,14 +421,12 @@ export const WorkersPage = (): JSX.Element => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onCreateWorker)} className="h-full flex flex-col gap-2 justify-between">
             <div className="px-5 py-6 flex flex-col">
-              {/* <h4 className="text-2xl text-primary font-bold">Dados pessoais</h4> */}
-
               <div className="flex flex-row gap-10">
                 <div className="flex flex-col items-center">
                   <div className="w-full !shrink-0">
-                    {previewImageURL ? (
+                    {previewImageURL || workerToEdit?.picture_url ? (
                       <img
-                        src={previewImageURL}
+                        src={previewImageURL || workerToEdit?.picture_url}
                         alt="Foto do funcionário"
                         className="mx-auto w-[200px] h-[200px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg !shrink-0"
                       />
@@ -398,7 +449,7 @@ export const WorkersPage = (): JSX.Element => {
                           <PaperClipIcon className="w-5 text-primary-700" />
                           <Label
                             htmlFor="picture"
-                            label={picturePreview ? 'Trocar foto' : 'Fazer upload de foto'}
+                            label={picturePreview ?? workerToEdit?.picture_url ? 'Trocar foto' : 'Fazer upload de foto'}
                             className="italic font-normal"
                           />
                         </div>
@@ -892,7 +943,7 @@ export const WorkersPage = (): JSX.Element => {
                   Cancelar
                 </Button>
                 <Button variant="default" type="submit">
-                  Criar funcionário
+                  {workerToEdit ? 'Salvar' : 'Criar funcionário'}
                 </Button>
               </div>
             </SlideOverFooter>
@@ -933,7 +984,6 @@ const _DeleteEventButton = ({ worker }: { worker: Worker }) => {
         data-tooltip-content={`Apagar "${worker.full_name}"`}
         variant="destructive"
         size="icon"
-        onClick={(event) => {}}
       >
         <TrashIcon className="w-4 h-4" />
       </Button>

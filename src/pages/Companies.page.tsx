@@ -1,13 +1,13 @@
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
-import { PlusIcon } from '@heroicons/react/24/solid'
+import { PencilSquareIcon, PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { useCreateCompany } from '@/api/mutations/companies.mutation'
+import { useCreateCompany, useUpdateCompany } from '@/api/mutations/companies.mutation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
@@ -19,13 +19,21 @@ import { indexCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { DataTable } from '@/components/ui/DataTable'
 import { checkError } from '@/utils/errors'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { CompanyBodyKeys, CreateCompanyBody, CreateCompanySchema, companiesColumns } from './Companies.defs'
+import {
+  Company,
+  CompanyBodyKeys,
+  CreateCompanyBody,
+  CreateCompanySchema,
+  DeleteCompanyButton,
+  companiesColumns,
+} from './Companies.defs'
 
 export const CompaniesPage = (): JSX.Element => {
   const { latestLocation, navigate } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
+  const [companyToEdit, setCompanyToEdit] = useState<Company | null>(null)
 
   const form = useForm<CreateCompanyBody>({
     resolver: zodResolver(CreateCompanySchema),
@@ -36,6 +44,7 @@ export const CompaniesPage = (): JSX.Element => {
   })
 
   const { mutateAsync: createCompany } = useCreateCompany()
+  const { mutateAsync: updateCompany } = useUpdateCompany()
 
   const filterByDebouncedSearchTerm = (debouncedSearchTerm: string) => {
     navigate({ params: '', search: (prev) => ({ ...prev, q: debouncedSearchTerm }) })
@@ -48,37 +57,53 @@ export const CompaniesPage = (): JSX.Element => {
   const options = indexCompaniesQueryOptions(search)
   const { data: companies } = useSuspenseQuery(options)
 
-  const onCreateCompany = async (values: CreateCompanyBody): Promise<void> => {
-    try {
-      await createCompany(values)
-      form.reset()
-      handleOnClose()
-      toast.success(
-        <p>
-          O fornecedor <strong>{values.name}</strong> foi criado com sucesso!
-        </p>,
-      )
-    } catch (error: unknown) {
-      const errors = checkError<CompanyBodyKeys>(error)
-      if (Array.isArray(errors) && errors.length > 0) {
-        for (const e of errors) {
-          form.setError(e.field, { message: e.message })
-          toast.error(
-            <p>
-              Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
-            </p>,
-          )
+  const onCreateCompany = useCallback(
+    async (values: CreateCompanyBody): Promise<void> => {
+      try {
+        if (companyToEdit) {
+          await updateCompany({ ...values, id: companyToEdit.id })
+        } else {
+          await createCompany(values)
         }
-      } else if (typeof errors === 'string') {
-        toast.error(errors)
+
+        form.reset()
+        handleOnClose()
+        toast.success(
+          <p>
+            O fornecedor <strong>{values.name}</strong> foi {companyToEdit ? 'atualizado' : 'criado'} com sucesso!
+          </p>,
+        )
+      } catch (error: unknown) {
+        const errors = checkError<CompanyBodyKeys>(error)
+        if (Array.isArray(errors) && errors.length > 0) {
+          for (const e of errors) {
+            form.setError(e.field, { message: e.message })
+            toast.error(
+              <p>
+                Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
+              </p>,
+            )
+          }
+        } else if (typeof errors === 'string') {
+          toast.error(errors)
+        }
       }
-    }
-  }
+    },
+    [companyToEdit],
+  )
 
   const handleOnClose = () => {
-    setIsOpen(false)
     form.reset()
+    setCompanyToEdit(null)
+    setIsOpen(false)
   }
+
+  useEffect(() => {
+    if (companyToEdit) {
+      form.setValue('name', companyToEdit.name)
+      form.setValue('cnpj', companyToEdit.cnpj)
+    }
+  }, [companyToEdit])
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
@@ -101,12 +126,28 @@ export const CompaniesPage = (): JSX.Element => {
           onQueryChange={(query) => setQueryString(query)}
           pages={companies?.data.companies.meta.last_page ?? 1}
           currentPage={companies?.data.companies.meta.current_page ?? 1}
+          actions={(company) => {
+            return (
+              <div className="flex gap-2">
+                <Button
+                  size="icon"
+                  onClick={() => {
+                    setCompanyToEdit(company)
+                    setIsOpen(true)
+                  }}
+                >
+                  <PencilSquareIcon className="w-5" />
+                </Button>
+                <DeleteCompanyButton company={company} />
+              </div>
+            )
+          }}
         />
       </section>
 
       <SlideOver
-        title="Novo fornecedor"
-        subtitle="Preencha os campos abaixo para criar um novo fornecedor."
+        title={companyToEdit ? 'Editar fornecedor' : 'Novo fornecedor'}
+        subtitle={`Preencha os campos abaixo para ${companyToEdit ? 'editar o' : 'criar um novo'} fornecedor.`}
         isOpen={isOpen}
         close={handleOnClose}
       >
@@ -162,7 +203,7 @@ export const CompaniesPage = (): JSX.Element => {
                   Cancelar
                 </Button>
                 <Button variant="default" type="submit">
-                  Criar fornecedor
+                  {companyToEdit ? 'Salvar' : 'Criar fornecedor'}
                 </Button>
               </div>
             </SlideOverFooter>

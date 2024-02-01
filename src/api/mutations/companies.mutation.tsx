@@ -28,3 +28,16 @@ export const useDeleteCompany = () => {
 
   return { ...mutation }
 }
+
+export const useUpdateCompany = () => {
+  const mutation = useMutation({
+    mutationFn: (company: { id:string; name: string; cnpj: string }) => {
+      return api.put(`/companies/${company.id}`, { name: company.name, cnpj: company.cnpj })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexCompaniesQueryOptions({ page: '1', q: '' }))
+    },
+  })
+
+  return { ...mutation }
+}

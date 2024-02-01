@@ -1,16 +1,16 @@
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
-import { PlusIcon } from '@heroicons/react/24/solid'
+import { PencilSquareIcon, PlusIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
-import { useCreateEvent } from '@/api/mutations/events.mutation'
+import { useCreateEvent, useUpdateEvent } from '@/api/mutations/events.mutation'
 import { Button } from '@components/ui/Button'
 import { Calendar } from '@components/ui/Calendar'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
@@ -25,13 +25,14 @@ import { indexEventsQueryOption } from '@/api/queries/events.query'
 import { DataTable } from '@/components/ui/DataTable'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import _ from 'lodash'
-import { CreateEventBody, CreateEventSchema, EventDay, eventsColumns } from './Events.defs'
+import { CreateEventBody, CreateEventSchema, EventDay, eventsColumns, DeleteEventButton, Event } from './Events.defs'
 
 export const EventsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
 
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
+  const [eventToEdit, setEventToEdit] = useState<Event | null>(null)
 
   const form = useForm<CreateEventBody>({
     resolver: zodResolver(CreateEventSchema),
@@ -60,15 +61,20 @@ export const EventsPage = (): JSX.Element => {
   const { data: events } = useSuspenseQuery(options)
 
   const navigate = useNavigate()
+  const { mutateAsync: doUpdateEvent } = useUpdateEvent()
 
   const onCreateEvent = async (values: CreateEventBody): Promise<void> => {
     try {
-      await createEvent(values)
+      if (eventToEdit) {
+        await doUpdateEvent({ ...values, id: eventToEdit.id })
+      } else {
+        await createEvent(values)
+      }
       form.reset()
       handleOnClose()
       toast.success(
         <p>
-          O evento <strong>{values.name}</strong> foi criado com sucesso!
+          O evento <strong>{values.name}</strong> foi {eventToEdit ? 'atualizado' : 'criado'} com sucesso!
         </p>,
       )
     } catch (error: unknown) {
@@ -92,6 +98,16 @@ export const EventsPage = (): JSX.Element => {
     form.reset()
   }
   const disabledDays = [{ before: new Date() }]
+
+  useEffect(() => {
+    if (eventToEdit) {
+      form.setValue('name', eventToEdit.name)
+      form.setValue('dates', {
+        from: new Date(eventToEdit.start_date),
+        to: new Date(eventToEdit.finish_date),
+      })
+    }
+  }, [eventToEdit])
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
@@ -122,12 +138,29 @@ export const EventsPage = (): JSX.Element => {
               search: { page: '1', q: '' },
             })
           }}
+          actions={(e) => {
+            return (
+              <div className="flex justify-start gap-2">
+                <Button
+                  size="icon"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setEventToEdit(e)
+                    setIsOpen(true)
+                  }}
+                >
+                  <PencilSquareIcon className="w-5" />
+                </Button>
+                <DeleteEventButton event={e} />
+              </div>
+            )
+          }}
         />
       </section>
 
       <SlideOver
-        title="Novo evento"
-        subtitle="Preencha os campos abaixo para criar um novo evento."
+        title={eventToEdit ? 'Editar evento' : 'Novo evento'}
+        subtitle={`Preencha os campos abaixo para ${eventToEdit ? 'editar o' : 'criar um novo'} evento.`}
         isOpen={isOpen}
         close={handleOnClose}
       >
@@ -148,53 +181,55 @@ export const EventsPage = (): JSX.Element => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="dates"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label htmlFor="dates" label="Dias do evento" isrequired />
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          id="date"
-                          variant="outline"
-                          className={cn(
-                            'w-[300px] justify-start text-left font-normal !border-slate-200 text-gray-600 hover:bg-white hover:text-gray-600 focus-visible:!border-primary-700',
-                            !field.value?.from && !field.value?.to && '!opacity-50',
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value?.from ? (
-                            field.value.to ? (
-                              <>
-                                {format(field.value.from, 'LLL dd, y')} - {format(field.value.to, 'LLL dd, y')}
-                              </>
+              {!eventToEdit && (
+                <FormField
+                  control={form.control}
+                  name="dates"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label htmlFor="dates" label="Dias do evento" isrequired />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            id="date"
+                            variant="outline"
+                            className={cn(
+                              'w-[300px] justify-start text-left font-normal !border-slate-200 text-gray-600 hover:bg-white hover:text-gray-600 focus-visible:!border-primary-700',
+                              !field.value?.from && !field.value?.to && '!opacity-50',
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value?.from ? (
+                              field.value.to ? (
+                                <>
+                                  {format(field.value.from, 'LLL dd, y')} - {format(field.value.to, 'LLL dd, y')}
+                                </>
+                              ) : (
+                                format(field.value.from, 'LLL dd, y')
+                              )
                             ) : (
-                              format(field.value.from, 'LLL dd, y')
-                            )
-                          ) : (
-                            <span>Escolha uma data</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 " align="start">
-                        <Calendar
-                          locale={ptBR}
-                          initialFocus
-                          mode="range"
-                          defaultMonth={field.value?.from}
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          numberOfMonths={1}
-                          disabled={disabledDays}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                              <span>Escolha uma data</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 " align="start">
+                          <Calendar
+                            locale={ptBR}
+                            initialFocus
+                            mode="range"
+                            defaultMonth={field.value?.from}
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            numberOfMonths={1}
+                            disabled={disabledDays}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <SlideOverFooter>
@@ -203,7 +238,7 @@ export const EventsPage = (): JSX.Element => {
                   Cancelar
                 </Button>
                 <Button variant="default" type="submit">
-                  Criar evento
+                  {eventToEdit ? 'Salvar' : 'Criar evento'}
                 </Button>
               </div>
             </SlideOverFooter>

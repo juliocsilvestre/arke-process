@@ -1,7 +1,8 @@
-import { EditWorkerBody } from '@/pages/WorkerDetails.defs'
 import { CreateWorkerBody, CreateWorkerRow } from '@/pages/Workers.defs'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
+import { queryClient } from '@/routes'
+import { indexWorkersQueryOptions } from '../queries/workers.query'
 
 export const useCreateWorker = () => {
   const mutation = useMutation({
@@ -22,9 +23,9 @@ export const useCreateWorker = () => {
 
   return { ...mutation }
 }
-export const useEditWorker = (workerId: string) => {
+export const useEditWorker = (workerId?: string) => {
   const mutation = useMutation({
-    mutationFn: (worker: EditWorkerBody) => {
+    mutationFn: (worker: CreateWorkerBody) => {
       const formData = new FormData()
 
       for (const [key, value] of Object.entries(worker)) {
@@ -56,6 +57,9 @@ export const useDeleteWorker = () => {
   const mutation = useMutation({
     mutationFn: (workerId: string) => {
       return api.delete(`/workers/${workerId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexWorkersQueryOptions({ page: '1', q: '' }))
     },
   })
 

@@ -43,7 +43,7 @@ export interface Event {
   deleted_at: Date
 }
 
-const _DeleteEventButton = ({ event }: { event: Event }) => {
+export const DeleteEventButton = ({ event }: { event: Event }) => {
   const { mutateAsync: deleteEvent } = useDeleteEvent()
 
   const onDeleteEvent = async (event: Event): Promise<void> => {
@@ -120,18 +120,5 @@ export const eventsColumns: ColumnDef<Event>[] = [
       const date = new Date(row.getValue('updated_at'))
       return formatDate(date)
     },
-  },
-  {
-    header: 'Ações',
-    id: 'actions',
-    cell: ({ row }) => {
-      const event = row.original
-
-      return (
-        <div className="flex justify-start">
-          <_DeleteEventButton event={event} />
-        </div>
-      )
-    },
-  },
+  }
 ]
