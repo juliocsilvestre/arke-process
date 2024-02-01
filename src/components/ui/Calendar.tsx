@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import * as React from 'react'
 import { DayPicker } from 'react-day-picker'
-import 'react-day-picker/dist/style.css';
+import 'react-day-picker/dist/style.css'
 
 import { buttonVariants } from '@components/ui/Button'
 import { cn } from '@utils/styles'

@@ -31,7 +31,7 @@ export const useDeleteCompany = () => {
 
 export const useUpdateCompany = () => {
   const mutation = useMutation({
-    mutationFn: (company: { id:string; name: string; cnpj: string }) => {
+    mutationFn: (company: { id: string; name: string; cnpj: string }) => {
       return api.put(`/companies/${company.id}`, { name: company.name, cnpj: company.cnpj })
     },
     onSuccess: () => {
