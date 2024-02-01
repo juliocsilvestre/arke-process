@@ -117,6 +117,8 @@ export const AttachWorkerToEventDaySlideover = ({
   useEffect(() => {
     if (pages?.currentPage < pages?.lastPage) {
       setHasMoreData(pages?.nextPage !== null)
+    } else {
+      setHasMoreData(false)
     }
   }, [pages?.nextPage])
 
@@ -137,15 +139,15 @@ export const AttachWorkerToEventDaySlideover = ({
     const { offsetHeight, scrollTop, scrollHeight } = target
     if (hasMoreData && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
       try {
-        setWorkersPage((page) => String(Number(page) + 1))
         fetchNextPage()
+        setWorkersPage((page) => String(Number(page) + 1))
       } catch (error) {
         toast.error('Erro ao buscar funcionários. Tente novamente.')
       }
-    } else if (isScrolledToTop(scrollTop)) {
+    } else if (pages?.currentPage > 1 && isScrolledToTop(scrollTop)) {
       try {
-        setWorkersPage((page) => (Number(page) > 1 ? String(Number(page) - 1) : '1'))
         fetchPreviousPage()
+        setWorkersPage((page) => (Number(page) > 1 ? String(Number(page) - 1) : '1'))
       } catch (error) {
         toast.error('Erro ao buscar funcionários. Tente novamente.')
       }

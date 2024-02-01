@@ -120,5 +120,5 @@ export const eventsColumns: ColumnDef<Event>[] = [
       const date = new Date(row.getValue('updated_at'))
       return formatDate(date)
     },
-  }
+  },
 ]

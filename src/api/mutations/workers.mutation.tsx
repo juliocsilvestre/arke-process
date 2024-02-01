@@ -1,7 +1,7 @@
 import { CreateWorkerBody, CreateWorkerRow } from '@/pages/Workers.defs'
+import { queryClient } from '@/routes'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
-import { queryClient } from '@/routes'
 import { indexWorkersQueryOptions } from '../queries/workers.query'
 
 export const useCreateWorker = () => {

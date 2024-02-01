@@ -36,7 +36,7 @@ export const getWorkers = async (pagination?: Pagination) => {
 
 export const infiniteWorkersQueryOptions = (isComboboxOpen: boolean, pagination?: Pagination) => {
   return infiniteQueryOptions({
-    queryKey: ['infinite', pagination],
+    queryKey: ['infinite-workers', pagination],
     queryFn: async () => await getWorkers(pagination),
     initialPageParam: 1,
     enabled: isComboboxOpen,
@@ -62,8 +62,8 @@ export const infiniteWorkersQueryOptions = (isComboboxOpen: boolean, pagination?
   })
 }
 
-export const useInfiniteWorkers = (pagination?: Pagination) => {
-  return useInfiniteQuery(infiniteWorkersQueryOptions(pagination))
+export const useInfiniteWorkers = (isComboboxOpen: boolean, pagination?: Pagination) => {
+  return useInfiniteQuery(infiniteWorkersQueryOptions(isComboboxOpen, pagination))
 }
 
 export const indexWorkersQueryOptions = (pagination?: Pagination) =>
