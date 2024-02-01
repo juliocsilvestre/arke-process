@@ -17,6 +17,7 @@ import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/util
 import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskDate, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
+import { Calendar } from '@components/ui/Calendar'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
 import { PaperClipIcon, PlusIcon, QrCodeIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid'
@@ -25,13 +26,13 @@ import { pdf } from '@react-pdf/renderer'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
-import { Calendar } from '@components/ui/Calendar'
-import { format } from 'date-fns'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
@@ -45,7 +46,6 @@ import {
   workersColumns,
   workersSheetMapper,
 } from './Workers.defs'
-import { ptBR } from 'date-fns/locale'
 
 export type UploadFileProps = {
   e?: ChangeEvent<HTMLInputElement>
