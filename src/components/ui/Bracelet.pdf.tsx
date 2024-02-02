@@ -1,5 +1,6 @@
 import { Worker } from '@/pages/Workers.defs'
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import LadeiraLogo from '../../assets/ladeira.png'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -19,8 +20,12 @@ export const BraceletPDF = ({ qrcode, worker }: { qrcode: string; worker: Worker
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
+        <View>
+          <Image style={{ width: 69 }} src={LadeiraLogo} />
+        </View>
         <View style={{ marginLeft: 20 }}>
           <Image style={{ width: 69, height: 69 }} src={`data:image/png;base64, ${qrcode}`} />
         </View>
@@ -30,6 +35,9 @@ export const BraceletPDF = ({ qrcode, worker }: { qrcode: string; worker: Worker
           </Text>
           <Text style={{ fontSize: 14 }}>{worker.role}</Text>
           <Text style={{ fontSize: 14 }}>{worker.company?.name}</Text>
+        </View>
+        <View style={{ marginLeft: 20 }}>
+          <Image style={{ width: 69 }} src={LadeiraLogo} />
         </View>
       </View>
     </Page>
