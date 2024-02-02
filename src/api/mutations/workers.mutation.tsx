@@ -19,6 +19,9 @@ export const useCreateWorker = () => {
         },
       })
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexWorkersQueryOptions({ page: '1', q: '' }))
+    },
   })
 
   return { ...mutation }
@@ -38,6 +41,9 @@ export const useEditWorker = (workerId?: string) => {
         },
       })
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexWorkersQueryOptions({ page: '1', q: '' }))
+    },
   })
 
   return { ...mutation }
@@ -47,6 +53,9 @@ export const useCreateWorkersBulk = () => {
   const mutation = useMutation({
     mutationFn: (workers: { workers: CreateWorkerRow[]; company_id: string }) => {
       return api.post('/workers/bulk', workers)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexWorkersQueryOptions({ page: '1', q: '' }))
     },
   })
 

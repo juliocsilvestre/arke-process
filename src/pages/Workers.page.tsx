@@ -254,15 +254,23 @@ export const WorkersPage = (): JSX.Element => {
       reader.onload = (e) => {
         const data = e?.target?.result
 
-        const workbook = xlsx.read(data, { type: 'array' })
+        const workbook = xlsx.read(data, {
+          type: 'array',
+          cellDates: true,
+          dateNF: 'DD/MM/YYYY',
+          cellNF: false,
+          cellText: true,
+          raw: true,
+        })
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
-        const json = xlsx.utils.sheet_to_json(worksheet)
+
+        const json = xlsx.utils.sheet_to_json(worksheet, { raw: true, dateNF: 'DD/MM/YYYY' })
         const serializedJson = workersSheetMapper(json as WorkerSheet[])
         const workersWithParsedIssuingDate = serializedJson.map((worker) => {
           return {
             ...worker,
-            issuing_date: format(parse(worker.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd'),
+            issuing_date: format(worker.issuing_date, 'yyyy-MM-dd'),
           }
         })
 

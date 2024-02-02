@@ -148,6 +148,7 @@ export interface CreateWorkerRow {
 
 export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
   return sheet.map((row) => {
+    console.log(row['Data de emissão'])
     return {
       full_name: row['Nome completo'],
       cpf: row.CPF,
@@ -159,7 +160,7 @@ export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
       status: WORKER_STATUS.active,
       issuing_agency: row['Orgão emissor'],
       issuing_state: row['Local de emissão'],
-      issuing_date: new Date(row['Data de emissão']).toISOString(),
+      issuing_date: row['Data de emissão'],
       emergency_name: row['Nome do contato de emergência'],
       emergency_number: row['Telefone celular do contato de emergência'],
 
