@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun vite",
     "build": "tsc && vite build",
-    "check": "bunx @biomejs/biome check --apply .",
+    "check": "bunx @biomejs/biome check --apply ./src",
     "lint": "bun biome lint . --apply-unsafe",
     "preview": "vite preview",
     "prepare": "bunx husky install",

@@ -100,9 +100,7 @@ export const WorkersPage = (): JSX.Element => {
 
   const onCreateWorkersBulk = useCallback(async () => {
     try {
-      const date = format(parse(values.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd')
-
-      await createWorkersBulk({ workers: workersToUpload, issuing_date: date, company_id: companyToBulkUpload })
+      await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
       handleOnClose()
       toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
     } catch (error: unknown) {
@@ -261,8 +259,14 @@ export const WorkersPage = (): JSX.Element => {
         const worksheet = workbook.Sheets[sheetName]
         const json = xlsx.utils.sheet_to_json(worksheet)
         const serializedJson = workersSheetMapper(json as WorkerSheet[])
+        const workersWithParsedIssuingDate = serializedJson.map((worker) => {
+          return {
+            ...worker,
+            issuing_date: format(parse(worker.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd'),
+          }
+        })
 
-        setWorkersToUpload(serializedJson)
+        setWorkersToUpload(workersWithParsedIssuingDate)
       }
 
       reader.readAsArrayBuffer(file)

@@ -61,7 +61,7 @@ export interface WorkerDetails {
   company_id: string | undefined
   admin_id: string | undefined
   issuing_agency: string | undefined
-  issuing_state:  UF
+  issuing_state: UF
   issuing_date: string | undefined
   emergency_name: string | undefined
   emergency_number: string | undefined
