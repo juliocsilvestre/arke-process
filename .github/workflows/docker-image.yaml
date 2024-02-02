@@ -1,9 +1,10 @@
 name: Publish Docker image
 
 on:
+  dispatch_workflow:
   push:
     branches:
-      - "releases/**"
+      - "release"
 
 jobs:
   push_to_registry:
