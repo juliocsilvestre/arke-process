@@ -1,6 +1,6 @@
 import { api } from '@/api/api'
 import { useCreateWorker, useCreateWorkersBulk, useDeleteWorker, useEditWorker } from '@/api/mutations/workers.mutation'
-import { infiniteCompaniesQueryOptions, useIndexCompanies } from '@/api/queries/companies.query'
+import { infiniteCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { indexWorkersQueryOptions, useGetAddresByCep, useSingleWorker } from '@/api/queries/workers.query'
 import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
@@ -17,7 +17,6 @@ import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, NAVIGATION, UF_LIST } from '@/util
 import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskDate, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
-import { Calendar } from '@components/ui/Calendar'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@components/ui/Form'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
 import { PaperClipIcon, PencilSquareIcon, PlusIcon, QrCodeIcon, TrashIcon, UserIcon } from '@heroicons/react/24/solid'
@@ -26,9 +25,8 @@ import { pdf } from '@react-pdf/renderer'
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useRouter, useSearch } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
-import { format, parse, parseISO } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
+import { format, parse } from 'date-fns'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
@@ -65,7 +63,7 @@ export const WorkersPage = (): JSX.Element => {
   const [queryString, setQueryString] = useState('')
   const [tableQueryString, setTableQueryString] = useState('')
   const [workerToEdit, setWorkerToEdit] = useState<Worker | null>(null)
-  const [hasMoreData, setHasMoreData] = useState(false)
+  const [, setHasMoreData] = useState(false)
   const [companiesPage, setCompaniesPage] = useState('1')
   const [companies, setCompanies] = useState<Company[]>([])
 

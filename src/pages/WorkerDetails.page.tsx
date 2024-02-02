@@ -51,7 +51,10 @@ export const WorkerDetailsPage = () => {
   const onEditWorker = useCallback(
     async (values: EditWorkerBody): Promise<void> => {
       try {
-        await editWorker({ ...values, picture: picturePreview })
+        await editWorker({
+          ...values,
+          picture: picturePreview,
+        })
         form.reset()
         handleOnClose()
         toast.success(

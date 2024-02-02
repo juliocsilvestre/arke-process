@@ -31,6 +31,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          build-args: 
+            host_ip=${{ env.HOST_IP }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -19,9 +19,9 @@ export const ClockPage = (): JSX.Element => {
     clockInputRef.current?.focus()
   })
 
-  const { event } = useSingleEvent(id)
+  const { data: eventData } = useSingleEvent(id)
 
-  const dayNumber = event.data?.data.days.findIndex((d: EventDay) => d.id === day) + 1 ?? 0
+  const dayNumber = eventData?.data.days.findIndex((d: EventDay) => d.id === day) + 1
 
   const { mutateAsync: clockWorker } = useClockWorkerOnEventDay()
 
@@ -88,7 +88,7 @@ export const ClockPage = (): JSX.Element => {
 
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
         <h1 className="text-4xl text-primary font-bold">
-          Registro de presença - {event.data?.data.name} - Dia {!Number.isNaN(dayNumber) && dayNumber}
+          Registro de presença - {eventData?.data.name} - Dia {!Number.isNaN(dayNumber) && dayNumber}
         </h1>
       </div>
 

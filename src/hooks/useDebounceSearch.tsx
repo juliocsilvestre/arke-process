@@ -40,7 +40,6 @@ interface useDebouncedSearchTermProps {
 const comboboxDebouncedSearchTerm = ({
   debouncedSearchTerm,
   delay = 500,
-  isLoadFinished = false,
 }: comboboxDebouncedSearchTermParams): string => {
   const debouncedSearchTermPromise = () =>
     new Promise((resolve) => setTimeout(() => resolve({ id: 'debounce', debouncedSearchTerm }), delay))
@@ -51,9 +50,6 @@ const comboboxDebouncedSearchTerm = ({
     error: 'Erro ao buscar. Tente novamente. 🤯',
     duration: delay,
     position: 'bottom-right',
-    onAutoClose: () => {
-      isLoadFinished = true
-    },
   })
 
   clearTimeout('debounce')
@@ -65,7 +61,6 @@ const runCallbackWithDebouncedSearchTerm = ({
   debouncedSearchTerm,
   callback,
   delay = 400,
-  isLoadFinished = false,
 }: runCallbackWithDebouncedSearchTermParams): void => {
   const callbackPromise = () =>
     new Promise((resolve) => setTimeout(() => resolve(callback(debouncedSearchTerm)), delay))
@@ -76,9 +71,6 @@ const runCallbackWithDebouncedSearchTerm = ({
     error: 'Erro ao buscar. Tente novamente. 🤯',
     duration: delay,
     dismissible: true,
-    onAutoClose: () => {
-      isLoadFinished = true
-    },
   })
 }
 
