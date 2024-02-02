@@ -11,6 +11,6 @@ export const DashboardLayout = () => (
         </div>
       </div>
     </Sidebar>
-    <TanStackRouterDevtools position="bottom-right" />
+    {process.env.NODE_ENV !== 'production' && <TanStackRouterDevtools position="bottom-right" />}
   </main>
 )

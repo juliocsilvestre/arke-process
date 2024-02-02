@@ -19,7 +19,9 @@ if (!rootElement.innerHTML) {
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <Toaster richColors theme="light" position="bottom-center" expand />
-      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+      {process.env.NODE_ENV !== 'production' && (
+        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+      )}
     </QueryClientProvider>,
   )
 }

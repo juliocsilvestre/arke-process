@@ -10,7 +10,7 @@ export const PublicLayout = (): JSX.Element => {
         <h1>Public</h1>
       </aside>
       <Outlet />
-      <TanStackRouterDevtools position="bottom-right" />
+      {process.env.NODE_ENV !== 'production' && <TanStackRouterDevtools position="bottom-right" />}
       <Footer />
     </main>
   )
