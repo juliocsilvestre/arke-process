@@ -100,7 +100,9 @@ export const WorkersPage = (): JSX.Element => {
 
   const onCreateWorkersBulk = useCallback(async () => {
     try {
-      await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
+      const date = format(parse(values.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd')
+
+      await createWorkersBulk({ workers: workersToUpload, issuing_date: date, company_id: companyToBulkUpload })
       handleOnClose()
       toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
     } catch (error: unknown) {
@@ -128,7 +130,6 @@ export const WorkersPage = (): JSX.Element => {
         const date = format(parse(values.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd')
 
         if (workerToEdit) {
-          console.log({ issuing_date: date, d: values.issuing_date })
           await updateWorker({ ...values, issuing_date: date })
         } else {
           await createWorker({ ...values, issuing_date: date })
