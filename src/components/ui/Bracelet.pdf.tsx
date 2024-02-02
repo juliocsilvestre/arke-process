@@ -1,10 +1,11 @@
 import { Worker } from '@/pages/Workers.defs'
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import LadeiraLogo from '../../assets/ladeira.png'
+import staff from '../../assets/staff.png'
 
 // Create styles
 const styles = StyleSheet.create({
-  page: { backgroundColor: 'transparent', display: 'flex', alignItems: 'flex-start', paddingLeft: 80 },
+  page: { backgroundColor: 'transparent', display: 'flex', alignItems: 'flex-start', paddingLeft: 30 },
   section: {
     fontSize: 18,
     marginTop: 5,
@@ -23,8 +24,9 @@ export const BraceletPDF = ({ qrcode, worker }: { qrcode: string; worker: Worker
           alignItems: 'center',
         }}
       >
-        <View>
-          <Image style={{ width: 69 }} src={LadeiraLogo} />
+        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <Image style={{ width: 69 }} src={staff} />
+          <Image style={{ width: 69, marginLeft: 10 }} src={LadeiraLogo} />
         </View>
         <View style={{ marginLeft: 20 }}>
           <Image style={{ width: 69, height: 69 }} src={`data:image/png;base64, ${qrcode}`} />
