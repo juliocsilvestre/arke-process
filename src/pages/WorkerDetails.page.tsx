@@ -1,5 +1,5 @@
 import { useEditWorker } from '@/api/mutations/workers.mutation'
-import { infiniteCompaniesQueryOptions, useIndexCompanies } from '@/api/queries/companies.query'
+import { infiniteCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { getSingleWorkerQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
@@ -35,7 +35,7 @@ export const WorkerDetailsPage = () => {
   const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
   const [companiesPage, setCompaniesPage] = useState('1')
-  const [hasMoreData, setHasMoreData] = useState(false)
+  const [, setHasMoreData] = useState(false)
   const [companies, setCompanies] = useState<Company[]>([])
 
   const workerId = useParams({

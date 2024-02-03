@@ -113,7 +113,7 @@ export const WorkersPage = (): JSX.Element => {
         for (const e of errors) {
           toast.error(
             <p>
-              Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
+              Alguma coisa deu errado com o campo <strong>{String(e.field)}</strong>: <strong>{e.message}</strong>
             </p>,
           )
         }
