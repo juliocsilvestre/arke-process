@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/Badge'
 import { CEP_REGEXP, CPF_REGEXP, PHONE_REGEXP, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { ColumnDef } from '@tanstack/react-table'
+import { format } from 'date-fns'
 import { z } from 'zod'
 import { Company } from './Companies.defs'
 
@@ -49,8 +50,29 @@ export const CreateWorkerSchema = z.object({
   ),
   neighborhood: z.string().min(2, { message: 'Bairro inválido.' }),
 })
+
+export const CreateWorkerSchemaWithOptionalFields = z.object({
+  ...CreateWorkerSchema.shape,
+  cpf: z
+    .string()
+    .refine(
+      (v) => {
+        return CPF_REGEXP.test(v.toString())
+      },
+      { message: 'CPF inválido' },
+    )
+    .optional(),
+  rg: z.string().optional(),
+  email: z.union([z.string().email({ message: 'Email inválido.' }), z.literal('')]).optional(),
+  issuing_agency: z.string().optional(),
+  issuing_state: z.nativeEnum(UF_LIST).optional(),
+  issuing_date: z.string().optional(),
+})
+
 export type CreateWorkerBody = z.infer<typeof CreateWorkerSchema>
 export type WorkerBodyKeys = keyof CreateWorkerBody
+
+export type BulkWorkerBodyKeys = z.infer<typeof CreateWorkerSchemaWithOptionalFields>
 
 export const workerInitialValues: CreateWorkerBody = {
   full_name: '',
@@ -123,16 +145,16 @@ export interface Worker {
 
 export interface CreateWorkerRow {
   full_name: string
-  cpf: string
-  rg: string
-  email: string
+  cpf?: string
+  rg?: string
+  email?: string
   phone_number: string
   picture_url: string
   role: string
   status: string
-  issuing_agency: string
-  issuing_state: string
-  issuing_date: string
+  issuing_agency?: string
+  issuing_state?: string
+  issuing_date?: string
   emergency_name: string
   emergency_number: string
   address: {
@@ -148,7 +170,7 @@ export interface CreateWorkerRow {
 
 export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
   return sheet.map((row) => {
-    console.log(row['Data de emissão'])
+    // console.log('@@@ROW', row)
     return {
       full_name: row['Nome completo'],
       cpf: row.CPF,
@@ -160,7 +182,7 @@ export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
       status: WORKER_STATUS.active,
       issuing_agency: row['Orgão emissor'],
       issuing_state: row['Local de emissão'],
-      issuing_date: row['Data de emissão'],
+      issuing_date: row['Data de emissão'] ? format(row['Data de emissão'], 'yyyy-MM-dd') : undefined,
       emergency_name: row['Nome do contato de emergência'],
       emergency_number: row['Telefone celular do contato de emergência'],
 
