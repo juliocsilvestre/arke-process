@@ -84,5 +84,4 @@ export const adminsColumns: ColumnDef<Admin>[] = [
 ]
 
 export type CreateAdminBody = z.infer<typeof CreateAdminSchema>
-export type EditAdminBody = Omit<z.infer<typeof EditAdminSchema>, 'password'>
 export type AdminBodyKeys = keyof CreateAdminBody

@@ -21,7 +21,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
-import { Admin, AdminBodyKeys, CreateAdminBody, CreateAdminSchema, EditAdminBody, adminsColumns } from './Admins.defs'
+import { Admin, AdminBodyKeys, CreateAdminBody, CreateAdminSchema, adminsColumns } from './Admins.defs'
 
 export const AdminsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
