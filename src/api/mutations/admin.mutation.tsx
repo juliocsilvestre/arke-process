@@ -15,3 +15,29 @@ export const useCreateAdmin = () => {
 
   return { ...mutation }
 }
+
+export const useUpdateAdmin = () => {
+  const mutation = useMutation({
+    mutationFn: (adminData: { name?: string; email?: string; cpf?: string; password?: string; id: string }) => {
+      return api.put(`/admins/${adminData.id}`, adminData)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexAdminsQueryOption({ page: '1', q: '' }))
+    },
+  })
+
+  return { ...mutation }
+}
+
+export const useDeleteAdmin = () => {
+  const mutation = useMutation({
+    mutationFn: (id: string) => {
+      return api.delete(`/admins/${id}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(indexAdminsQueryOption({ page: '1', q: '' }))
+    },
+  })
+
+  return { ...mutation }
+}

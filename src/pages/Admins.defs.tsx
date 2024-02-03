@@ -16,9 +16,31 @@ export const CreateAdminSchema = z.object({
       message: 'Credenciais inválidas',
     },
   ),
-  password: z.string().min(10, {
-    message: 'Credenciais inválidas',
-  }),
+  password: z.union([
+    z.undefined(),
+    z
+      .string()
+      .min(10, {
+        message: 'Credenciais inválidas',
+      })
+      .optional(),
+  ]),
+})
+
+export const EditAdminSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: 'Nome deve conter pelo menos 3 caracteres.' })
+    .max(50, { message: 'Nome deve conter no máximo 50 caracteres.' }),
+  email: z.union([z.string().email(), z.literal('')]),
+  cpf: z.string().refine(
+    (cpf) => {
+      return CPF_REGEXP.test(cpf.toString())
+    },
+    {
+      message: 'Credenciais inválidas',
+    },
+  ),
 })
 
 export interface Admin {
@@ -59,21 +81,8 @@ export const adminsColumns: ColumnDef<Admin>[] = [
       return formatDate(date)
     },
   },
-  // TODO: add actions
-  // {
-  //   header: 'Ações',
-  //   id: 'actions',
-  //   cell: ({ row }) => {
-  //     const company = row.original
-
-  //     return (
-  //       <div className="flex justify-start">
-  //         <_DeleteCompanyButton company={company} />
-  //       </div>
-  //     )
-  //   },
-  // },
 ]
 
 export type CreateAdminBody = z.infer<typeof CreateAdminSchema>
+export type EditAdminBody = Omit<z.infer<typeof EditAdminSchema>, 'password'>
 export type AdminBodyKeys = keyof CreateAdminBody
