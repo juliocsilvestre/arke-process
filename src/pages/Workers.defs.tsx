@@ -170,7 +170,6 @@ export interface CreateWorkerRow {
 
 export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
   return sheet.map((row) => {
-    // console.log('@@@ROW', row)
     return {
       full_name: row['Nome completo'],
       cpf: row.CPF,
