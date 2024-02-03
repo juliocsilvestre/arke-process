@@ -18,6 +18,7 @@ const dialogVariants = cva('', {
     variant: {
       default: 'bg-primary text-primary-50 hover:bg-primary-700',
       destructive: 'bg-error-500 text-white hover:bg-error-600',
+      secondary: 'bg-secondary-500 text-gray-800 hover:bg-secondary-500 hover:text-white',
     },
   },
   defaultVariants: {

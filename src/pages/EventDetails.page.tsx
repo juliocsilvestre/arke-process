@@ -1,15 +1,18 @@
 import { api } from '@/api/api'
+import { useUpdateWorkerStatus } from '@/api/mutations/workers.mutation'
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
 import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventDaySlideover'
 import { ClockEntryModal } from '@/components/ClockEntryLogModal'
+import { ConfirmationModal } from '@/components/ConfirmationModal'
 import { ReplacementSlideover } from '@/components/ReplacementSlideover'
 import { BraceletPDF } from '@/components/ui/Bracelet.pdf'
 import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
+import { WORKER_STATUS } from '@/utils/constants'
 import { ClockIcon } from '@heroicons/react/24/outline'
-import { ArrowsRightLeftIcon, QrCodeIcon } from '@heroicons/react/24/solid'
+import { ArrowsRightLeftIcon, NoSymbolIcon, QrCodeIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { pdf } from '@react-pdf/renderer'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter, useSearch } from '@tanstack/react-router'
@@ -25,6 +28,7 @@ export const EventDetailsPage = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
   const [workerToReplace, setWorkerToReplace] = useState<Worker | null>(null)
+
   const { day: eventDayId, id: eventId } = useParams({
     from: '/dashboard-layout/dashboard/eventos/$id/dias/$day',
   })
@@ -66,6 +70,8 @@ export const EventDetailsPage = () => {
   const { data: workersData } = useSuspenseQuery(options)
 
   const workers = workersData?.data.workers.data
+
+  const { mutateAsync: doUpdateWorkerStatus } = useUpdateWorkerStatus()
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
@@ -143,15 +149,6 @@ export const EventDetailsPage = () => {
           return (
             <div className="flex justify-start gap-2">
               <Button
-                data-tooltip-id={`replace-worker-${worker.id}`}
-                data-tooltip-content={`Substituir "${worker.full_name}"`}
-                onClick={() => setWorkerToReplace(worker)}
-              >
-                <ArrowsRightLeftIcon className="w-5" />
-              </Button>
-              <Tooltip id={`replace-worker-${worker.id}`} place="top" />
-
-              <Button
                 size="icon"
                 onClick={async (event) => {
                   event.preventDefault()
@@ -180,6 +177,57 @@ export const EventDetailsPage = () => {
               >
                 <QrCodeIcon className="w-6 h-6" />
               </Button>
+              <Button
+                size="icon"
+                data-tooltip-id={`replace-worker-${worker.id}`}
+                data-tooltip-content={`Substituir "${worker.full_name}"`}
+                onClick={() => setWorkerToReplace(worker)}
+              >
+                <ArrowsRightLeftIcon className="w-5" />
+              </Button>
+              <Tooltip id={`replace-worker-${worker.id}`} place="top" />
+              <ConfirmationModal
+                title={
+                  <span>
+                    Você tem certeza de que deseja banir <strong>"{worker?.full_name}"</strong>?
+                  </span>
+                }
+                description="Esta ação não pode ser desfeita."
+                variant="destructive"
+                actionButtonLabel="Banir"
+                onAction={() => void doUpdateWorkerStatus({ workerId: worker.id, status: WORKER_STATUS.banished })}
+              >
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  data-tooltip-id={`banish-worker-${worker.id}`}
+                  data-tooltip-content={`Banir "${worker.full_name}"`}
+                >
+                  <NoSymbolIcon className="w-5" />
+                </Button>
+                <Tooltip id={`banish-worker-${worker.id}`} place="top" />
+              </ConfirmationModal>
+              <ConfirmationModal
+                title={
+                  <span>
+                    Você tem certeza de que deseja expulsar <strong>"{worker?.full_name}"</strong>?
+                  </span>
+                }
+                description="Esta ação não pode ser desfeita."
+                variant="destructive"
+                actionButtonLabel="Expulsar"
+                onAction={() => void doUpdateWorkerStatus({ workerId: worker.id, status: WORKER_STATUS.expelled })}
+              >
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  data-tooltip-id={`expell-worker-${worker.id}`}
+                  data-tooltip-content={`Expulsar "${worker.full_name}"`}
+                >
+                  <XMarkIcon className="w-5" />
+                </Button>
+                <Tooltip id={`expell-worker-${worker.id}`} place="top" />
+              </ConfirmationModal>
             </div>
           )
         }}
