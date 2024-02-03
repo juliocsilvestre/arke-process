@@ -34,6 +34,7 @@ import { toast } from 'sonner'
 import * as xlsx from 'xlsx'
 import { Company } from './Companies.defs'
 import {
+  BulkWorkerBodyKeys,
   CreateWorkerBody,
   CreateWorkerRow,
   CreateWorkerSchema,
@@ -66,6 +67,7 @@ export const WorkersPage = (): JSX.Element => {
   const [, setHasMoreData] = useState(false)
   const [companiesPage, setCompaniesPage] = useState('1')
   const [companies, setCompanies] = useState<Company[]>([])
+  const [isBulkImporting, setIsBulkImporting] = useState(false)
 
   const hasComboboxVisible = isOpen || isSpreadsheetManagerOpen
 
@@ -100,17 +102,18 @@ export const WorkersPage = (): JSX.Element => {
 
   const onCreateWorkersBulk = useCallback(async () => {
     try {
+      setIsBulkImporting(true)
+      console.log('@workersToUpload', workersToUpload)
       await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
       handleOnClose()
       toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
     } catch (error: unknown) {
-      const errors = checkError<WorkerBodyKeys>(error)
+      const errors = checkError<BulkWorkerBodyKeys>(error)
       if (Array.isArray(errors) && errors.length > 0) {
         for (const e of errors) {
-          form.setError(e.field, { message: e.message })
           toast.error(
             <p>
-              Alguma coisa deu errado com o campo <strong>{e.field}</strong>: <strong>{e.message}</strong>
+              Alguma coisa deu errado com o campo <strong>{String(e.field)}</strong>: <strong>{e.message}</strong>
             </p>,
           )
         }
@@ -166,6 +169,8 @@ export const WorkersPage = (): JSX.Element => {
 
   const handleOnClose = () => {
     setIsOpen(false)
+    setIsSpreadsheetManagerOpen(false)
+    setIsBulkImporting(false)
     setPicturePreview(null)
     setPreviewImageURL('')
     setWorkerToEdit(null)
@@ -270,7 +275,6 @@ export const WorkersPage = (): JSX.Element => {
         const workersWithParsedIssuingDate = serializedJson.map((worker) => {
           return {
             ...worker,
-            issuing_date: format(worker.issuing_date, 'yyyy-MM-dd'),
           }
         })
 
@@ -489,7 +493,7 @@ export const WorkersPage = (): JSX.Element => {
             <Button type="button" variant="outline" onClick={() => setIsSpreadsheetManagerOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="default" type="button" onClick={onCreateWorkersBulk}>
+            <Button variant="default" type="button" onClick={onCreateWorkersBulk} disabled={isBulkImporting}>
               Criar funcionários
             </Button>
           </div>
