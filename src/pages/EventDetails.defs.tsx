@@ -31,16 +31,6 @@ export const workersByEventDayColumns: ColumnDef<Worker>[] = [
     accessorKey: 'role',
     header: 'Cargo',
   },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const worker = row.original
-      return (
-        <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{WORKER_STATUS_MAPPER[worker.status].label}</Badge>
-      )
-    },
-  },
 ]
 
 export const AttachWorkerToEventDaySchema = z.object({
