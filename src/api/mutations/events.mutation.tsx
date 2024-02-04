@@ -3,7 +3,11 @@ import { queryClient } from '@/routes'
 import { useMutation } from '@tanstack/react-query'
 import { eachDayOfInterval } from 'date-fns'
 import { api } from '../api'
-import { indexEventsQueryOption, indexReplacementsPerEventDayQueryOptions } from '../queries/events.query'
+import {
+  indexEventsQueryOption,
+  indexReplacementsPerEventDayQueryOptions,
+  indexWorkersPerEventDayQueryOptions,
+} from '../queries/events.query'
 
 export const useCreateEvent = () => {
   const mutation = useMutation({
@@ -81,7 +85,12 @@ export const useUpdateEvent = () => {
 
 export const useReplaceWorkerOnEventDay = () => {
   const mutation = useMutation({
-    mutationFn: (assignement: { event_id: string; event_day_id: string; worker_id: string; new_worker_id: string }) => {
+    mutationFn: (assignement: {
+      event_id: string
+      event_day_id: string
+      worker_id: string
+      new_worker_id: string
+    }) => {
       return api.post(`/events/${assignement.event_id}/days/${assignement.event_day_id}/replacements`, {
         worker_id: assignement.worker_id,
         new_worker_id: assignement.new_worker_id,
@@ -90,10 +99,40 @@ export const useReplaceWorkerOnEventDay = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries(indexEventsQueryOption({ page: '1', q: '' }))
       queryClient.invalidateQueries(
-        indexReplacementsPerEventDayQueryOptions({ eventDayId: variables.event_day_id, eventId: variables.event_id }),
+        indexReplacementsPerEventDayQueryOptions({
+          eventDayId: variables.event_day_id,
+          eventId: variables.event_id,
+        }),
       )
     },
   })
 
+  return { ...mutation }
+}
+
+export const useExpelWorkerFromEvent = () => {
+  const mutation = useMutation({
+    mutationFn: ({
+      workerId,
+      eventId,
+      eventDayId,
+    }: {
+      workerId: string
+      eventId: string
+      eventDayId: string
+    }) => {
+      return api.delete(`/events/${eventId}/days/${eventDayId}/workers/${workerId}`)
+    },
+    onSuccess: (_, { eventId, eventDayId }) => {
+      queryClient.invalidateQueries(
+        indexWorkersPerEventDayQueryOptions({
+          page: '1',
+          q: '',
+          eventDayId,
+          eventId,
+        }),
+      )
+    },
+  })
   return { ...mutation }
 }

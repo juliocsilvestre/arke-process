@@ -1,9 +1,9 @@
-import { useEditWorker } from '@/api/mutations/workers.mutation'
+import { useActivateWorker, useBanishWorker, useEditWorker } from '@/api/mutations/workers.mutation'
 import { infiniteCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { getSingleWorkerQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
+import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-// import { BRAND } from 'zod'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/Command'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Input'
@@ -11,15 +11,17 @@ import { Label } from '@/components/ui/Label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
-import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, UF_LIST } from '@/utils/constants'
+import { queryClient } from '@/routes'
+import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { PaperClipIcon, UserIcon } from '@heroicons/react/24/solid'
+import { ArrowPathIcon, NoSymbolIcon, PaperClipIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
+import { AxiosError } from 'axios'
 import { Check, ChevronsUpDown, EditIcon } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -185,6 +187,47 @@ export const WorkerDetailsPage = () => {
     }
   }
 
+  const { mutateAsync: doBanishWorker } = useBanishWorker()
+  const { mutateAsync: doActivateWorker } = useActivateWorker()
+
+  const handleBanishWorker = useCallback(async () => {
+    try {
+      if (worker?.data.id) {
+        await doBanishWorker({ workerId })
+        toast.success(
+          <p>
+            O funcionário <strong>{worker?.data.full_name}</strong> foi banido com sucesso!
+          </p>,
+        )
+
+        queryClient.invalidateQueries(getSingleWorkerQueryOptions(workerId))
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(`Erro ao banir o funcionário: ${error.response?.data.message}`)
+      }
+    }
+  }, [worker?.data])
+
+  const handleActivateWorker = useCallback(async () => {
+    try {
+      if (worker?.data.id) {
+        await doActivateWorker(workerId)
+        toast.success(
+          <p>
+            O funcionário <strong>{worker?.data.full_name}</strong> foi reativado com sucesso!
+          </p>,
+        )
+
+        queryClient.invalidateQueries(getSingleWorkerQueryOptions(workerId))
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(`Erro ao reativar o funcionário: ${error.response?.data.message}`)
+      }
+    }
+  }, [worker?.data])
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center">
@@ -200,7 +243,15 @@ export const WorkerDetailsPage = () => {
           </Avatar>
           <div className="mt-[8px] md:ml-[16px] md:mt-0">
             <div className="flex items-center">
-              <h1 className="text-center md:text-left text-3xl text-primary font-bold">{worker?.data.full_name}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-center md:text-left text-3xl text-primary font-bold">{worker?.data.full_name}</h1>
+                {worker?.data.status && WORKER_STATUS_MAPPER[worker.data.status] && (
+                  <Badge variant={WORKER_STATUS_MAPPER[worker.data.status].color}>
+                    {WORKER_STATUS_MAPPER[worker.data.status].label}
+                  </Badge>
+                )}
+              </div>
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -216,6 +267,18 @@ export const WorkerDetailsPage = () => {
             </h3>
           </div>
         </div>
+
+        {worker?.data.status === WORKER_STATUS.active ? (
+          <Button variant="destructive" className="mt-4" onClick={handleBanishWorker}>
+            <NoSymbolIcon className="h-6 w-6" aria-hidden="true" />
+            Banir
+          </Button>
+        ) : (
+          <Button variant="default" className="mt-4" onClick={handleActivateWorker}>
+            <ArrowPathIcon className="h-6 w-6" aria-hidden="true" />
+            Reativar
+          </Button>
+        )}
       </div>
       <div className="worker-body mt-[32px]">
         <div className="worker-body__header">
