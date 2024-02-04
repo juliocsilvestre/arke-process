@@ -3,6 +3,7 @@ import { queryClient } from '@/routes'
 import { WorkerStatus } from '@/utils/constants'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
+import { indexWorkersPerEventDayQueryOptions } from '../queries/events.query'
 import { indexWorkersQueryOptions } from '../queries/workers.query'
 
 export const useCreateWorker = () => {
@@ -86,5 +87,24 @@ export const useUpdateWorkerStatus = () => {
     },
   })
 
+  return { ...mutation }
+}
+
+export const useBanishWorker = () => {
+  const mutation = useMutation({
+    mutationFn: ({ workerId }: { workerId: string; eventId: string; eventDayId: string }) => {
+      return api.delete(`/workers/${workerId}/banish`)
+    },
+    onSuccess: (_, { eventId, eventDayId }) => {
+      queryClient.invalidateQueries(
+        indexWorkersPerEventDayQueryOptions({
+          page: '1',
+          q: '',
+          eventDayId,
+          eventId,
+        }),
+      )
+    },
+  })
   return { ...mutation }
 }

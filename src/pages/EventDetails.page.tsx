@@ -1,5 +1,6 @@
 import { api } from '@/api/api'
-import { useUpdateWorkerStatus } from '@/api/mutations/workers.mutation'
+import { useExpelWorkerFromEvent } from '@/api/mutations/events.mutation'
+import { useBanishWorker, useUpdateWorkerStatus } from '@/api/mutations/workers.mutation'
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
 import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventDaySlideover'
 import { ClockEntryModal } from '@/components/ClockEntryLogModal'
@@ -72,6 +73,8 @@ export const EventDetailsPage = () => {
   const workers = workersData?.data.workers.data
 
   const { mutateAsync: doUpdateWorkerStatus } = useUpdateWorkerStatus()
+  const { mutateAsync: doExpelWorkerEvent } = useExpelWorkerFromEvent()
+  const { mutateAsync: doBanishWorker } = useBanishWorker()
 
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
@@ -195,7 +198,13 @@ export const EventDetailsPage = () => {
                 description="Esta ação não pode ser desfeita."
                 variant="destructive"
                 actionButtonLabel="Banir"
-                onAction={() => void doUpdateWorkerStatus({ workerId: worker.id, status: WORKER_STATUS.banished })}
+                onAction={() =>
+                  void doBanishWorker({
+                    workerId: worker.id,
+                    eventId,
+                    eventDayId,
+                  })
+                }
               >
                 <Button
                   variant="destructive"
@@ -216,7 +225,13 @@ export const EventDetailsPage = () => {
                 description="Esta ação não pode ser desfeita."
                 variant="destructive"
                 actionButtonLabel="Expulsar"
-                onAction={() => void doUpdateWorkerStatus({ workerId: worker.id, status: WORKER_STATUS.expelled })}
+                onAction={() =>
+                  void doExpelWorkerEvent({
+                    workerId: worker.id,
+                    eventId,
+                    eventDayId,
+                  })
+                }
               >
                 <Button
                   variant="secondary"
