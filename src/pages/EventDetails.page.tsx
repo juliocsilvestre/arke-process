@@ -1,6 +1,6 @@
 import { api } from '@/api/api'
 import { useExpelWorkerFromEvent } from '@/api/mutations/events.mutation'
-import { useBanishWorker, useUpdateWorkerStatus } from '@/api/mutations/workers.mutation'
+import { useBanishWorker } from '@/api/mutations/workers.mutation'
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
 import { AttachWorkerToEventDaySlideover } from '@/components/AttachUserToEventDaySlideover'
 import { ClockEntryModal } from '@/components/ClockEntryLogModal'
@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
-import { WORKER_STATUS } from '@/utils/constants'
 import { ClockIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon, NoSymbolIcon, QrCodeIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { pdf } from '@react-pdf/renderer'
@@ -72,7 +71,6 @@ export const EventDetailsPage = () => {
 
   const workers = workersData?.data.workers.data
 
-  const { mutateAsync: doUpdateWorkerStatus } = useUpdateWorkerStatus()
   const { mutateAsync: doExpelWorkerEvent } = useExpelWorkerFromEvent()
   const { mutateAsync: doBanishWorker } = useBanishWorker()
 
