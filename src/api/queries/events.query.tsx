@@ -50,7 +50,7 @@ export const getWorkersPerEventDay = async ({
   eventId,
   page,
   q,
-}: { eventId: string; eventDayId: string; page?: string; q?: string }) => {
+}: { eventId?: string; eventDayId?: string; page?: string; q?: string }) => {
   // Construct the base path with optional query parameters
   const path = `/events/${eventId}/days/${eventDayId}/workers`
   const queryParams = new URLSearchParams({
@@ -66,8 +66,8 @@ export const getWorkersPerEventDay = async ({
 }
 
 export const indexWorkersPerEventDayQueryOptions = (props: {
-  eventId: string
-  eventDayId: string
+  eventId?: string
+  eventDayId?: string
   page?: string
   q?: string
 }) =>
