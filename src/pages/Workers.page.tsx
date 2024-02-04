@@ -103,7 +103,6 @@ export const WorkersPage = (): JSX.Element => {
   const onCreateWorkersBulk = useCallback(async () => {
     try {
       setIsBulkImporting(true)
-      console.log('@workersToUpload', workersToUpload)
       await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
       handleOnClose()
       toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
