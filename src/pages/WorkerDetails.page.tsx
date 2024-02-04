@@ -1,5 +1,5 @@
 import { useActivateWorker, useBanishWorker, useEditWorker } from '@/api/mutations/workers.mutation'
-import { useIndexCompanies } from '@/api/queries/companies.query'
+import { infiniteCompaniesQueryOptions } from '@/api/queries/companies.query'
 import { getSingleWorkerQueryOptions, useGetAddresByCep } from '@/api/queries/workers.query'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
@@ -10,15 +10,16 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { queryClient } from '@/routes'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
-import { ArrowPathIcon, CheckBadgeIcon, NoSymbolIcon, PaperClipIcon, UserIcon } from '@heroicons/react/24/solid'
+import { ArrowPathIcon, NoSymbolIcon, PaperClipIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
 import { AxiosError } from 'axios'
 import { Check, ChevronsUpDown, EditIcon } from 'lucide-react'
@@ -34,6 +35,10 @@ export const WorkerDetailsPage = () => {
   const [picturePreview, setPicturePreview] = useState<File | null>(null)
   const [previewImageURL, setPreviewImageURL] = useState<string>('')
   const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
+  const [queryString, setQueryString] = useState('')
+  const [companiesPage, setCompaniesPage] = useState('1')
+  const [, setHasMoreData] = useState(false)
+  const [companies, setCompanies] = useState<Company[]>([])
 
   const workerId = useParams({
     from: '/dashboard-layout/dashboard/funcionarios/$id',
@@ -42,8 +47,6 @@ export const WorkerDetailsPage = () => {
 
   const { data: worker } = useQuery(getSingleWorkerQueryOptions(workerId))
   const { mutateAsync: editWorker } = useEditWorker(workerId)
-
-  const { data: companies } = useIndexCompanies()
 
   const form = useForm<EditWorkerBody>({
     resolver: zodResolver(EditWorkerSchema),
@@ -116,6 +119,73 @@ export const WorkerDetailsPage = () => {
       form.setValue('uf', data.uf)
     }
   }, [cep, data, form, worker])
+
+  const { comboboxParameters } = useDebounceSearch({
+    searchTerm: queryString,
+    isComboboxOpen: isOpen,
+  })
+
+  const {
+    data: pages,
+    fetchNextPage,
+    fetchPreviousPage,
+  } = useInfiniteQuery(
+    infiniteCompaniesQueryOptions(isOpen, {
+      page: companiesPage,
+      q: comboboxParameters.debouncedSearchTerm,
+      limit: '20',
+    }),
+  )
+
+  useEffect(() => {
+    if (!isOpen) {
+      setQueryString('')
+      setCompaniesPage('1')
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (pages?.companies) {
+      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+      setCompanies([...pages?.companies])
+    }
+  }, [pages?.companies])
+
+  useEffect(() => {
+    if (pages?.currentPage < pages?.lastPage) {
+      setHasMoreData(pages?.nextPage !== null)
+    } else {
+      setHasMoreData(false)
+    }
+  }, [pages?.nextPage])
+
+  const isScrolledToBottom = (offsetHeight: number, scrollTop: number, scrollHeight: number) => {
+    return offsetHeight + scrollTop >= scrollHeight
+  }
+
+  const isScrolledToTop = (scrollTop: number) => {
+    return scrollTop <= 0
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const handleScroll = (target: any) => {
+    const { offsetHeight, scrollTop, scrollHeight } = target
+    if (pages?.nextPage && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
+      try {
+        fetchNextPage()
+        setCompaniesPage((page) => (parseInt(page) + 1).toString())
+      } catch (error) {
+        toast.error('Erro ao buscar fornecedores. Tente novamente.')
+      }
+    } else if (pages?.currentPage > 1 && isScrolledToTop(scrollTop)) {
+      try {
+        fetchPreviousPage()
+        setCompaniesPage((page) => (parseInt(page) - 1).toString())
+      } catch (error) {
+        toast.error('Erro ao buscar fornecedores. Tente novamente.')
+      }
+    }
+  }
 
   const { mutateAsync: doBanishWorker } = useBanishWorker()
   const { mutateAsync: doActivateWorker } = useActivateWorker()
@@ -504,8 +574,7 @@ export const WorkerDetailsPage = () => {
                               )}
                             >
                               {field.value
-                                ? companies?.data.companies.data.find((company: Company) => company.id === field.value)
-                                    ?.name
+                                ? companies.find((company: Company) => company.id === field.value)?.name
                                 : 'Fornecedor'}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -514,9 +583,9 @@ export const WorkerDetailsPage = () => {
                         <PopoverContent className="w-[420px] p-0">
                           <Command className="w-full">
                             <CommandInput placeholder="Fornecedor..." className="w-full" />
-                            <CommandEmpty>Fornecedor não encontrado.</CommandEmpty>
-                            <CommandGroup>
-                              {companies?.data.companies.data.map((company: Company) => (
+                            <CommandEmpty searchTarget="Fornecedor">Fornecedor não encontrado.</CommandEmpty>
+                            <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                              {companies.map((company: Company) => (
                                 <CommandItem
                                   value={company.name}
                                   key={company.id}
