@@ -1,5 +1,3 @@
-import { Badge } from '@/components/ui/Badge'
-import { WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 import { Admin } from './Admins.defs'
@@ -30,16 +28,6 @@ export const workersByEventDayColumns: ColumnDef<Worker>[] = [
   {
     accessorKey: 'role',
     header: 'Cargo',
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const worker = row.original
-      return (
-        <Badge variant={WORKER_STATUS_MAPPER[worker.status].color}>{WORKER_STATUS_MAPPER[worker.status].label}</Badge>
-      )
-    },
   },
 ]
 

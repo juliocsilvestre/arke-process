@@ -68,9 +68,11 @@ export const SlideOver = ({ title, subtitle, isOpen, children, classNames, close
   )
 }
 
-export const SlideOverFooter = ({ children }: { children: ReactNode }): JSX.Element => {
+export const SlideOverFooter = ({ className, children }: { className?: string; children: ReactNode }): JSX.Element => {
   return (
-    <div className="flex flex-shrink-0 justify-end py-4 bg-white border-t-[1px] border-solid border-gray-100">
+    <div
+      className={`flex flex-shrink-0 justify-end py-4 bg-white border-t-[1px] border-solid border-gray-100 ${className}`}
+    >
       {children}
     </div>
   )

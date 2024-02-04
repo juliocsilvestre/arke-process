@@ -10,6 +10,7 @@ import { DataTable } from '@/components/ui/DataTable'
 import { DropZone } from '@/components/ui/DropZone'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
+import { Loading } from '@/components/ui/Loading'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
@@ -67,7 +68,7 @@ export const WorkersPage = (): JSX.Element => {
   const [, setHasMoreData] = useState(false)
   const [companiesPage, setCompaniesPage] = useState('1')
   const [companies, setCompanies] = useState<Company[]>([])
-  const [isBulkImporting, setIsBulkImporting] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const hasComboboxVisible = isOpen || isSpreadsheetManagerOpen
 
@@ -101,10 +102,9 @@ export const WorkersPage = (): JSX.Element => {
   const { mutateAsync: createWorkersBulk } = useCreateWorkersBulk()
 
   const onCreateWorkersBulk = useCallback(async () => {
+    setIsLoading(true)
     try {
-      setIsBulkImporting(true)
       await createWorkersBulk({ workers: workersToUpload, company_id: companyToBulkUpload })
-      handleOnClose()
       toast.success(<p>{workersToUpload.length} funcionários foram criados com sucesso!</p>)
     } catch (error: unknown) {
       const errors = checkError<BulkWorkerBodyKeys>(error)
@@ -119,6 +119,8 @@ export const WorkersPage = (): JSX.Element => {
       } else if (typeof errors === 'string') {
         toast.error(errors)
       }
+    } finally {
+      handleOnClose()
     }
   }, [workersToUpload, companyToBulkUpload, createWorkersBulk])
 
@@ -169,7 +171,7 @@ export const WorkersPage = (): JSX.Element => {
   const handleOnClose = () => {
     setIsOpen(false)
     setIsSpreadsheetManagerOpen(false)
-    setIsBulkImporting(false)
+    setIsLoading(false)
     setPicturePreview(null)
     setPreviewImageURL('')
     setWorkerToEdit(null)
@@ -301,15 +303,17 @@ export const WorkersPage = (): JSX.Element => {
   useEffect(() => {
     if (singleWorkerToEdit) {
       form.setValue('full_name', singleWorkerToEdit.full_name)
-      form.setValue('cpf', singleWorkerToEdit.cpf)
-      form.setValue('rg', singleWorkerToEdit.rg)
-      form.setValue('issuing_agency', singleWorkerToEdit.issuing_agency)
-      form.setValue('issuing_state', singleWorkerToEdit.issuing_state as keyof typeof UF_LIST)
+      form.setValue('cpf', singleWorkerToEdit?.cpf)
+      form.setValue('rg', singleWorkerToEdit?.rg)
+      form.setValue('issuing_agency', singleWorkerToEdit?.issuing_agency)
+      form.setValue('issuing_state', singleWorkerToEdit?.issuing_state as keyof typeof UF_LIST)
       form.setValue(
         'issuing_date',
-        format(parse(singleWorkerToEdit.issuing_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy'),
+        singleWorkerToEdit.issuing_date
+          ? format(parse(singleWorkerToEdit.issuing_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy')
+          : '',
       )
-      form.setValue('email', singleWorkerToEdit.email)
+      form.setValue('email', singleWorkerToEdit?.email)
       form.setValue('phone_number', singleWorkerToEdit.phone_number)
       form.setValue('company_id', singleWorkerToEdit.company_id)
       form.setValue('role', singleWorkerToEdit.role)
@@ -487,15 +491,33 @@ export const WorkersPage = (): JSX.Element => {
             Baixe o modelo de planilha clicando aqui
           </Button>
         </div>
-        <SlideOverFooter>
-          <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
-            <Button type="button" variant="outline" onClick={() => setIsSpreadsheetManagerOpen(false)}>
-              Cancelar
+        <SlideOverFooter className={`${isLoading ? 'justify-center' : null}`}>
+          {!isLoading ? (
+            <div className="flex flex-shrink-0 justify-end px-4 py-1 bg-white gap-2">
+              <>
+                <Button type="button" variant="outline" onClick={() => setIsSpreadsheetManagerOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button
+                  variant="default"
+                  type="button"
+                  onClick={onCreateWorkersBulk}
+                  disabled={isLoading || !companyToBulkUpload}
+                >
+                  Criar funcionários
+                </Button>
+              </>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              type="button"
+              className="text-[18px] hover:bg-transparent pointer-events-none cursor-progress"
+            >
+              <span className="color-primary-500 font-[600]">Importando Funcionários</span>{' '}
+              <Loading className="h-auto" />
             </Button>
-            <Button variant="default" type="button" onClick={onCreateWorkersBulk} disabled={isBulkImporting}>
-              Criar funcionários
-            </Button>
-          </div>
+          )}
         </SlideOverFooter>
       </SlideOver>
 
