@@ -234,7 +234,7 @@ export const WorkerDetailsPage = () => {
         <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center">
           <div className="flex flex-col justify-center items-center  md:flex-row md:justify-start md:items-center">
             <Avatar className="w-[136px] h-[136px]">
-              <AvatarImage src={worker?.data.picture_url} />
+              <AvatarImage src={worker?.data.picture_url} className="object-cover" />
               <AvatarFallback>
                 {worker?.data.full_name
                   .split(' ')
@@ -246,9 +246,9 @@ export const WorkerDetailsPage = () => {
               <div className="flex items-center">
                 <div className="flex items-center gap-2">
                   <h1 className="text-center md:text-left text-3xl text-primary font-bold">{worker?.data.full_name}</h1>
-                  {worker?.data.status && WORKER_STATUS_MAPPER[worker.data.status] && (
-                    <Badge variant={WORKER_STATUS_MAPPER[worker.data.status].color}>
-                      {WORKER_STATUS_MAPPER[worker.data.status].label}
+                  {worker?.data.status && WORKER_STATUS_MAPPER[worker?.data.status] && (
+                    <Badge variant={WORKER_STATUS_MAPPER[worker?.data.status].color}>
+                      {WORKER_STATUS_MAPPER[worker?.data.status].label}
                     </Badge>
                   )}
                 </div>

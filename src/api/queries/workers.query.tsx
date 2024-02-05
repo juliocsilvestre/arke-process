@@ -1,6 +1,7 @@
 import { infiniteQueryOptions, queryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
+import { WorkerStatus } from '@/utils/constants'
 import { Pagination } from '@/utils/types'
 import { api } from '../api'
 
@@ -18,13 +19,14 @@ export const useGetAddresByCep = (cep: string) => {
   return { ...query }
 }
 
-export const getWorkers = async (pagination?: Pagination) => {
+export const getWorkers = async (pagination?: Pagination, filters?: { status: WorkerStatus }) => {
   // Construct the base path with optional query parameters
   const path = '/workers'
   const queryParams = new URLSearchParams({
     q: pagination?.q || '', // Use empty string if q is not provided
     page: pagination?.page || '1', // Use empty string if page is not provided
     limit: pagination?.limit || '10',
+    status: filters?.status || '',
   })
 
   // Combine the base path with query parameters
@@ -34,10 +36,14 @@ export const getWorkers = async (pagination?: Pagination) => {
   return await api.get(url)
 }
 
-export const infiniteWorkersQueryOptions = (isComboboxOpen: boolean, pagination?: Pagination) => {
+export const infiniteWorkersQueryOptions = (
+  isComboboxOpen: boolean,
+  pagination?: Pagination,
+  filters?: { status: WorkerStatus },
+) => {
   return infiniteQueryOptions({
     queryKey: ['infinite-workers', pagination],
-    queryFn: async () => await getWorkers(pagination),
+    queryFn: async () => await getWorkers(pagination, filters),
     initialPageParam: 1,
     enabled: isComboboxOpen,
     select: (data) => {
@@ -62,8 +68,12 @@ export const infiniteWorkersQueryOptions = (isComboboxOpen: boolean, pagination?
   })
 }
 
-export const useInfiniteWorkers = (isComboboxOpen: boolean, pagination?: Pagination) => {
-  return useInfiniteQuery(infiniteWorkersQueryOptions(isComboboxOpen, pagination))
+export const useInfiniteWorkers = (
+  isComboboxOpen: boolean,
+  pagination?: Pagination,
+  filters?: { status: WorkerStatus },
+) => {
+  return useInfiniteQuery(infiniteWorkersQueryOptions(isComboboxOpen, pagination, filters))
 }
 
 export const indexWorkersQueryOptions = (pagination?: Pagination) =>

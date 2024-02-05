@@ -10,7 +10,7 @@ import {
 import { EventDay } from '@/pages/Events.defs'
 import { Worker } from '@/pages/Workers.defs'
 import { queryClient } from '@/routes'
-import { checkIfStatusKeyword } from '@/utils/constants'
+import { WORKER_STATUS, checkIfStatusKeyword } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { cn } from '@/utils/styles'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -105,7 +105,13 @@ export const AttachWorkerToEventDaySlideover = ({
     data: pages,
     fetchNextPage,
     fetchPreviousPage,
-  } = useInfiniteQuery(infiniteWorkersQueryOptions(isOpen, { page: workersPage, q: debouncedSearchTerm, limit: '20' }))
+  } = useInfiniteQuery(
+    infiniteWorkersQueryOptions(
+      isOpen,
+      { page: workersPage, q: debouncedSearchTerm, limit: '20' },
+      { status: WORKER_STATUS.active },
+    ),
+  )
 
   useEffect(() => {
     if (pages?.workers) {

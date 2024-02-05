@@ -109,6 +109,7 @@ export interface WorkerSheet {
   RG: string
   Rua: string
   UF: string
+  'URL da foto': string
   'E-mail': string
   'Nome completo': string
   'Orgão emissor': string
@@ -176,7 +177,7 @@ export const workersSheetMapper = (sheet: WorkerSheet[]): CreateWorkerRow[] => {
       rg: row.RG,
       email: row['E-mail'],
       phone_number: row['Telefone/Whatsapp'],
-      picture_url: '',
+      picture_url: row['URL da foto'],
       role: row.Cargo,
       status: WORKER_STATUS.active,
       issuing_agency: row['Orgão emissor'],
