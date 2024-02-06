@@ -152,7 +152,7 @@ export const EventsPage = (): JSX.Element => {
                 >
                   <PencilSquareIcon className="w-5" />
                 </Button>
-                <DeleteEventButton event={e} />
+                {/* <DeleteEventButton event={e} /> */}
               </div>
             )
           }}
