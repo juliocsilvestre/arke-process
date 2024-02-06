@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
 
 import { Button } from '@components/ui/Button'
@@ -21,7 +21,7 @@ import { type SignInBody } from './SignIn.defs'
 
 export const SignIn = () => {
   const form = useForm<z.infer<typeof SignInSchema>>({
-    resolver: zodResolver(SignInSchema),
+    // resolver: zodResolver(SignInSchema),
     defaultValues: {
       cpf: '',
       password: '',
