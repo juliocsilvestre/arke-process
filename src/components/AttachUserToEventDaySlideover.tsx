@@ -207,7 +207,7 @@ export const AttachWorkerToEventDaySlideover = ({
                             setQueryString(s)
                           }}
                         />
-                        <CommandEmpty searchTarget="funcionário">Funcionário não encontrado.</CommandEmpty>
+                        <CommandEmpty searchTarget="Funcionário">Funcionário não encontrado.</CommandEmpty>
                         <CommandGroup
                           onScroll={(event) => {
                             if (!hasMoreData) return

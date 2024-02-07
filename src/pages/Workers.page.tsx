@@ -274,7 +274,10 @@ export const WorkersPage = (): JSX.Element => {
         const sheetName = workbook.SheetNames[0]
         const worksheet = workbook.Sheets[sheetName]
 
-        const json = xlsx.utils.sheet_to_json(worksheet, { raw: true, dateNF: 'DD/MM/YYYY' })
+        const json = xlsx.utils.sheet_to_json(worksheet, {
+          raw: true,
+          dateNF: 'DD/MM/YYYY',
+        })
         const serializedJson = workersSheetMapper(json as WorkerSheet[])
         const workersWithParsedIssuingDate = serializedJson.map((worker) => {
           return {
@@ -295,7 +298,10 @@ export const WorkersPage = (): JSX.Element => {
 
   useDebounceSearch({ searchTerm: tableQueryString, callback: filterByDebouncedSearchTerm })
 
-  const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios/' }) as { q: string; page: string }
+  const search = useSearch({ from: '/dashboard-layout/dashboard/funcionarios/' }) as {
+    q: string
+    page: string
+  }
 
   const options = indexWorkersQueryOptions(search)
   const { data: workers } = useSuspenseQuery(options)
@@ -322,7 +328,7 @@ export const WorkersPage = (): JSX.Element => {
       form.setValue('role', singleWorkerToEdit.role)
       form.setValue('emergency_name', singleWorkerToEdit.emergency_name)
       form.setValue('emergency_number', singleWorkerToEdit.emergency_number)
-      form.setValue('cep', singleWorkerToEdit.address.cep)
+      form.setValue('cep', singleWorkerToEdit.address?.cep)
       form.setValue('street', singleWorkerToEdit.address.street)
       form.setValue('number', singleWorkerToEdit.address.number)
       form.setValue('neighborhood', singleWorkerToEdit.address.neighborhood)
@@ -448,7 +454,7 @@ export const WorkersPage = (): JSX.Element => {
                     setQueryString(s)
                   }}
                 />
-                <CommandEmpty searchTarget="fornecedor">Fornecedor não encontrado.</CommandEmpty>
+                <CommandEmpty searchTarget="Fornecedor">Fornecedor não encontrado.</CommandEmpty>
                 <CommandGroup
                   onScroll={(event) => {
                     if (!hasMoreData) return
@@ -843,7 +849,7 @@ export const WorkersPage = (): JSX.Element => {
                                 setQueryString(s)
                               }}
                             />
-                            <CommandEmpty searchTarget="fornecedor">Fornecedor não encontrado.</CommandEmpty>
+                            <CommandEmpty searchTarget="Fornecedor">Fornecedor não encontrado.</CommandEmpty>
                             <CommandGroup
                               onScroll={(event) => {
                                 if (!hasMoreData) return
