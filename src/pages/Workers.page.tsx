@@ -65,7 +65,7 @@ export const WorkersPage = (): JSX.Element => {
   const [queryString, setQueryString] = useState('')
   const [tableQueryString, setTableQueryString] = useState('')
   const [workerToEdit, setWorkerToEdit] = useState<Worker | null>(null)
-  const [, setHasMoreData] = useState(false)
+  const [hasMoreData, setHasMoreData] = useState(false)
   const [companiesPage, setCompaniesPage] = useState('1')
   const [companies, setCompanies] = useState<Company[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -81,6 +81,7 @@ export const WorkersPage = (): JSX.Element => {
     data: pages,
     fetchNextPage,
     fetchPreviousPage,
+    isFetching,
   } = useInfiniteQuery(
     infiniteCompaniesQueryOptions(hasComboboxVisible, {
       page: companiesPage,
@@ -200,7 +201,7 @@ export const WorkersPage = (): JSX.Element => {
     } else {
       setHasMoreData(false)
     }
-  }, [pages?.nextPage])
+  }, [pages?.nextPage, pages?.currentPage, pages?.lastPage])
 
   const isScrolledToBottom = (offsetHeight: number, scrollTop: number, scrollHeight: number) => {
     return offsetHeight + scrollTop >= scrollHeight
@@ -448,7 +449,12 @@ export const WorkersPage = (): JSX.Element => {
                   }}
                 />
                 <CommandEmpty searchTarget="fornecedor">Fornecedor não encontrado.</CommandEmpty>
-                <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                <CommandGroup
+                  onScroll={(event) => {
+                    if (!hasMoreData) return
+                    handleScroll(event.target)
+                  }}
+                >
                   {companies.map((company: Company) => (
                     <CommandItem
                       value={company.name}
@@ -465,6 +471,19 @@ export const WorkersPage = (): JSX.Element => {
                     </CommandItem>
                   ))}
                 </CommandGroup>
+                {!hasMoreData && !isFetching && companies?.length > 0 && (
+                  <div className="w-full flex justify-center items-center my-[32px]">
+                    <strong>Sem mais resultados...</strong>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="hover:bg-transparent p-[.5rem]"
+                      onClick={() => setCompaniesPage('1')}
+                    >
+                      Voltar para o ínicio da lista
+                    </Button>
+                  </div>
+                )}
               </Command>
             </PopoverContent>
           </Popover>
@@ -825,7 +844,12 @@ export const WorkersPage = (): JSX.Element => {
                               }}
                             />
                             <CommandEmpty searchTarget="fornecedor">Fornecedor não encontrado.</CommandEmpty>
-                            <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                            <CommandGroup
+                              onScroll={(event) => {
+                                if (!hasMoreData) return
+                                handleScroll(event.target)
+                              }}
+                            >
                               {companies.map((company: Company) => (
                                 <CommandItem
                                   value={company.name}
@@ -845,6 +869,19 @@ export const WorkersPage = (): JSX.Element => {
                                 </CommandItem>
                               ))}
                             </CommandGroup>
+                            {!hasMoreData && !isFetching && companies?.length > 0 && (
+                              <div className="w-full flex justify-center items-center my-[32px]">
+                                <strong>Sem mais resultados...</strong>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  className="hover:bg-transparent p-[.5rem]"
+                                  onClick={() => setCompaniesPage('1')}
+                                >
+                                  Voltar para o ínicio da lista
+                                </Button>
+                              </div>
+                            )}
                           </Command>
                         </PopoverContent>
                       </Popover>

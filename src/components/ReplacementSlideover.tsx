@@ -1,15 +1,17 @@
 import { useReplaceWorkerOnEventDay } from '@/api/mutations/events.mutation'
 import { getSingleEvent, indexWorkersPerEventDayQueryOptions } from '@/api/queries/events.query'
-import { indexWorkersQueryOptions } from '@/api/queries/workers.query'
+import { infiniteWorkersQueryOptions } from '@/api/queries/workers.query'
+import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { ReplacementBody, ReplacementKeys, ReplacementSchema } from '@/pages/EventDetails.defs'
 import { EventDay } from '@/pages/Events.defs'
 import { Worker } from '@/pages/Workers.defs'
 import { queryClient } from '@/routes'
+import { WORKER_STATUS } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { cn } from '@/utils/styles'
 import { ArrowsUpDownIcon, UserIcon } from '@heroicons/react/24/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Form, useForm } from 'react-hook-form'
@@ -38,7 +40,85 @@ export const ReplacementSlideover = ({
 }: AttachWorkerToEventDaySlideoverProps): JSX.Element => {
   const [queryString, setQueryString] = useState('')
   const [newWorker, setNewWorker] = useState<Worker | null>(null)
+  const [workersPage, setWorkersPage] = useState('1')
+  const [workers, setWorkers] = useState<Worker[]>([])
+  const [hasMoreData, setHasMoreData] = useState(false)
   const [isWorkersComboBoxOpen, setIsWorkersComboBoxOpen] = useState(false)
+
+  const {
+    comboboxParameters: { debouncedSearchTerm },
+  } = useDebounceSearch({
+    searchTerm: queryString,
+    isComboboxOpen: isWorkersComboBoxOpen,
+  })
+
+  useEffect(() => {
+    // biome-ignore lint/complexity/noExtraBooleanCast: <explanation>
+    if (!Boolean(workerToReplace)) {
+      setQueryString('')
+      setWorkersPage('1')
+    }
+  }, [Boolean(workerToReplace)])
+
+  const {
+    data: pages,
+    fetchNextPage,
+    fetchPreviousPage,
+    isFetching,
+  } = useInfiniteQuery(
+    infiniteWorkersQueryOptions(
+      Boolean(workerToReplace),
+      { page: workersPage, q: debouncedSearchTerm, limit: '20' },
+      { status: WORKER_STATUS.active },
+    ),
+  )
+
+  useEffect(() => {
+    if (pages?.workers) {
+      // biome-ignore lint/correctness/noUnsafeOptionalChaining: <explanation>
+      setWorkers([...pages?.workers] as Worker[])
+    }
+  }, [pages?.workers])
+
+  useEffect(() => {
+    if (pages?.currentPage < pages?.lastPage) {
+      setHasMoreData(pages?.nextPage !== null)
+    } else {
+      setHasMoreData(false)
+    }
+  }, [pages?.nextPage, pages?.currentPage, pages?.lastPage])
+
+  useEffect(() => {
+    setWorkersPage('1')
+  }, [debouncedSearchTerm])
+
+  const isScrolledToBottom = (offsetHeight: number, scrollTop: number, scrollHeight: number) => {
+    return offsetHeight + scrollTop >= scrollHeight
+  }
+
+  const isScrolledToTop = (scrollTop: number) => {
+    return scrollTop <= 0
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const handleScroll = (target: any) => {
+    const { offsetHeight, scrollTop, scrollHeight } = target
+    if (pages?.nextPage && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
+      try {
+        fetchNextPage()
+        setWorkersPage((page) => String(Number(page) + 1))
+      } catch (error) {
+        toast.error('Erro ao buscar funcionários. Tente novamente.')
+      }
+    } else if (pages?.currentPage > 1 && isScrolledToTop(scrollTop)) {
+      try {
+        fetchPreviousPage()
+        setWorkersPage((page) => (Number(page) > 1 ? String(Number(page) - 1) : '1'))
+      } catch (error) {
+        toast.error('Erro ao buscar funcionários. Tente novamente.')
+      }
+    }
+  }
 
   const { data: event } = useQuery({ queryKey: ['event', eventId], queryFn: () => getSingleEvent(eventId) })
   const days = event?.data.days as EventDay[]
@@ -77,16 +157,11 @@ export const ReplacementSlideover = ({
     }
   }
 
-  const options = indexWorkersQueryOptions({ page: '1', q: queryString })
-  const { data: allWorkersData } = useQuery(options)
-
-  const allWorkers = allWorkersData?.data.workers.data as Worker[]
-
   const newWorkerId = form.watch('new_worker_id')
 
   useEffect(() => {
     if (newWorkerId) {
-      const w = allWorkers.find((worker) => worker.id === newWorkerId)
+      const w = workers.find((worker) => worker.id === newWorkerId)
 
       if (w) {
         setNewWorker(w)
@@ -176,7 +251,7 @@ export const ReplacementSlideover = ({
                         )}
                       >
                         {field.value
-                          ? allWorkers?.find((worker) => worker.id === field.value)?.full_name
+                          ? workers?.find((worker) => worker.id === field.value)?.full_name
                           : 'Selecione um funcionário'}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -190,9 +265,14 @@ export const ReplacementSlideover = ({
                             setQueryString(s)
                           }}
                         />
-                        <CommandEmpty>Funcionário não encontrado.</CommandEmpty>
-                        <CommandGroup>
-                          {allWorkers?.map((worker: Worker) => (
+                        <CommandEmpty searchTarget="Funcionário">Funcionário não encontrado.</CommandEmpty>
+                        <CommandGroup
+                          onScroll={(event) => {
+                            if (!hasMoreData) return
+                            handleScroll(event.target)
+                          }}
+                        >
+                          {workers?.map((worker: Worker) => (
                             <CommandItem
                               value={JSON.stringify([
                                 worker.full_name,
@@ -242,6 +322,19 @@ export const ReplacementSlideover = ({
                             </CommandItem>
                           ))}
                         </CommandGroup>
+                        {!hasMoreData && !isFetching && workers?.length > 0 && (
+                          <div className="w-full flex justify-center items-center my-[32px]">
+                            <strong>Sem mais resultados...</strong>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="hover:bg-transparent p-[.5rem]"
+                              onClick={() => setWorkersPage('1')}
+                            >
+                              Voltar para o ínicio da lista
+                            </Button>
+                          </div>
+                        )}
                       </Command>
                     </PopoverContent>
                   </Popover>

@@ -10,7 +10,7 @@ import {
 import { EventDay } from '@/pages/Events.defs'
 import { Worker } from '@/pages/Workers.defs'
 import { queryClient } from '@/routes'
-import { WORKER_STATUS, checkIfStatusKeyword } from '@/utils/constants'
+import { WORKER_STATUS } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
 import { cn } from '@/utils/styles'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -52,7 +52,7 @@ export const AttachWorkerToEventDaySlideover = ({
   const {
     comboboxParameters: { debouncedSearchTerm },
   } = useDebounceSearch({
-    searchTerm: checkIfStatusKeyword({ value: queryString?.toLowerCase(), hasColumnStatus: true }),
+    searchTerm: queryString,
     isComboboxOpen: isWorkersComboBoxOpen,
   })
 
@@ -105,6 +105,7 @@ export const AttachWorkerToEventDaySlideover = ({
     data: pages,
     fetchNextPage,
     fetchPreviousPage,
+    isFetching,
   } = useInfiniteQuery(
     infiniteWorkersQueryOptions(
       isOpen,
@@ -126,7 +127,7 @@ export const AttachWorkerToEventDaySlideover = ({
     } else {
       setHasMoreData(false)
     }
-  }, [pages?.nextPage])
+  }, [pages?.nextPage, pages?.currentPage, pages?.lastPage])
 
   useEffect(() => {
     setWorkersPage('1')
@@ -143,7 +144,7 @@ export const AttachWorkerToEventDaySlideover = ({
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const handleScroll = (target: any) => {
     const { offsetHeight, scrollTop, scrollHeight } = target
-    if (hasMoreData && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
+    if (pages?.nextPage && isScrolledToBottom(offsetHeight, scrollTop, scrollHeight)) {
       try {
         fetchNextPage()
         setWorkersPage((page) => String(Number(page) + 1))
@@ -207,64 +208,83 @@ export const AttachWorkerToEventDaySlideover = ({
                           }}
                         />
                         <CommandEmpty searchTarget="funcionário">Funcionário não encontrado.</CommandEmpty>
-                        <CommandGroup onScroll={(event) => handleScroll(event.target)}>
-                          {workers.map((worker: Worker) => (
-                            <CommandItem
-                              value={JSON.stringify([
-                                worker.full_name,
-                                worker.cpf,
-                                worker.role,
-                                worker.company?.name,
-                                worker.rg,
-                                worker.email,
-                                checkIfStatusKeyword({ value: worker.status.toLowerCase(), isCombobox: true }),
-                              ])}
-                              key={worker.id}
-                              className={cn(
-                                'group cursor-pointer flex gap-2',
-                                field.value.includes(worker.id) && 'bg-success-500/10 text-gray-800',
-                              )}
-                              onSelect={() => {
-                                if (field.value.includes(worker.id)) {
-                                  form.setValue(
-                                    'workers_id',
-                                    field.value.filter((workerId) => workerId !== worker.id),
-                                  )
-                                  return
-                                }
-
-                                form.setValue('eventId', eventId)
-                                form.setValue('event_day_id', eventDayId)
-                                form.setValue('workers_id', [...field.value, worker.id])
-                              }}
-                            >
-                              <Check
+                        <CommandGroup
+                          onScroll={(event) => {
+                            if (!hasMoreData) return
+                            handleScroll(event.target)
+                          }}
+                        >
+                          {workers.map((worker: Worker) => {
+                            return (
+                              <CommandItem
+                                value={JSON.stringify([
+                                  worker.full_name,
+                                  worker.cpf,
+                                  worker.role,
+                                  worker.company?.name,
+                                  worker.rg,
+                                  worker.email,
+                                ])}
+                                key={worker.id}
                                 className={cn(
-                                  'mr-2 h-4 w-4',
-                                  field.value.includes(worker.id) ? 'opacity-100' : 'opacity-0',
+                                  'group cursor-pointer flex gap-2',
+                                  field.value.includes(worker.id) && 'bg-success-500/10 text-gray-800',
                                 )}
-                              />
-                              <Avatar>
-                                <AvatarImage src={worker.picture_url} />
-                                <AvatarFallback>
-                                  {worker.full_name
-                                    .split(' ')
-                                    .map((name) => name[0])
-                                    .join('')}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex flex-col">
-                                <span>
-                                  <strong>{worker.full_name}</strong>
-                                  <span className="text-xs text-gray-500 group-hover:text-white">({worker.cpf})</span>
-                                </span>
-                                <span className="text-xs">
-                                  {worker.role} em {worker.company?.name}
-                                </span>
-                              </div>
-                            </CommandItem>
-                          ))}
+                                onSelect={() => {
+                                  if (field.value.includes(worker.id)) {
+                                    form.setValue(
+                                      'workers_id',
+                                      field.value.filter((workerId) => workerId !== worker.id),
+                                    )
+                                    return
+                                  }
+
+                                  form.setValue('eventId', eventId)
+                                  form.setValue('event_day_id', eventDayId)
+                                  form.setValue('workers_id', [...field.value, worker.id])
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    field.value.includes(worker.id) ? 'opacity-100' : 'opacity-0',
+                                  )}
+                                />
+                                <Avatar>
+                                  <AvatarImage src={worker.picture_url} />
+                                  <AvatarFallback>
+                                    {worker.full_name
+                                      .split(' ')
+                                      .map((name) => name[0])
+                                      .join('')}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                  <span>
+                                    <strong>{worker.full_name}</strong>
+                                    <span className="text-xs text-gray-500 group-hover:text-white">({worker.cpf})</span>
+                                  </span>
+                                  <span className="text-xs">
+                                    {worker.role} em {worker.company?.name}
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            )
+                          })}
                         </CommandGroup>
+                        {!hasMoreData && !isFetching && workers?.length > 0 && (
+                          <div className="w-full flex justify-center items-center my-[32px]">
+                            <strong>Sem mais resultados...</strong>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              className="hover:bg-transparent p-[.5rem]"
+                              onClick={() => setWorkersPage('1')}
+                            >
+                              Voltar para o ínicio da lista
+                            </Button>
+                          </div>
+                        )}
                       </Command>
                     </PopoverContent>
                   </Popover>
