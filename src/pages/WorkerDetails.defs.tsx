@@ -110,13 +110,13 @@ export const editWorkerInitialValues = (worker: SingleWorkerResponse) => {
     emergency_number: worker?.data.emergency_number,
     role: worker?.data.role,
     company_id: worker?.data.company?.id,
-    street: worker?.data.address.street,
-    complement: worker?.data.address.complement,
-    number: worker?.data.address.number,
-    cep: worker?.data.address.cep,
-    neighborhood: worker?.data.address.neighborhood,
-    city: worker?.data.address.city,
-    uf: worker?.data.address.uf,
+    street: worker?.data?.address?.street,
+    complement: worker?.data?.address?.complement,
+    number: worker?.data?.address?.number,
+    cep: worker?.data?.address?.cep,
+    neighborhood: worker?.data?.address?.neighborhood,
+    city: worker?.data?.address?.city,
+    uf: worker?.data?.address?.uf,
   }
 
   return initialValues

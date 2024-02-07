@@ -7,7 +7,6 @@ import { Company } from './Companies.defs'
 
 export const CreateWorkerSchema = z.object({
   full_name: z.string().min(2, { message: 'Nome deve conter pelo menos 2 caracteres.' }),
-  email: z.union([z.string().email({ message: 'Email inválido.' }), z.literal('')]),
   cpf: z.string().refine(
     (v) => {
       return CPF_REGEXP.test(v.toString())
@@ -15,40 +14,51 @@ export const CreateWorkerSchema = z.object({
     { message: 'CPF inválido' },
   ),
   rg: z.string(),
-  phone_number: z.string().refine(
-    (v) => {
-      return PHONE_REGEXP.test(v.toString())
-    },
-    { message: 'Celular inválido' },
-  ),
   role: z.string().min(2, { message: 'Cargo inválido.' }),
   status: z.nativeEnum(WORKER_STATUS),
-  issuing_agency: z.string(),
-  issuing_state: z.nativeEnum(UF_LIST),
-  issuing_date: z.string(),
-  emergency_name: z.string(),
-  emergency_number: z.string().refine(
-    (v) => {
-      return PHONE_REGEXP.test(v.toString())
-    },
-    { message: 'Celular inválido' },
-  ),
   company_id: z.string().uuid({ message: 'Empresa inválida.' }).min(1, { message: 'Empresa inválida.' }),
-  street: z.string().min(2, { message: 'Rua deve conter pelo menos 2 caracteres.' }),
-  complement: z.string(),
-  number: z.number().min(1, { message: 'Número inválido.' }),
-  picture: z.any(),
-  city: z.string().min(2, { message: 'Cidade inválida.' }),
-  uf: z.nativeEnum(UF_LIST),
-  cep: z.string().refine(
-    (v) => {
-      return CEP_REGEXP.test(v.toString())
-    },
-    {
-      message: 'CEP inválido',
-    },
+
+  email: z.union([z.optional(z.string().email({ message: 'Email inválido.' })), z.literal('')]),
+  phone_number: z.optional(
+    z.string().refine(
+      (v) => {
+        return PHONE_REGEXP.test(v.toString()) || v === ''
+      },
+      { message: 'Celular inválido' },
+    ),
   ),
-  neighborhood: z.string().min(2, { message: 'Bairro inválido.' }),
+  issuing_agency: z.optional(z.string()),
+  issuing_state: z.optional(z.nativeEnum(UF_LIST)),
+  issuing_date: z.optional(z.string()),
+  emergency_name: z.optional(z.string()),
+  emergency_number: z.optional(
+    z.string().refine(
+      (v) => {
+        return PHONE_REGEXP.test(v.toString()) || v === ''
+      },
+      { message: 'Celular inválido' },
+    ),
+  ),
+  street: z.string().optional(),
+  complement: z.string().optional(),
+  number: z.union([z.number().optional(), z.literal('')]),
+  picture: z.any(),
+  city: z.union([z.optional(z.string().min(2, { message: 'Cidade inválida.' })), z.literal('')]),
+  uf: z.optional(z.nativeEnum(UF_LIST)),
+  cep: z.union([
+    z.optional(
+      z.string().refine(
+        (v) => {
+          return CEP_REGEXP.test(v.toString()) || ''
+        },
+        {
+          message: 'CEP inválido',
+        },
+      ),
+    ),
+    z.literal(''),
+  ]),
+  neighborhood: z.optional(z.string().min(2, { message: 'Bairro inválido.' })),
 })
 
 export const CreateWorkerSchemaWithOptionalFields = z.object({
@@ -64,8 +74,8 @@ export const CreateWorkerSchemaWithOptionalFields = z.object({
     .optional(),
   rg: z.string().optional(),
   email: z.union([z.string().email({ message: 'Email inválido.' }), z.literal('')]).optional(),
-  issuing_agency: z.string().optional(),
-  issuing_state: z.nativeEnum(UF_LIST).optional(),
+  issuing_agency: z.optional(z.string()),
+  issuing_state: z.optional(z.nativeEnum(UF_LIST)),
   issuing_date: z.string().optional(),
 })
 
@@ -78,24 +88,26 @@ export const workerInitialValues: CreateWorkerBody = {
   full_name: '',
   cpf: '',
   rg: '',
-  email: '',
-  phone_number: '',
-  picture: '',
   company_id: '',
   role: '',
   status: 'active',
-  issuing_agency: '',
-  issuing_state: 'AC',
-  issuing_date: '',
-  emergency_name: '',
-  emergency_number: '',
-  street: '',
-  complement: '',
-  cep: '',
-  city: '',
-  neighborhood: '',
-  number: 0,
-  uf: 'AC',
+
+  phone_number: undefined,
+
+  picture: undefined,
+  email: undefined,
+  issuing_agency: undefined,
+  issuing_state: undefined,
+  issuing_date: undefined,
+  emergency_name: undefined,
+  emergency_number: undefined,
+  street: undefined,
+  complement: undefined,
+  cep: undefined,
+  city: undefined,
+  neighborhood: undefined,
+  number: undefined,
+  uf: undefined,
 }
 
 export interface WorkerSheet {

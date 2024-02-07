@@ -5,7 +5,7 @@ import { WorkerStatus } from '@/utils/constants'
 import { Pagination } from '@/utils/types'
 import { api } from '../api'
 
-export const useGetAddresByCep = (cep: string) => {
+export const useGetAddresByCep = (cep?: string) => {
   const query = useQuery({
     queryKey: ['address', cep],
     queryFn: async () => {
@@ -13,7 +13,7 @@ export const useGetAddresByCep = (cep: string) => {
       return data
     },
     refetchOnWindowFocus: false,
-    enabled: cep.length === 9,
+    enabled: cep?.length === 9,
   })
 
   return { ...query }

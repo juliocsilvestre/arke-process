@@ -129,7 +129,9 @@ export const WorkersPage = (): JSX.Element => {
   const onCreateWorker = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
-        const date = format(parse(values.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd')
+        const date = values.issuing_date
+          ? format(parse(values.issuing_date, 'dd/MM/yyyy', new Date()), 'yyyy-MM-dd')
+          : undefined
 
         if (workerToEdit) {
           await updateWorker({ ...values, issuing_date: date })
@@ -242,7 +244,7 @@ export const WorkersPage = (): JSX.Element => {
 
   const cep = form.watch('cep')
   useEffect(() => {
-    if (cep.length !== 9) return
+    if (cep?.length !== 9) return
 
     if (Object.keys(data ?? {})?.length > 0) {
       form.setValue('street', data.logradouro)
@@ -670,11 +672,12 @@ export const WorkersPage = (): JSX.Element => {
                       )}
                     />
                     <FormField
+                      disabled
                       control={form.control}
                       name="issuing_agency"
                       render={({ field }) => (
                         <FormItem className="w-[25%]">
-                          <Label htmlFor="issuing_agency" label="Órgão expedidor" isrequired />
+                          <Label htmlFor="issuing_agency" label="Órgão expedidor" />
                           <FormControl>
                             <Input id="issuing_agency" placeholder="ex: SDS" {...field} size="md" />
                           </FormControl>
@@ -683,11 +686,12 @@ export const WorkersPage = (): JSX.Element => {
                       )}
                     />
                     <FormField
+                      disabled
                       control={form.control}
                       name="issuing_state"
                       render={({ field }) => (
                         <FormItem className="w-[10%]">
-                          <Label htmlFor="issuing_state" label="UF" isrequired />
+                          <Label htmlFor="issuing_state" label="UF" />
                           <FormControl>
                             <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
                               <SelectTrigger className="w-full">
@@ -709,11 +713,12 @@ export const WorkersPage = (): JSX.Element => {
                       )}
                     />
                     <FormField
+                      disabled
                       control={form.control}
                       name="issuing_date"
                       render={({ field }) => (
                         <FormItem className="w-[25%]">
-                          <Label htmlFor="issuing_date" label="Data de emissão" isrequired />
+                          <Label htmlFor="issuing_date" label="Data de emissão" />
                           <FormControl>
                             <Input
                               id="issuing_date"
@@ -739,6 +744,7 @@ export const WorkersPage = (): JSX.Element => {
 
                   <div className="flex gap-2">
                     <FormField
+                      disabled
                       control={form.control}
                       name="email"
                       render={({ field }) => (
@@ -757,7 +763,7 @@ export const WorkersPage = (): JSX.Element => {
                       name="phone_number"
                       render={({ field }) => (
                         <FormItem className="w-[40%]">
-                          <Label htmlFor="phone_number" label="Celular/Whatsapp" isrequired />
+                          <Label htmlFor="phone_number" label="Celular/Whatsapp" />
                           <FormControl>
                             <Input
                               id="phone_number"
@@ -864,11 +870,12 @@ export const WorkersPage = (): JSX.Element => {
 
               <div className="flex gap-2">
                 <FormField
+                  disabled
                   control={form.control}
                   name="emergency_name"
                   render={({ field }) => (
                     <FormItem className="w-[40%]">
-                      <Label htmlFor="emergency_name" label="Nome do contato de emergência" isrequired />
+                      <Label htmlFor="emergency_name" label="Nome do contato de emergência" />
                       <FormControl>
                         <Input id="emergency_name" placeholder="Insira o nome" {...field} size="md" />
                       </FormControl>
@@ -878,6 +885,7 @@ export const WorkersPage = (): JSX.Element => {
                 />
 
                 <FormField
+                  disabled
                   control={form.control}
                   name="emergency_number"
                   render={({ field }) => (
@@ -906,14 +914,14 @@ export const WorkersPage = (): JSX.Element => {
                 />
               </div>
 
-              {/* <h4 className="text-2xl text-primary font-bold">Endereço</h4> */}
               <div className="flex gap-2">
                 <FormField
+                  disabled
                   control={form.control}
                   name="cep"
                   render={({ field }) => (
                     <FormItem className="w-[20%]">
-                      <Label htmlFor="cep" label="CEP" isrequired />
+                      <Label htmlFor="cep" label="CEP" />
                       <FormControl>
                         <Input
                           id="cep"
@@ -923,8 +931,6 @@ export const WorkersPage = (): JSX.Element => {
                           onBlur={(event) => {
                             if (event.target.value) {
                               form.trigger('cep')
-
-                              // TODO: fetch address by CEP
                             }
                           }}
                           onChange={(event) => {
@@ -939,11 +945,12 @@ export const WorkersPage = (): JSX.Element => {
                 />
 
                 <FormField
+                  disabled
                   control={form.control}
                   name="street"
                   render={({ field }) => (
                     <FormItem className="w-[70%]">
-                      <Label htmlFor="street" label="Rua" isrequired />
+                      <Label htmlFor="street" label="Rua" />
                       <FormControl>
                         <Input id="street" placeholder="Insira a rua" {...field} size="md" />
                       </FormControl>
@@ -953,11 +960,12 @@ export const WorkersPage = (): JSX.Element => {
                 />
 
                 <FormField
+                  disabled
                   control={form.control}
                   name="number"
                   render={({ field }) => (
                     <FormItem className="w-[20%]">
-                      <Label htmlFor="number" label="Número" isrequired />
+                      <Label htmlFor="number" label="Número" />
                       <FormControl>
                         <Input
                           id="number"
@@ -982,11 +990,12 @@ export const WorkersPage = (): JSX.Element => {
 
               <div className="flex gap-2">
                 <FormField
+                  disabled
                   control={form.control}
                   name="neighborhood"
                   render={({ field }) => (
                     <FormItem className="w-[30%]">
-                      <Label htmlFor="neighborhood" label="Bairro" isrequired />
+                      <Label htmlFor="neighborhood" label="Bairro" />
                       <FormControl>
                         <Input id="neighborhood" placeholder="Insira o bairro" {...field} size="md" />
                       </FormControl>
@@ -996,6 +1005,7 @@ export const WorkersPage = (): JSX.Element => {
                 />
 
                 <FormField
+                  disabled
                   control={form.control}
                   name="complement"
                   render={({ field }) => (
@@ -1010,11 +1020,12 @@ export const WorkersPage = (): JSX.Element => {
                 />
 
                 <FormField
+                  disabled
                   control={form.control}
                   name="city"
                   render={({ field }) => (
                     <FormItem className="w-[30%]">
-                      <Label htmlFor="city" label="Cidade" isrequired />
+                      <Label htmlFor="city" label="Cidade" />
                       <FormControl>
                         <Input id="city" placeholder="Insira a cidade" {...field} size="md" />
                       </FormControl>
@@ -1024,11 +1035,12 @@ export const WorkersPage = (): JSX.Element => {
                 />
 
                 <FormField
+                  disabled
                   control={form.control}
                   name="uf"
                   render={({ field }) => (
                     <FormItem className="w-[10%]">
-                      <Label htmlFor="uf" label="UF" isrequired />
+                      <Label htmlFor="uf" label="UF" />
                       <FormControl>
                         <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
                           <SelectTrigger className="w-full">

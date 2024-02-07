@@ -110,7 +110,7 @@ export const WorkerDetailsPage = () => {
   }
 
   useEffect(() => {
-    if (cep.length !== 9) return
+    if (cep?.length !== 9) return
 
     if (Object.keys(data ?? {})?.length > 0) {
       form.setValue('street', data.logradouro)
@@ -329,7 +329,7 @@ export const WorkerDetailsPage = () => {
                   label="Rua"
                   className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
                 />
-                <span className="text-gray-600 font-normal">{worker?.data.address.street}</span>
+                <span className="text-gray-600 font-normal">{worker?.data?.address?.street}</span>
               </div>
               <div className="md:text-left worker-detail-field">
                 <Label
@@ -338,32 +338,32 @@ export const WorkerDetailsPage = () => {
                 >
                   Complemento:
                 </Label>
-                <span className="text-gray-600 font-normal">{worker?.data.address.complement}</span>
+                <span className="text-gray-600 font-normal">{worker?.data?.address?.complement}</span>
               </div>
               <div className="md:text-left worker-detail-field">
                 <Label label="UF" className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold" />
-                <span className="text-gray-600 font-normal">{worker?.data.address.uf}</span>
+                <span className="text-gray-600 font-normal">{worker?.data?.address?.uf}</span>
               </div>
               <div className="md:text-left worker-detail-field">
                 <Label
                   label="CEP"
                   className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
                 />
-                <span className="text-gray-600 font-normal">{worker?.data.address.cep}</span>
+                <span className="text-gray-600 font-normal">{worker?.data?.address?.cep}</span>
               </div>
               <div className="md:text-left worker-detail-field">
                 <Label
                   label="Bairro"
                   className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
                 />
-                <span className="text-gray-600 font-normal">{worker?.data.address.neighborhood}</span>
+                <span className="text-gray-600 font-normal">{worker?.data?.address?.neighborhood}</span>
               </div>
               <div className="md:text-left worker-detail-field">
                 <Label
                   label="Cidade"
                   className="inline mr-[4px] md:mr-0 md:block text-lg text-primary-600 font-semibold"
                 />
-                <span className="text-gray-600 font-normal">{worker?.data.address.city}</span>
+                <span className="text-gray-600 font-normal">{worker?.data?.address?.city}</span>
               </div>
             </div>
           </div>

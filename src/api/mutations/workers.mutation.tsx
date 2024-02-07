@@ -12,6 +12,7 @@ export const useCreateWorker = () => {
       const formData = new FormData()
 
       for (const [key, value] of Object.entries(worker)) {
+        if (!value) continue
         formData.append(key, value)
       }
 
