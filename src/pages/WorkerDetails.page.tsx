@@ -37,7 +37,7 @@ export const WorkerDetailsPage = () => {
   const [isCompanySelectOpen, setIsCompanySelectOpen] = useState(false)
   const [queryString, setQueryString] = useState('')
   const [companiesPage, setCompaniesPage] = useState('1')
-  const [, setHasMoreData] = useState(false)
+  const [hasMoreData, setHasMoreData] = useState(false)
   const [companies, setCompanies] = useState<Company[]>([])
 
   const workerId = useParams({
@@ -129,6 +129,7 @@ export const WorkerDetailsPage = () => {
     data: pages,
     fetchNextPage,
     fetchPreviousPage,
+    isFetching,
   } = useInfiniteQuery(
     infiniteCompaniesQueryOptions(isOpen, {
       page: companiesPage,
@@ -157,7 +158,7 @@ export const WorkerDetailsPage = () => {
     } else {
       setHasMoreData(false)
     }
-  }, [pages?.nextPage])
+  }, [pages?.nextPage, pages?.currentPage, pages?.lastPage])
 
   const isScrolledToBottom = (offsetHeight: number, scrollTop: number, scrollHeight: number) => {
     return offsetHeight + scrollTop >= scrollHeight
@@ -594,7 +595,12 @@ export const WorkerDetailsPage = () => {
                             <Command className="w-full">
                               <CommandInput placeholder="Fornecedor..." className="w-full" />
                               <CommandEmpty searchTarget="Fornecedor">Fornecedor não encontrado.</CommandEmpty>
-                              <CommandGroup onScroll={(event) => handleScroll(event.target)}>
+                              <CommandGroup
+                                onScroll={(event) => {
+                                  if (!hasMoreData) return
+                                  handleScroll(event.target)
+                                }}
+                              >
                                 {companies.map((company: Company) => (
                                   <CommandItem
                                     value={company.name}
@@ -614,6 +620,19 @@ export const WorkerDetailsPage = () => {
                                   </CommandItem>
                                 ))}
                               </CommandGroup>
+                              {!hasMoreData && !isFetching && companies?.length > 0 && (
+                                <div className="w-full flex justify-center items-center my-[32px]">
+                                  <strong>Sem mais resultados...</strong>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    className="hover:bg-transparent p-[.5rem]"
+                                    onClick={() => setCompaniesPage('1')}
+                                  >
+                                    Voltar para o ínicio da lista
+                                  </Button>
+                                </div>
+                              )}
                             </Command>
                           </PopoverContent>
                         </Popover>
