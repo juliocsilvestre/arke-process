@@ -328,7 +328,7 @@ export const WorkersPage = (): JSX.Element => {
       form.setValue('role', singleWorkerToEdit.role)
       form.setValue('emergency_name', singleWorkerToEdit.emergency_name)
       form.setValue('emergency_number', singleWorkerToEdit.emergency_number)
-      form.setValue('cep', singleWorkerToEdit.address.cep)
+      form.setValue('cep', singleWorkerToEdit.address?.cep)
       form.setValue('street', singleWorkerToEdit.address.street)
       form.setValue('number', singleWorkerToEdit.address.number)
       form.setValue('neighborhood', singleWorkerToEdit.address.neighborhood)
