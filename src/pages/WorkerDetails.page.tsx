@@ -14,7 +14,7 @@ import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { queryClient } from '@/routes'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE, UF_LIST, WORKER_STATUS, WORKER_STATUS_MAPPER } from '@/utils/constants'
 import { checkError } from '@/utils/errors'
-import { maskCEP, maskCPF, maskPhoneNumber } from '@/utils/strings'
+import { maskCEP, maskCPF, maskDate, maskPhoneNumber } from '@/utils/strings'
 import { cn } from '@/utils/styles'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@components/ui/Select'
 import { ArrowPathIcon, NoSymbolIcon, PaperClipIcon, UserIcon } from '@heroicons/react/24/solid'
@@ -382,9 +382,9 @@ export const WorkerDetailsPage = () => {
                 <div className="flex flex-row gap-10">
                   <div className="flex flex-col items-center">
                     <div className="w-full !shrink-0">
-                      {previewImageURL || picturePreview ? (
+                      {previewImageURL ? (
                         <img
-                          src={previewImageURL ?? picturePreview ?? ''}
+                          src={previewImageURL}
                           alt="Foto do funcionário"
                           className="mx-auto w-[200px] h-[200px] object-cover object-center rounded-full border border-solid border-primary-500 mb-1 shadow-lg !shrink-0"
                         />
@@ -407,7 +407,7 @@ export const WorkerDetailsPage = () => {
                             <PaperClipIcon className="w-5 text-primary-700" />
                             <Label
                               htmlFor="picture"
-                              label={picturePreview || previewImageURL ? 'Trocar foto' : 'Fazer upload de foto'}
+                              label={picturePreview ? 'Trocar foto' : 'Fazer upload de foto'}
                               className="italic font-normal"
                             />
                           </div>
@@ -455,7 +455,7 @@ export const WorkerDetailsPage = () => {
                         control={form.control}
                         name="full_name"
                         render={({ field }) => (
-                          <FormItem className="w-[100%]">
+                          <FormItem className="w-[60%]">
                             <Label htmlFor="full_name" label="Nome Completo" isrequired />
                             <FormControl>
                               <Input id="full_name" placeholder="Insira o nome completo" {...field} size="md" />
@@ -464,19 +464,16 @@ export const WorkerDetailsPage = () => {
                           </FormItem>
                         )}
                       />
-                    </div>
-
-                    <div className="flex gap-2">
                       <FormField
                         control={form.control}
                         name="cpf"
                         render={({ field }) => (
-                          <FormItem className="w-[50%]">
+                          <FormItem className="w-[40%]">
                             <Label htmlFor="cpf" label="CPF" isrequired />
                             <FormControl>
                               <Input
                                 id="cpf"
-                                placeholder="Insira seu CPF"
+                                placeholder="Insira o CPF"
                                 {...field}
                                 size="md"
                                 onBlur={(event) => {
@@ -494,16 +491,19 @@ export const WorkerDetailsPage = () => {
                           </FormItem>
                         )}
                       />
+                    </div>
+
+                    <div className="flex gap-2">
                       <FormField
                         control={form.control}
                         name="rg"
                         render={({ field }) => (
-                          <FormItem className="w-[50%]">
+                          <FormItem className="w-[30%]">
                             <Label htmlFor="rg" label="RG" isrequired />
                             <FormControl>
                               <Input
                                 id="rg"
-                                placeholder="Insira seu RG"
+                                placeholder="Insira o RG"
                                 {...field}
                                 size="md"
                                 onBlur={(event) => {
@@ -517,17 +517,87 @@ export const WorkerDetailsPage = () => {
                           </FormItem>
                         )}
                       />
+                      <FormField
+                        disabled
+                        control={form.control}
+                        name="issuing_agency"
+                        render={({ field }) => (
+                          <FormItem className="w-[25%]">
+                            <Label htmlFor="issuing_agency" label="Órgão expedidor" />
+                            <FormControl>
+                              <Input id="issuing_agency" placeholder="ex: SDS" {...field} size="md" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        disabled
+                        control={form.control}
+                        name="issuing_state"
+                        render={({ field }) => (
+                          <FormItem className="w-[10%]">
+                            <Label htmlFor="issuing_state" label="UF" />
+                            <FormControl>
+                              <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="UF" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    {Object.values(UF_LIST).map((uf) => (
+                                      <SelectItem key={uf} value={uf}>
+                                        {uf}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        disabled
+                        control={form.control}
+                        name="issuing_date"
+                        render={({ field }) => (
+                          <FormItem className="w-[25%]">
+                            <Label htmlFor="issuing_date" label="Data de emissão" />
+                            <FormControl>
+                              <Input
+                                id="issuing_date"
+                                placeholder="DD/MM/YYYY"
+                                {...field}
+                                size="md"
+                                onBlur={(event) => {
+                                  if (event.target.value) {
+                                    form.trigger('issuing_date')
+                                  }
+                                }}
+                                onChange={(event) => {
+                                  const date = maskDate(event.target.value)
+                                  form.setValue('issuing_date', date)
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
 
                     <div className="flex gap-2">
                       <FormField
+                        disabled
                         control={form.control}
                         name="email"
                         render={({ field }) => (
                           <FormItem className="w-[60%]">
                             <Label htmlFor="email" label="E-mail" />
                             <FormControl>
-                              <Input id="email" placeholder="Insira seu e-mail" {...field} size="md" />
+                              <Input id="email" placeholder="Insira o e-mail" {...field} size="md" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -539,11 +609,11 @@ export const WorkerDetailsPage = () => {
                         name="phone_number"
                         render={({ field }) => (
                           <FormItem className="w-[40%]">
-                            <Label htmlFor="phone_number" label="Celular/Whatsapp" isrequired />
+                            <Label htmlFor="phone_number" label="Celular/Whatsapp" />
                             <FormControl>
                               <Input
                                 id="phone_number"
-                                placeholder="Insira seu celular/whatsapp"
+                                placeholder="Insira o celular/whatsapp"
                                 {...field}
                                 size="md"
                                 onBlur={(event) => {
@@ -593,7 +663,13 @@ export const WorkerDetailsPage = () => {
                           </PopoverTrigger>
                           <PopoverContent className="w-[420px] p-0">
                             <Command className="w-full">
-                              <CommandInput placeholder="Fornecedor..." className="w-full" />
+                              <CommandInput
+                                placeholder="Fornecedor..."
+                                className="w-full"
+                                onValueChange={(s) => {
+                                  setQueryString(s)
+                                }}
+                              />
                               <CommandEmpty searchTarget="Fornecedor">Fornecedor não encontrado.</CommandEmpty>
                               <CommandGroup
                                 onScroll={(event) => {
@@ -658,11 +734,58 @@ export const WorkerDetailsPage = () => {
 
                 <div className="flex gap-2">
                   <FormField
+                    disabled
+                    control={form.control}
+                    name="emergency_name"
+                    render={({ field }) => (
+                      <FormItem className="w-[40%]">
+                        <Label htmlFor="emergency_name" label="Nome do contato de emergência" />
+                        <FormControl>
+                          <Input id="emergency_name" placeholder="Insira o nome" {...field} size="md" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    disabled
+                    control={form.control}
+                    name="emergency_number"
+                    render={({ field }) => (
+                      <FormItem className="w-[40%]">
+                        <Label htmlFor="emergency_number" label="Número do contato de emergência" isrequired />
+                        <FormControl>
+                          <Input
+                            id="emergency_number"
+                            placeholder="Insira o celular/whatsapp"
+                            {...field}
+                            size="md"
+                            onBlur={(event) => {
+                              if (event.target.value) {
+                                form.trigger('emergency_number')
+                              }
+                            }}
+                            onChange={(event) => {
+                              const phoneNumber = maskPhoneNumber(event.target.value)
+                              form.setValue('emergency_number', phoneNumber)
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <FormField
+                    disabled
                     control={form.control}
                     name="cep"
                     render={({ field }) => (
                       <FormItem className="w-[20%]">
-                        <Label htmlFor="cep" label="CEP" isrequired />
+                        <Label htmlFor="cep" label="CEP" />
                         <FormControl>
                           <Input
                             id="cep"
@@ -672,8 +795,6 @@ export const WorkerDetailsPage = () => {
                             onBlur={(event) => {
                               if (event.target.value) {
                                 form.trigger('cep')
-
-                                // TODO: fetch address by CEP
                               }
                             }}
                             onChange={(event) => {
@@ -688,11 +809,12 @@ export const WorkerDetailsPage = () => {
                   />
 
                   <FormField
+                    disabled
                     control={form.control}
                     name="street"
                     render={({ field }) => (
                       <FormItem className="w-[70%]">
-                        <Label htmlFor="street" label="Rua" isrequired />
+                        <Label htmlFor="street" label="Rua" />
                         <FormControl>
                           <Input id="street" placeholder="Insira a rua" {...field} size="md" />
                         </FormControl>
@@ -702,11 +824,12 @@ export const WorkerDetailsPage = () => {
                   />
 
                   <FormField
+                    disabled
                     control={form.control}
                     name="number"
                     render={({ field }) => (
                       <FormItem className="w-[20%]">
-                        <Label htmlFor="number" label="Número" isrequired />
+                        <Label htmlFor="number" label="Número" />
                         <FormControl>
                           <Input
                             id="number"
@@ -731,11 +854,12 @@ export const WorkerDetailsPage = () => {
 
                 <div className="flex gap-2">
                   <FormField
+                    disabled
                     control={form.control}
                     name="neighborhood"
                     render={({ field }) => (
                       <FormItem className="w-[30%]">
-                        <Label htmlFor="neighborhood" label="Bairro" isrequired />
+                        <Label htmlFor="neighborhood" label="Bairro" />
                         <FormControl>
                           <Input id="neighborhood" placeholder="Insira o bairro" {...field} size="md" />
                         </FormControl>
@@ -745,6 +869,7 @@ export const WorkerDetailsPage = () => {
                   />
 
                   <FormField
+                    disabled
                     control={form.control}
                     name="complement"
                     render={({ field }) => (
@@ -759,11 +884,12 @@ export const WorkerDetailsPage = () => {
                   />
 
                   <FormField
+                    disabled
                     control={form.control}
                     name="city"
                     render={({ field }) => (
                       <FormItem className="w-[30%]">
-                        <Label htmlFor="city" label="Cidade" isrequired />
+                        <Label htmlFor="city" label="Cidade" />
                         <FormControl>
                           <Input id="city" placeholder="Insira a cidade" {...field} size="md" />
                         </FormControl>
@@ -773,11 +899,12 @@ export const WorkerDetailsPage = () => {
                   />
 
                   <FormField
+                    disabled
                     control={form.control}
                     name="uf"
                     render={({ field }) => (
                       <FormItem className="w-[10%]">
-                        <Label htmlFor="uf" label="UF" isrequired />
+                        <Label htmlFor="uf" label="UF" />
                         <FormControl>
                           <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
                             <SelectTrigger className="w-full">

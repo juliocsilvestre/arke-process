@@ -4,7 +4,7 @@ import { WORKER_STATUS } from '@/utils/constants'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '../api'
 import { indexWorkersPerEventDayQueryOptions } from '../queries/events.query'
-import { indexWorkersQueryOptions } from '../queries/workers.query'
+import { getSingleWorkerQueryOptions, indexWorkersQueryOptions } from '../queries/workers.query'
 
 export const useCreateWorker = () => {
   const mutation = useMutation({
@@ -35,6 +35,7 @@ export const useEditWorker = (workerId?: string) => {
       const formData = new FormData()
 
       for (const [key, value] of Object.entries(worker)) {
+        if (!value) continue
         formData.append(key, value)
       }
 
@@ -46,6 +47,9 @@ export const useEditWorker = (workerId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(indexWorkersQueryOptions({ page: '1', q: '' }))
+      if (workerId) {
+        queryClient.invalidateQueries(getSingleWorkerQueryOptions(workerId))
+      }
     },
   })
 
