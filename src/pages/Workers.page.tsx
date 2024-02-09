@@ -127,6 +127,10 @@ export const WorkersPage = (): JSX.Element => {
 
   const { mutateAsync: updateWorker } = useEditWorker(workerToEdit?.id)
 
+  useEffect(() => {
+    console.log(form.formState.errors)
+  }, [form.formState.errors])
+
   const onCreateWorker = useCallback(
     async (values: CreateWorkerBody): Promise<void> => {
       try {
@@ -315,7 +319,9 @@ export const WorkersPage = (): JSX.Element => {
       form.setValue('cpf', singleWorkerToEdit?.cpf)
       form.setValue('rg', singleWorkerToEdit?.rg)
       form.setValue('issuing_agency', singleWorkerToEdit?.issuing_agency)
-      form.setValue('issuing_state', singleWorkerToEdit?.issuing_state as keyof typeof UF_LIST)
+      if (singleWorkerToEdit?.issuing_state) {
+        form.setValue('issuing_state', singleWorkerToEdit?.issuing_state as keyof typeof UF_LIST)
+      }
       form.setValue(
         'issuing_date',
         singleWorkerToEdit.issuing_date
@@ -678,7 +684,7 @@ export const WorkersPage = (): JSX.Element => {
                       name="rg"
                       render={({ field }) => (
                         <FormItem className="w-[30%]">
-                          <Label htmlFor="rg" label="RG" isrequired />
+                          <Label htmlFor="rg" label="RG" />
                           <FormControl>
                             <Input
                               id="rg"

@@ -9,7 +9,7 @@ export const EditWorkerSchema = z.object({
     },
     { message: 'CPF inválido' },
   ),
-  rg: z.string(),
+  rg: z.any(),
   role: z.string().min(2, { message: 'Cargo inválido.' }),
 
   email: z.string().optional(),
@@ -68,7 +68,7 @@ export interface WorkerDetails {
   company_id: string | undefined
   admin_id: string | undefined
   issuing_agency: string | undefined
-  issuing_state: UF
+  issuing_state: UF | undefined
   issuing_date: string | undefined
   emergency_name: string | undefined
   emergency_number: string | undefined
@@ -105,13 +105,13 @@ export const editWorkerInitialValues = (worker: SingleWorkerResponse) => {
   const initialValues = {
     full_name: worker?.data.full_name,
     cpf: worker?.data.cpf,
-    rg: worker?.data.rg,
+    rg: worker?.data.rg ?? undefined,
     phone_number: worker?.data.phone_number ?? undefined,
     email: worker?.data.email ?? undefined,
     picture: worker?.data.picture_url,
     status: worker?.data.status,
     issuing_agency: worker?.data.issuing_agency,
-    issuing_state: worker?.data.issuing_state,
+    issuing_state: worker?.data.issuing_state ?? undefined,
     issuing_date: worker?.data.issuing_date,
     emergency_name: worker?.data.emergency_name,
     emergency_number: worker?.data.emergency_number,

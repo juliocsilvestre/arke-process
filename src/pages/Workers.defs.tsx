@@ -13,20 +13,13 @@ export const CreateWorkerSchema = z.object({
     },
     { message: 'CPF inválido' },
   ),
-  rg: z.string(),
+  rg: z.any(),
   role: z.string().min(2, { message: 'Cargo inválido.' }),
   status: z.nativeEnum(WORKER_STATUS),
   company_id: z.string().uuid({ message: 'Empresa inválida.' }).min(1, { message: 'Empresa inválida.' }),
 
-  email: z.union([z.optional(z.string().email({ message: 'Email inválido.' })), z.literal('')]),
-  phone_number: z.optional(
-    z.string().refine(
-      (v) => {
-        return PHONE_REGEXP.test(v.toString()) || v === ''
-      },
-      { message: 'Celular inválido' },
-    ),
-  ),
+  email: z.optional(z.string().email({ message: 'Email inválido.' })),
+  phone_number: z.any(),
   issuing_agency: z.optional(z.string()),
   issuing_state: z.optional(z.nativeEnum(UF_LIST)),
   issuing_date: z.optional(z.string()),
@@ -73,7 +66,7 @@ export const CreateWorkerSchemaWithOptionalFields = z.object({
     )
     .optional(),
   rg: z.string().optional(),
-  email: z.union([z.string().email({ message: 'Email inválido.' }), z.literal('')]).optional(),
+  email: z.optional(z.string().email({ message: 'Email inválido.' })),
   issuing_agency: z.optional(z.string()),
   issuing_state: z.optional(z.nativeEnum(UF_LIST)),
   issuing_date: z.string().optional(),
@@ -87,7 +80,7 @@ export type BulkWorkerBodyKeys = z.infer<typeof CreateWorkerSchemaWithOptionalFi
 export const workerInitialValues: CreateWorkerBody = {
   full_name: '',
   cpf: '',
-  rg: '',
+  rg: undefined,
   company_id: '',
   role: '',
   status: 'active',
@@ -118,7 +111,7 @@ export interface WorkerSheet {
   Cidade: string
   Complemento: string
   Número: string
-  RG: string
+  RG: string | undefined
   Rua: string
   UF: string
   'URL da foto': string
@@ -136,10 +129,10 @@ export interface Worker {
   id: string
   full_name: string
   cpf: string
-  rg: string
+  rg: string | undefined
   email: string
   issuing_agency: string
-  issuing_state: string
+  issuing_state: string | undefined
   issuing_date: string
   emergency_name: string
   emergency_number: string
