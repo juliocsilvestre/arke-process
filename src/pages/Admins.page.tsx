@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { DataTable } from '@/components/ui/DataTable'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select'
 import { SlideOver, SlideOverFooter } from '@/components/ui/Slideover'
 import { useDebounceSearch } from '@/hooks/useDebounceSearch'
 import { useAuthStore } from '@/store/auth.store'
@@ -21,7 +22,15 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Tooltip } from 'react-tooltip'
 import { toast } from 'sonner'
-import { Admin, AdminBodyKeys, CreateAdminBody, CreateAdminSchema, adminsColumns } from './Admins.defs'
+import {
+  Admin,
+  AdminBodyKeys,
+  CreateAdminBody,
+  CreateAdminSchema,
+  UserRole,
+  UserRoleOptions,
+  adminsColumns,
+} from './Admins.defs'
 
 export const AdminsPage = (): JSX.Element => {
   const { latestLocation } = useRouter()
@@ -36,6 +45,8 @@ export const AdminsPage = (): JSX.Element => {
       name: '',
       cpf: '',
       email: '',
+      password: '',
+      role: UserRole.ADMIN,
     },
   })
 
@@ -101,18 +112,22 @@ export const AdminsPage = (): JSX.Element => {
   )
 
   const handleOnClose = () => {
+    form.reset()
+    form.resetField('password')
+
     setIsOpen(false)
     setAdminToEdit(null)
-    form.reset()
   }
 
   useEffect(() => {
     if (adminToEdit) {
       form.setValue('name', adminToEdit?.name ?? '')
       form.setValue('cpf', adminToEdit?.cpf ?? '')
+      form.setValue('role', adminToEdit?.role ?? UserRole.ADMIN)
       form.setValue('email', adminToEdit?.email ?? '')
     }
   }, [adminToEdit])
+
   return (
     <section className="bg-gray-50 min-h-screen overflow-y-auto p-4 md:p-10">
       <div className="mx-auto flex flex-col md:flex-row md:items-center justify-between">
@@ -184,6 +199,33 @@ export const AdminsPage = (): JSX.Element => {
                     <Label htmlFor="email" label="E-mail" />
                     <FormControl>
                       <Input id="email" placeholder="Insira seu e-mail" {...field} size="lg" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="role" label="Papel" />
+                    <FormControl>
+                      <Select {...field} onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecione o papel" className="[&_span]:text-gray-300" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            {Object.values(UserRoleOptions).map((role) => (
+                              <SelectItem key={role.value} value={role.value}>
+                                {role.label}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -2,12 +2,23 @@ import { ColumnDef } from '@tanstack/react-table'
 import { CPF_REGEXP, formatDate } from '@utils/constants'
 import * as z from 'zod'
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
+export const UserRoleOptions = [
+  { value: UserRole.ADMIN, label: 'Administrador' },
+  { value: UserRole.USER, label: 'Usuário' },
+]
+
 export const CreateAdminSchema = z.object({
   name: z
     .string()
     .min(3, { message: 'Nome deve conter pelo menos 3 caracteres.' })
     .max(50, { message: 'Nome deve conter no máximo 50 caracteres.' }),
   email: z.union([z.string().email(), z.literal('')]),
+  role: z.nativeEnum(UserRole),
   cpf: z.string().refine(
     (cpf) => {
       return CPF_REGEXP.test(cpf.toString())
@@ -47,6 +58,7 @@ export interface Admin {
   id: string
   name: string
   cpf: string
+  role: UserRole
   email: string
   created_at: Date
   updated_at: Date
@@ -60,6 +72,19 @@ export const adminsColumns: ColumnDef<Admin>[] = [
   {
     accessorKey: 'cpf',
     header: 'CPF',
+  },
+  {
+    accessorKey: 'role',
+    header: 'Papel',
+    cell: ({ row }) => {
+      const role = row.getValue('role')
+
+      if (role === UserRole.ADMIN) {
+        return 'Administrador'
+      }
+
+      return 'Usuário'
+    },
   },
   {
     accessorKey: 'email',
