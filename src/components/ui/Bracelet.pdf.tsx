@@ -26,7 +26,7 @@ export const BraceletPDF = ({ qrcode, worker }: { qrcode: string; worker: Worker
       >
         <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <Image style={{ width: 69 }} src={staff} />
-          <Image style={{ width: 100, marginLeft: 10 }} src={LadeiraLogo} />
+          {/* <Image style={{ width: 100, marginLeft: 10 }} src={LadeiraLogo} /> */}
         </View>
         <View style={{ marginLeft: 20 }}>
           <Image style={{ width: 69, height: 69 }} src={`data:image/png;base64, ${qrcode}`} />
@@ -38,9 +38,7 @@ export const BraceletPDF = ({ qrcode, worker }: { qrcode: string; worker: Worker
           <Text style={{ fontSize: 14 }}>{worker.role}</Text>
           <Text style={{ fontSize: 14 }}>{worker.company?.name}</Text>
         </View>
-        <View style={{ marginLeft: 20 }}>
-          <Image style={{ width: 100 }} src={LadeiraLogo} />
-        </View>
+        <View style={{ marginLeft: 20 }}>{/* <Image style={{ width: 100 }} src={LadeiraLogo} /> */}</View>
       </View>
     </Page>
   </Document>
