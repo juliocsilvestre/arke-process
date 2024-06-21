@@ -1,6 +1,6 @@
 import { Worker } from '@/pages/Workers.defs'
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
-import LadeiraLogo from '../../assets/ladeira.png'
+// import LadeiraLogo from '../../assets/ladeira.png'
 import staff from '../../assets/staff.png'
 
 // Create styles
