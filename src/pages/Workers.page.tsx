@@ -286,6 +286,7 @@ export const WorkersPage = (): JSX.Element => {
         const workersWithParsedIssuingDate = serializedJson.map((worker) => {
           return {
             ...worker,
+            rg: String(worker.rg),
           }
         })
 
@@ -317,7 +318,7 @@ export const WorkersPage = (): JSX.Element => {
     if (singleWorkerToEdit) {
       form.setValue('full_name', singleWorkerToEdit.full_name)
       form.setValue('cpf', singleWorkerToEdit?.cpf)
-      form.setValue('rg', singleWorkerToEdit?.rg)
+      form.setValue('rg', String(singleWorkerToEdit?.rg))
       form.setValue('issuing_agency', singleWorkerToEdit?.issuing_agency)
       if (singleWorkerToEdit?.issuing_state) {
         form.setValue('issuing_state', singleWorkerToEdit?.issuing_state as keyof typeof UF_LIST)
