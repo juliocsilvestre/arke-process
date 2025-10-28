@@ -638,6 +638,6 @@ This project is under the MIT license. See the [LICENSE](LICENSE) file for more 
 ---
 
 <div align="center">
-  <strong>Developed with ❤️ for unforgettable events</strong><br>
-  <strong>Desenvolvido com ❤️ para eventos inesquecíveis</strong>
+  <strong>Developed by init1 for unforgettable events</strong><br>
+  <strong>Desenvolvido por init1 para eventos inesquecíveis</strong>
 </div>
